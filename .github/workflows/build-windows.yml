@@ -1,0 +1,62 @@
+name: Build Ray Client (Windows Installer)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build portable executable
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "Ray Client" ray_client.py
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\ray-client.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (!(Test-Path "release/Ray-Client-Setup.exe")) { throw "Installer was not created at release/Ray-Client-Setup.exe" }
+          if (!(Test-Path "dist/Ray Client.exe")) { throw "Portable executable was not created at dist/Ray Client.exe" }
+
+      - name: Upload installer and portable app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ray-Client-Windows-Downloads
+          path: |
+            release/Ray-Client-Setup.exe
+            dist/Ray Client.exe
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Publish GitHub Release on version tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/Ray-Client-Setup.exe
+            dist/Ray Client.exe
+          generate_release_notes: true
