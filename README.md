@@ -1,24 +1,18 @@
-# Ray Client 2.0
+# Ray Client Launcher 3.0
 
-A dark-blue Minecraft Java launcher project with isolated instances, version library, managed Java runtime installation, mod-loader installation, Microsoft sign-in integration, offline profiles, configurable memory and interface scaling, and a GitHub Actions Windows installer build.
+A dark, pixel-styled Minecraft Java launcher with **Microsoft (premium) accounts and offline (cracked) accounts**, isolated instances, a version library, mod-loader installer (Fabric, Forge, NeoForge, Quilt), a mod manager and a live game console.
 
 ## Features
 
-- Browse Mojang's published Java Edition versions and install them.
-- Launch installed versions; first launch downloads missing game files and required Mojang-managed Java runtimes.
-- Request installation/checking of Mojang-managed Java runtimes from Settings.
-- Install supported Forge, NeoForge, Fabric, and Quilt loader profiles using `minecraft-launcher-lib`.
-- Microsoft sign-in flow using `minecraft-launcher-lib`.
-- Offline profile for single-player and servers that explicitly permit offline-mode connections.
-- Choose game directory and RAM allocation.
-- GitHub Actions workflow builds a Windows executable.
-
-## Requirements
-
-- Python 3.10+ to run from source.
-- Internet access for sign-in, version lists, game downloads, runtime downloads and mod-loader installation.
-- A Minecraft Java Edition entitlement for authenticated gameplay.
-- A Microsoft application Client ID configured by the project owner. See below.
+- **Accounts page** - keep several accounts and switch between them with one click.
+  - *Offline*: type a name and play. The UUID is generated the same way vanilla offline servers do it, so your worlds and inventories stay yours.
+  - *Microsoft*: device-code sign-in (no URL pasting). You get a code, enter it on microsoft.com/link, done. The refresh token is saved, so you stay signed in after a restart.
+- **Play page** modelled on the Ray Client main menu: one big PLAY button, version and instance pickers.
+- **Versions**: releases, snapshots, old versions, installed modded profiles; install, delete, filter and search.
+- **Mods**: install a loader (only the Minecraft versions it supports are offered), add / enable / disable / remove mod jars.
+- **Console**: live Minecraft output, crash detection, copy log.
+- **Instances**: separate game folders (mods, saves, versions) per instance.
+- **Settings**: RAM slider, Java path, JVM arguments, window size, minimise-while-playing, UI scale (Ctrl +/-).
 
 ## Run from source
 
@@ -26,83 +20,42 @@ A dark-blue Minecraft Java launcher project with isolated instances, version lib
 python -m pip install -r requirements.txt
 python ray_client.py
 ```
+Python 3.10+ with Tk (included in the python.org installer on Windows).
 
-## Microsoft sign-in configuration (required for sign-in)
+## Microsoft sign-in: one-time setup
 
-Microsoft authentication is not a magic switch: each launcher needs a registered app Client ID and correct redirect configuration, and Microsoft's/Minecraft's service permissions can affect whether a new app is allowed to authenticate Minecraft users.
+Offline accounts work immediately. For real Microsoft accounts the launcher needs **its own Azure app** (free):
 
-1. Register an application in the Microsoft/Azure app portal that supports personal Microsoft accounts.
-2. Configure a redirect URI supported by the application type and the `minecraft-launcher-lib` authentication flow. The current default is `http://localhost`; make the redirect URI match exactly in the app configuration and in Ray Client.
-3. In Ray Client, open **Settings** and enter the app's Client ID.
-4. If Minecraft Services rejects the app, follow the current `minecraft-launcher-lib` Microsoft Login tutorial and Microsoft's/Minecraft's permission requirements. Do not ask users for Microsoft passwords; the launcher opens Microsoft's own sign-in page.
-5. For production distribution, review current Microsoft identity platform policies and Minecraft API permission requirements before publishing.
+1. Azure portal -> *App registrations* -> *New registration*. Supported account types: **Personal Microsoft accounts only**. No redirect URI needed.
+2. In the app: *Authentication* -> enable **Allow public client flows**.
+3. Copy the *Application (client) ID* and paste it in **Accounts -> Add Microsoft** (or Settings). The in-app guide has buttons for the links.
+4. **Mojang must approve the app.** Submit the client ID in Mojang's form (https://aka.ms/AppRegistrationForm). Until it is approved, sign-in ends with `INVALID_REGISTRATION`; this is Mojang's rule for every third-party launcher, not a bug. Offline accounts keep working meanwhile.
 
-The sign-in flow asks the user to paste the URL they are redirected to. This avoids running a local callback server, but is less seamless than a polished native callback flow. The current starter keeps the access token in memory only, so a signed-in session may need to be re-established after restarting the app.
+If you distribute the launcher, set `DEFAULT_CLIENT_ID` in `ray_core.py` to your approved client ID. Players then never see this setup - only the "enter this code" screen.
 
-## Offline profile
+Passwords are never typed into Ray Client. Only refresh tokens are stored (`~/.ray-client/accounts.json`); short-lived game tokens stay in memory.
 
-Offline mode does not authenticate a Microsoft account. It is intended for single-player and servers configured to allow offline-mode connections. It will not authenticate on most online-mode servers or bypass account ownership checks. Do not use offline mode to impersonate another player.
+## Offline accounts
 
-## Java runtimes
+Offline mode does not verify ownership. It is meant for singleplayer and servers that run in offline mode. It does not work on online-mode servers.
 
-Minecraft version metadata may cause `minecraft-launcher-lib` to install the matching Mojang-managed runtime as part of installation. The Settings page also offers to install/check the managed runtimes known to the library. Some older mod loaders or unusual versions can still require additional Java troubleshooting.
+## Build for Windows
 
-## Mod loaders
+`.github/workflows/build-windows.yml` builds `Ray Client.exe` (portable) and `Ray-Client-Setup.exe` (installer). Run the workflow from the Actions tab, or push a tag such as `v3.0.0` to publish both files on the Releases page.
 
-The launcher uses `minecraft-launcher-lib`'s mod-loader support for Forge, NeoForge, Fabric and Quilt. Availability varies by Minecraft version. Mods are not bundled; install trusted mods that match the Minecraft version and loader.
-
-## Build Windows downloads (portable EXE + installer)
-
-The workflow `.github/workflows/build-windows.yml` creates both:
-- `Ray-Client-Setup.exe` — a normal Windows installer with Start Menu shortcut, optional desktop shortcut, and uninstall support.
-- `Ray Client.exe` — a portable executable that does not need to be installed.
-
-### Build and download from GitHub Actions
-1. Commit and push the project files to GitHub.
-2. Open the repository's **Actions** tab.
-3. Select **Build Ray Client (Windows Installer)**.
-4. Click **Run workflow** and wait for the green check mark.
-5. Open that workflow run and download **Ray-Client-Windows-Downloads** under Artifacts.
-6. Extract the downloaded artifact ZIP. Run `Ray-Client-Setup.exe` to install, or run `Ray Client.exe` as the portable version.
-
-### Important: Actions artifacts vs. GitHub Releases
-Running the workflow from the **Actions** tab creates a downloadable artifact named `Ray-Client-Windows-Downloads`. Open the completed run and find **Artifacts** near the bottom; download that ZIP and extract it to find both the installer and portable EXE.
-
-The repository's **Releases** page is different: it only gets installer assets when you push a version tag. Push a version tag such as `v2.1.0` after committing the workflow:
+Manual build:
 ```bash
-git tag v2.1.0
-git push origin v2.1.0
+pip install -r requirements.txt pyinstaller
+pyinstaller --noconfirm --clean --onefile --windowed --name "Ray Client" --icon assets/ray.ico --add-data "assets;assets" ray_client.py
 ```
-The workflow builds both files and attaches them to a GitHub Release automatically. People can then open your repository's **Releases** page and download `Ray-Client-Setup.exe` directly.
 
-The project ZIP itself does not contain a built Windows installer. GitHub Actions builds the Windows files on a Windows runner.
+## Files
 
-## Legal and branding notes
+| File | Purpose |
+|---|---|
+| `ray_client.py` | Application and all pages |
+| `ray_ui.py` | Theme, pixel font loading, custom widgets, dialogs, bolt logo |
+| `ray_core.py` | Config, accounts, Microsoft sign-in, helpers |
+| `assets/` | Silkscreen pixel font (SIL OFL, see `assets/fonts/OFL.txt`), icon |
 
-Ray Client is an unofficial third-party launcher and is not endorsed by Mojang or Microsoft. Minecraft is a trademark of its respective owner. The project does not bundle or redistribute Minecraft game files. Follow the Minecraft EULA, applicable terms, and third-party loader licenses. Review dependencies and generated builds before distributing them.
-
-## Troubleshooting
-
-- **Microsoft sign-in fails:** Check Client ID, app type, exact redirect URI and current Minecraft API permission requirements.
-- **Game does not start:** Check the launcher status, selected version, Java/runtime compatibility, and the game's `logs/latest.log`.
-- **Mod loader install fails:** That loader may not support the selected version.
-- **Windows SmartScreen warning:** Unsigned community-built executables can trigger warnings. Do not tell users to ignore warnings without verifying the build's source and integrity.
-
-
-## Separate instances
-
-Use **+ New instance** on Home to create an isolated Minecraft instance. Each instance has its own directory, installed versions, mods, assets, libraries, and saves. Switch instances from the selector on Home. You can also use **Open instance folder** to inspect its files. Existing installations are preserved when upgrading from the previous version.
-
-## Display scaling
-
-Open **Settings → Interface scaling** to select 80%, 90%, 100%, 110%, 125%, 150% or 175%. The choice is saved between launches. You can also use **Ctrl + Plus** / **Ctrl + Equals** to increase scaling or **Ctrl + Minus** to decrease it by 10%. Tkinter cannot dynamically resize every widget perfectly on every display, so restart Ray Client if some controls do not reflect a change immediately.
-
-## Fabric quick start
-
-1. Open **Mod Loaders**.
-2. Pick the Minecraft version for the selected instance.
-3. Choose **fabric** and click **Install mod loader**.
-4. Return Home and select the installed Fabric profile/version.
-5. Put Fabric-compatible mods in that instance's `mods` directory. Mods must match both Minecraft and Fabric versions.
-
-Microsoft sign-in still requires a Microsoft Entra/Azure app registration and a redirect URI that matches the app configuration. This project uses the launcher's browser-based authorization-code flow; do not enter your Microsoft password into Ray Client. This starter project has not been independently validated against a production Minecraft account or Microsoft app registration.
+Ray Client is an unofficial launcher, not affiliated with Mojang AB or Microsoft. Minecraft is a trademark of Mojang Synergies AB.

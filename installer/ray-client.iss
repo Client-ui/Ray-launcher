@@ -1,5 +1,5 @@
 #define MyAppName "Ray Client"
-#define MyAppVersion "2.1.0"
+#define MyAppVersion "3.0.0"
 #define MyAppPublisher "Ray Client"
 #define MyAppExeName "Ray Client.exe"
 
@@ -12,6 +12,7 @@ DefaultDirName={localappdata}\Programs\Ray Client
 DefaultGroupName=Ray Client
 DisableProgramGroupPage=yes
 OutputDir=..\release
+SetupIconFile=..\assets\ray.ico
 OutputBaseFilename=Ray-Client-Setup
 Compression=lzma2
 SolidCompression=yes
