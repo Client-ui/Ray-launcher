@@ -1,0 +1,6 @@
+/target
+.DS_Store
+/.idea
+RayLauncher.iml
+
+/packages/rayclient_app/icons/generated/

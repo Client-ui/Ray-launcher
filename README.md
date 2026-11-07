@@ -1,61 +1,87 @@
-# Ray Client Launcher 3.0
+<div align="center">
 
-A dark, pixel-styled Minecraft Java launcher with **Microsoft (premium) accounts and offline (cracked) accounts**, isolated instances, a version library, mod-loader installer (Fabric, Forge, NeoForge, Quilt), a mod manager and a live game console.
+<img src=".github/media/RepoBanner.png" alt="Ray Launcher" />
 
-## Features
+# Ray Launcher
+A dark-blue, Minecraft-styled launcher for Ray Client, with one-click modded instances.
 
-- **Accounts page** - keep several accounts and switch between them with one click.
-  - *Offline*: type a name and play. The UUID is generated the same way vanilla offline servers do it, so your worlds and inventories stay yours.
-  - *Microsoft*: device-code sign-in (no URL pasting). You get a code, enter it on microsoft.com/link, done. The refresh token is saved, so you stay signed in after a restart.
-- **Play page** modelled on the Ray Client main menu: one big PLAY button, version and instance pickers.
-- **Versions**: releases, snapshots, old versions, installed modded profiles; install, delete, filter and search.
-- **Mods**: install a loader (only the Minecraft versions it supports are offered), add / enable / disable / remove mod jars.
-- **Console**: live Minecraft output, crash detection, copy log.
-- **Instances**: separate game folders (mods, saves, versions) per instance.
-- **Settings**: RAM slider, Java path, JVM arguments, window size, minimise-while-playing, UI scale (Ctrl +/-).
+</div>
 
-## Run from source
+> Ray Launcher is a fork of [OneLauncher](https://github.com/Polyfrost/OneLauncher) by Polyfrost, licensed under
+> GPL-3.0-only. See [ATTRIBUTION.md](./ATTRIBUTION.md).
 
-```bash
-python -m pip install -r requirements.txt
-python ray_client.py
+## Installing
+
+Grab the latest release from the [GitHub releases](https://github.com/your-org/RayLauncher/releases/latest) page
+(replace `your-org` with the account that hosts your fork).
+
+| Windows (x86_64) | macOS (Intel & Apple Silicon) | Linux (x86_64) |
+|------------------|-------------------------------|----------------|
+| Installer        | DMG                           | AppImage       |
+|                  | App Bundle                    | DEB            |
+|                  |                               | RPM            |
+
+Auto-update is **off** unless you build with your own signed update feed (see [Build-time configuration](#build-time-configuration)).
+
+## Look and feel
+
+Ray Launcher ships four built-in themes, all in the deep-navy palette used by Ray Client:
+
+| Theme            | Style                                             |
+|------------------|---------------------------------------------------|
+| Ray Craft Dark   | Pixel font, square corners, pixel icons (default) |
+| Ray Craft Light  | Same, light variant                               |
+| Ray Dark         | Smooth, rounded                                   |
+| Ray Light        | Smooth, rounded, light variant                    |
+
+Themes are plain JSON in [`packages/rayclient_app/assets/themes/`](./packages/rayclient_app/assets/themes).
+
+## Contributing
+
+Please read the [contributing guidelines](CONTRIBUTING.md) before getting started.
+
+### Requirements
+
+The project targets **Rust 1.97** or later. You can install Rust via [rustup](https://rustup.rs/).
+
+### Building & Running
+
+```sh
+# Run the app
+cargo run -p rayclient_app
+
+# Build a release binary
+cargo build -p rayclient_app --release
 ```
-Python 3.10+ with Tk (included in the python.org installer on Windows).
 
-## Microsoft sign-in: one-time setup
+### Build-time configuration
 
-Offline accounts work immediately. For real Microsoft accounts the launcher needs **its own Azure app** (free):
+A stock build talks to no Ray-owned services. Opt in to each one with an environment variable at compile time:
 
-1. Azure portal -> *App registrations* -> *New registration*. Supported account types: **Personal Microsoft accounts only**. No redirect URI needed.
-2. In the app: *Authentication* -> enable **Allow public client flows**.
-3. Copy the *Application (client) ID* and paste it in **Accounts -> Add Microsoft** (or Settings). The in-app guide has buttons for the links.
-4. **Mojang must approve the app.** Submit the client ID in Mojang's form (https://aka.ms/AppRegistrationForm). Until it is approved, sign-in ends with `INVALID_REGISTRATION`; this is Mojang's rule for every third-party launcher, not a bug. Offline accounts keep working meanwhile.
+| Variable                | Enables                                                                    |
+|-------------------------|----------------------------------------------------------------------------|
+| `RAY_UPDATER_ENDPOINT`  | Auto-update feed URL (also needs `RAY_UPDATER_PUBKEY`, a minisign public key) |
+| `RAY_UPDATER_PUBKEY`    | Public key used to verify updates                                          |
+| `RAY_RELEASES_URL`      | Release page shown when an update can't be installed automatically         |
+| `RAY_SENTRY_DSN`        | Crash reporting to your own Sentry project                                 |
+| `RAY_DISCORD_CLIENT_ID` | Discord rich presence under your own Discord application                   |
+| `RAY_SUPPORT_URL`       | Target of the "get help" buttons                                           |
 
-If you distribute the launcher, set `DEFAULT_CLIENT_ID` in `ray_core.py` to your approved client ID. Players then never see this setup - only the "enter this code" screen.
+At runtime, `RAY_DISABLE_AUTOUPDATE=1` and `RAY_DISABLE_JAVA_AUTOINSTALL=1` turn those features off.
 
-Passwords are never typed into Ray Client. Only refresh tokens are stored (`~/.ray-client/accounts.json`); short-lived game tokens stay in memory.
+### Packaging / Releasing
 
-## Offline accounts
+Installers are produced with [**cargo-packager**](https://github.com/crabnebula-dev/cargo-packager). Config lives in
+[`packages/rayclient_app/Cargo.toml`](./packages/rayclient_app/Cargo.toml) under `[package.metadata.packager]`.
 
-Offline mode does not verify ownership. It is meant for singleplayer and servers that run in offline mode. It does not work on online-mode servers.
-
-## Build for Windows
-
-`.github/workflows/build-windows.yml` builds `Ray Client.exe` (portable) and `Ray-Client-Setup.exe` (installer). Run the workflow from the Actions tab, or push a tag such as `v3.0.0` to publish both files on the Releases page.
-
-Manual build:
-```bash
-pip install -r requirements.txt pyinstaller
-pyinstaller --noconfirm --clean --onefile --windowed --name "Ray Client" --icon assets/ray.ico --add-data "assets;assets" ray_client.py
+```sh
+cargo install cargo-packager --locked
+cargo build --release -p rayclient_app
+cargo packager --release -p rayclient_app --formats <targets>
+#   Windows: nsis      macOS: app,dmg      Linux: deb,appimage
 ```
 
-## Files
+### Versioning
 
-| File | Purpose |
-|---|---|
-| `ray_client.py` | Application and all pages |
-| `ray_ui.py` | Theme, pixel font loading, custom widgets, dialogs, bolt logo |
-| `ray_core.py` | Config, accounts, Microsoft sign-in, helpers |
-| `assets/` | Silkscreen pixel font (SIL OFL, see `assets/fonts/OFL.txt`), icon |
-
-Ray Client is an unofficial launcher, not affiliated with Mojang AB or Microsoft. Minecraft is a trademark of Mojang Synergies AB.
+The workspace shares a single version, defined in the root [`Cargo.toml`](./Cargo.toml) under `[workspace.package]`.
+Versions and release notes come from [Knope](https://knope.tech) change files in [`.changeset/`](./.changeset).
