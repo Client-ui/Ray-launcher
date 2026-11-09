@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.ray.RayLauncher</id>
+  <name>RayLauncher</name>
+  <summary>Next-generation open source Minecraft launcher</summary>
+  <developer id="org.polyfrost">
+    <name>Ray</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <description>
+    <p>Ray Launcher is a dark-blue, Minecraft-styled open source launcher for Ray Client, based on OneLauncher by Polyfrost.</p>
+  </description>
+  <launchable type="desktop-id">dev.ray.RayLauncher.desktop</launchable>
+  <url type="homepage">https://github.com/your-org/RayLauncher</url>
+  <url type="bugtracker">https://github.com/your-org/RayLauncher/issues</url>
+  <url type="vcs-browser">https://github.com/your-org/RayLauncher</url>
+  <content_rating type="oars-1.1"/>
+  <provides>
+    <binary>rayclient_app</binary>
+  </provides>
+</component>

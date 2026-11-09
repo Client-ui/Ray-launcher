@@ -1,0 +1,14 @@
+{
+  "name": "Ray Dark",
+  "colors": {
+    "light": false,
+    "page": "#0A0D16",
+    "page_elevated": "#0F1320",
+    "card": "#151A2A",
+    "component": "#1A2033",
+    "border": "#9FB4FF1F",
+    "text": "#F0F3FB",
+    "text_secondary": "#9AA5C2",
+    "accent": "#3478F6"
+  }
+}

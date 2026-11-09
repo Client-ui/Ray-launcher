@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Ray Launcher
+Comment=Dark-blue, Minecraft-styled launcher for Ray Client
+Exec={{exec}}
+Icon={{icon}}
+Type=Application
+Terminal=false
+StartupNotify=true
+Categories=Game;ActionGame;AdventureGame;Simulation;
+Keywords=mc;minecraft;game
+StartupWMClass={{exec}}
+Version=1.4

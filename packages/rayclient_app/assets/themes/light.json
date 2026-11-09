@@ -1,0 +1,14 @@
+{
+  "name": "Ray Light",
+  "colors": {
+    "light": true,
+    "page": "#D3DBF2",
+    "page_elevated": "#DCE3F6",
+    "card": "#E6ECFB",
+    "component": "#EEF2FE",
+    "border": "#8A99C44D",
+    "text": "#0A0D16",
+    "text_secondary": "#46506B",
+    "accent": "#2F6BFF"
+  }
+}

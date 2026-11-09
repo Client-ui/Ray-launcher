@@ -1,0 +1,19 @@
+{
+  "name": "Ray Craft Dark",
+  "radius_scale": 0,
+  "font": "Minecraft",
+  "mono_font": "Minecraft",
+  "pixel_font_size": 10,
+  "pixel_icons": true,
+  "colors": {
+    "light": false,
+    "page": "#070A12",
+    "page_elevated": "#0F1320",
+    "card": "#151A2A",
+    "component": "#1F2740",
+    "border": "#7C8FD138",
+    "text": "#F0F3FB",
+    "text_secondary": "#9AA5C2",
+    "accent": "#3478F6"
+  }
+}
