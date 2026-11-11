@@ -102,7 +102,7 @@ category = "Game"
 publisher = "Ray"
 copyright = "© 2026 Ray. Based on OneLauncher © Polyfrost Inc. (GPL-3.0)"
 homepage = "https://github.com/your-org/RayLauncher"
-long-description = "Dark-blue, Minecraft-styled launcher for Ray Client"
+long-description = "Dark and orange launcher for Ray Client"
 formats = ["nsis", "app", "dmg", "deb", "appimage"]
 binaries = [{ path = "rayclient_app", main = true }]
 icons = [

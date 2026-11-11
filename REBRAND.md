@@ -64,3 +64,13 @@ cargo check --workspace
 cargo test --workspace --lib          # unit tests; some integration tests need network
 cargo run -p rayclient_app
 ```
+
+## Orange rebrand update
+
+- Dark and orange theme (`assets/themes/dark.json`, `light.json`); Minecraft themes removed, old settings fall back to Ray Dark.
+- Default UI font is Inter (readable, no pixel font).
+- Offline accounts no longer require a Microsoft account first (also offered in first-run setup).
+- Only Minecraft 1.21.11 (Fabric) is offered. The catalog is `rayclient_core/assets/versions.json`; the Ray Client bundle (Ray Client 1.0.5 jar + Fabric API) is `rayclient_content/assets/ray-client-1.21.11.polymrpack`. Both are built in, so startup makes no catalog requests.
+- Eight bundled orange wallpapers, picked per instance; wallpapers fade in.
+- App icons regenerated from the new R logo.
+- Fabric API in the bundle is pinned by Modrinth version id (0.141.3+1.21.11); its sha1 field is a placeholder because install resolves it by id.

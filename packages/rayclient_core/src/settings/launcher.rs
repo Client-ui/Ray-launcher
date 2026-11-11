@@ -133,7 +133,7 @@ impl Default for LauncherSettings {
             dynamic_background_enabled: true,
             start_maximized: false,
             animations_enabled: true,
-            theme: "minecraft-dark".to_string(),
+            theme: "dark".to_string(),
             accent_color: None,
             language: None,
             view_states: BTreeMap::new(),

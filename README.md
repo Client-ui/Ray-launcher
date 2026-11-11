@@ -3,7 +3,7 @@
 <img src=".github/media/RepoBanner.png" alt="Ray Launcher" />
 
 # Ray Launcher
-A dark-blue, Minecraft-styled launcher for Ray Client, with one-click modded instances.
+A dark and orange launcher for Ray Client, with one-click modded instances.
 
 </div>
 

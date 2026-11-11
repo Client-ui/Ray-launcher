@@ -33,6 +33,8 @@ pub struct DynamicArt {
     preview_edge: Option<u32>,
     url: Option<String>,
     skeleton: bool,
+    /// Picks which bundled wallpaper stands in when there is no remote or custom art
+    seed: u64,
 }
 
 impl DynamicArt {
@@ -52,6 +54,7 @@ impl DynamicArt {
             key: parsed.and_then(|p| p.key()),
             loader: Some(cluster.mc_loader),
             cover: cluster.cover_file(),
+            seed: cluster.id.unsigned_abs(),
             ..Self::fallback()
         }
     }
@@ -74,7 +77,15 @@ impl DynamicArt {
             preview_edge: None,
             url: None,
             skeleton: false,
+            seed: 0,
         }
+    }
+
+    /// Choose a different bundled wallpaper, e.g. per card in a list
+    #[must_use]
+    pub fn seed(mut self, seed: u64) -> Self {
+        self.seed = seed;
+        self
     }
 
     #[must_use]
@@ -116,14 +127,48 @@ impl DynamicArt {
 
 pub fn use_art_bytes(art: &DynamicArt) -> (String, Bytes) {
     let max_edge = art.max_edge;
-    use_resolved_art(art)
-        .unwrap_or_else(|| (format!("{max_edge}|{HOME_BACKGROUND_ASSET}"), bundled_art()))
+    use_resolved_art(art).unwrap_or_else(|| bundled_art(max_edge, art.variant()))
 }
 
-fn bundled_art() -> Bytes {
-    static ART: LazyLock<Bytes> =
-        LazyLock::new(|| AppAssets::get_bytes(HOME_BACKGROUND_ASSET).unwrap_or_default());
-    ART.clone()
+/// Every wallpaper that ships inside the launcher; picked by seed so instances differ
+pub const BUNDLED_WALLPAPERS: [&str; 8] = [
+    HOME_BACKGROUND_ASSET,
+    "backgrounds/RayDusk.jpg",
+    "backgrounds/RayRays.jpg",
+    "backgrounds/RayHorizon.jpg",
+    "backgrounds/RayNebula.jpg",
+    "backgrounds/RayDunes.jpg",
+    "backgrounds/RaySparks.jpg",
+    "backgrounds/RayFlare.jpg",
+];
+
+impl DynamicArt {
+    /// Index into [`BUNDLED_WALLPAPERS`]; mixes the version too so each release differs
+    fn variant(&self) -> usize {
+        let mut h = self.seed.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        if let Some(major) = self.major {
+            h ^= u64::from(major).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+        }
+        if let Some((minor, patch)) = self.key {
+            h ^= (u64::from(minor) << 8 | u64::from(patch.unwrap_or(0)))
+                .wrapping_mul(0x1656_67B1_9E37_79F9);
+        }
+        ((h >> 32) as usize) % BUNDLED_WALLPAPERS.len()
+    }
+}
+
+fn bundled_art(max_edge: u32, variant: usize) -> (String, Bytes) {
+    static ART: LazyLock<Vec<Bytes>> = LazyLock::new(|| {
+        BUNDLED_WALLPAPERS
+            .iter()
+            .map(|path| AppAssets::get_bytes(path).unwrap_or_default())
+            .collect()
+    });
+    let index = variant % BUNDLED_WALLPAPERS.len();
+    (
+        format!("{max_edge}|{}", BUNDLED_WALLPAPERS[index]),
+        ART[index].clone(),
+    )
 }
 
 fn use_resolved_art(art: &DynamicArt) -> Option<(String, Bytes)> {
@@ -137,6 +182,7 @@ fn use_resolved_art(art: &DynamicArt) -> Option<(String, Bytes)> {
         preview_edge,
         url,
         skeleton: _,
+        seed: _,
     } = art.clone();
 
     let cover_query = use_local_image(
@@ -179,6 +225,20 @@ impl Component for DynamicArt {
     fn render(&self) -> impl IntoElement {
         let resolved = use_resolved_art(self);
         let show_skeleton = self.skeleton && resolved.is_none();
+        let (key, bytes) = resolved
+            .clone()
+            .unwrap_or_else(|| bundled_art(self.max_edge, self.variant()));
+
+        // New art eases in rather than popping, so swapping wallpapers feels smooth
+        let fade = use_animation_with_dependencies(&key, |conf, _| {
+            conf.on_creation(OnCreation::Run);
+            conf.on_change(OnChange::Rerun);
+            AnimNum::new(0., 1.)
+                .time(420)
+                .ease(Ease::Out)
+                .function(Function::Cubic)
+        });
+        let fade_v = fade.read().value();
 
         let pulse = use_animation_with_dependencies(&show_skeleton, |conf, show| {
             conf.on_change(OnChange::Rerun);
@@ -204,16 +264,18 @@ impl Component for DynamicArt {
                 .into_element();
         }
 
-        let max_edge = self.max_edge;
-        let (key, bytes) = resolved
-            .unwrap_or_else(|| (format!("{max_edge}|{HOME_BACKGROUND_ASSET}"), bundled_art()));
-
-        ImageViewer::new((key, bytes))
+        rect()
             .width(Size::fill())
             .height(Size::fill())
-            .aspect_ratio(AspectRatio::Max)
-            .image_cover(ImageCover::Center)
-            .fallback(rect().width(Size::fill()).height(Size::fill()))
+            .opacity(fade_v)
+            .child(
+                ImageViewer::new((key, bytes))
+                    .width(Size::fill())
+                    .height(Size::fill())
+                    .aspect_ratio(AspectRatio::Max)
+                    .image_cover(ImageCover::Center)
+                    .fallback(rect().width(Size::fill()).height(Size::fill())),
+            )
             .into_element()
     }
 }

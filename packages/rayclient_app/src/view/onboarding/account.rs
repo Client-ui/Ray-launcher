@@ -1,8 +1,11 @@
 use freya::prelude::*;
+use freya::query::MutationStateData;
 use rayclient_auth::MinecraftAccount;
 
-use crate::components::{Avatar, Button, Icon, IconType, use_microsoft_login};
-use crate::hooks::{try_default_account, use_current_account};
+use crate::components::{Avatar, Button, Icon, IconType, TextInput, use_microsoft_login};
+use crate::hooks::{
+    AddOfflineAccountKeys, try_default_account, use_add_offline_account, use_current_account,
+};
 use crate::i18n::t;
 use crate::routes::Route;
 use crate::theme::{colors, text_size};
@@ -17,6 +20,8 @@ impl Component for OnboardingAccount {
     fn render(&self) -> impl IntoElement {
         let account_query = use_current_account();
         let msa = use_microsoft_login();
+        let add_offline = use_add_offline_account();
+        let username = use_state(String::new);
 
         let account = try_default_account(&account_query);
         let has_account = account.is_some();
@@ -33,8 +38,24 @@ impl Component for OnboardingAccount {
                 Some(account) => account_preview(account).into_element(),
                 None => {
                     let start = msa.clone();
-                    sign_in_card(msa.pending, msa.error.clone(), move |_| start.start())
-                        .into_element()
+                    let offline_error = match &*add_offline.read().state() {
+                        MutationStateData::Settled { res: Err(err), .. } => Some(err.to_string()),
+                        _ => None,
+                    };
+                    let on_offline = move |_| {
+                        let name = username.peek().trim().to_string();
+                        if !name.is_empty() {
+                            add_offline.mutate(AddOfflineAccountKeys { username: name });
+                        }
+                    };
+                    sign_in_card(
+                        msa.pending,
+                        msa.error.clone().or(offline_error),
+                        username,
+                        move |_| start.start(),
+                        on_offline,
+                    )
+                    .into_element()
                 }
             })
             .into_element();
@@ -97,7 +118,9 @@ fn account_preview(account: &MinecraftAccount) -> impl IntoElement {
 fn sign_in_card(
     pending: bool,
     error: Option<String>,
+    username: State<String>,
     on_add: impl FnMut(Event<PressEventData>) + 'static,
+    on_offline: impl FnMut(Event<PressEventData>) + 'static,
 ) -> impl IntoElement {
     rect()
         .vertical()
@@ -115,6 +138,32 @@ fn sign_in_card(
                 } else {
                     t("oneclient.onboarding.account.add")
                 }),
+        )
+        .child(
+            label()
+                .text(t("oneclient.onboarding.account.or_offline"))
+                .font_size(text_size(12.))
+                .color(colors::fg_secondary()),
+        )
+        .child(
+            rect()
+                .horizontal()
+                .cross_align(Alignment::Center)
+                .spacing(8.)
+                .child(
+                    rect()
+                        .width(Size::px(240.))
+                        .child(TextInput::new(username).placeholder(t(
+                            "oneclient.settings.accounts.offline.username_placeholder",
+                        ))),
+                )
+                .child(
+                    Button::new()
+                        .secondary()
+                        .on_press(on_offline)
+                        .child(Icon::new(IconType::Plus).size(16.))
+                        .text(t("oneclient.onboarding.account.add_offline")),
+                ),
         )
         .maybe_child(error.map(|message| {
             rect()

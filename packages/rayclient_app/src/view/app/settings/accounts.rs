@@ -222,7 +222,6 @@ fn hero(
                                 .child(
                                     Button::new()
                                         .secondary()
-                                        .enabled(has_microsoft)
                                         .on_press(on_open_offline)
                                         .child(Icon::new(IconType::Plus).size(16.))
                                         .text(t("oneclient.settings.accounts.add_offline")),
@@ -234,7 +233,7 @@ fn hero(
                         .maybe(!has_microsoft, |el| {
                             el.child(hint_line(
                                 IconType::InfoCircle,
-                                t("oneclient.settings.accounts.microsoft_required").to_string(),
+                                t("oneclient.settings.accounts.offline_hint").to_string(),
                                 colors::fg_secondary(),
                             ))
                         }),

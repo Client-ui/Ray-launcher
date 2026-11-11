@@ -15,14 +15,13 @@ pub mod colors;
 
 pub const NAVBAR_HEIGHT_PX: f32 = 80.;
 pub const HOME_PADDING_PX: f32 = 48.;
-pub const DEFAULT_FONT: &str = "Poppins";
+pub const DEFAULT_FONT: &str = "Inter";
 pub const MONO_FONT: &str = "JetBrains Mono";
-const MINECRAFT_FONT: &str = "Minecraft";
 const PIXEL_BOOST_MAX: f32 = 2.5;
 const PIXEL_BOOST_END: f32 = 17.;
 const PIXEL_BOOST_RANGE: f32 = 8.;
 
-const BUILTIN_THEMES: [&str; 4] = ["dark", "light", "minecraft-dark", "minecraft-light"];
+const BUILTIN_THEMES: [&str; 2] = ["dark", "light"];
 
 thread_local! {
     static THEMES: RefCell<Vec<Rc<Theme>>> =
@@ -86,8 +85,8 @@ pub fn system_aware(id: &str, system_dark: bool) -> &str {
 
 pub fn resolve_theme(id: &str) -> Rc<Theme> {
     let id = match id {
-        "amoled" | "grey" => "dark",
-        "white" => "light",
+        "amoled" | "grey" | "minecraft-dark" => "dark",
+        "white" | "minecraft-light" => "light",
         id => id,
     };
     THEMES.with_borrow(|themes| {
@@ -148,7 +147,7 @@ pub fn pixel_font_size_of(family: &str) -> Option<f32> {
 }
 
 pub fn font_families() -> Vec<String> {
-    let mut families: Vec<String> = [DEFAULT_FONT, MONO_FONT, MINECRAFT_FONT]
+    let mut families: Vec<String> = [DEFAULT_FONT, MONO_FONT]
         .into_iter()
         .map(str::to_string)
         .chain(
@@ -284,20 +283,18 @@ pub fn rounded(radius: f32) -> CornerRadius {
 }
 
 pub fn load_fonts() -> Vec<(Cow<'static, str>, Bytes)> {
-    const FONTS: [(&str, &str); 13] = [
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-Bold.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-BoldItalic.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-SemiBold.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-SemiBoldItalic.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-Medium.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-MediumItalic.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-Regular.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-Italic.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-Light.ttf"),
-        (DEFAULT_FONT, "fonts/Poppins/Poppins-LightItalic.ttf"),
+    const FONTS: [(&str, &str); 11] = [
+        (DEFAULT_FONT, "fonts/Inter/Inter-Bold.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-BoldItalic.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-SemiBold.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-SemiBoldItalic.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-Medium.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-MediumItalic.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-Regular.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-Italic.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-Light.otf"),
+        (DEFAULT_FONT, "fonts/Inter/Inter-LightItalic.otf"),
         (MONO_FONT, "fonts/JetBrainsMono/JetBrainsMonoVariable.ttf"),
-        (MINECRAFT_FONT, "fonts/Minecraft/Minecraft-Regular.otf"),
-        (MINECRAFT_FONT, "fonts/Minecraft/Minecraft-Bold.otf"),
     ];
 
     let mut fonts: Vec<(Cow<'static, str>, Bytes)> = FONTS

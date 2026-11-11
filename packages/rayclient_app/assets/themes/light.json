@@ -2,13 +2,13 @@
   "name": "Ray Light",
   "colors": {
     "light": true,
-    "page": "#D3DBF2",
-    "page_elevated": "#DCE3F6",
-    "card": "#E6ECFB",
-    "component": "#EEF2FE",
-    "border": "#8A99C44D",
-    "text": "#0A0D16",
-    "text_secondary": "#46506B",
-    "accent": "#2F6BFF"
+    "page": "#F1DFCE",
+    "page_elevated": "#F6E8DA",
+    "card": "#FAEFE4",
+    "component": "#FFF7EF",
+    "border": "#B8764040",
+    "text": "#1A0F08",
+    "text_secondary": "#6B5243",
+    "accent": "#E8630A"
   }
 }

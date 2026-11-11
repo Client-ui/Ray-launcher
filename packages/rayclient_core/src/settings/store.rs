@@ -156,7 +156,7 @@ mod tests {
             "the location has to survive whatever else is wrong with the file"
         );
         assert!(settings.log_debug);
-        assert_eq!(settings.theme, "minecraft-dark");
+        assert_eq!(settings.theme, "dark");
         assert_eq!(settings.max_concurrent_requests, 25);
     }
 
