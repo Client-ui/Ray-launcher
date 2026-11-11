@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use freya::query::{Query, QueryCapability, UseQuery, use_query};
 use rayclient_common::domain::GraphicsBackend;
 use rayclient_core::LauncherError;
-use rayclient_core::clusters::Cluster;
+use rayclient_core::clusters::{Cluster, ClusterKind};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct ListClustersQuery;
@@ -18,7 +18,28 @@ impl QueryCapability for ListClustersQuery {
 
     async fn run(&self, _keys: &Self::Keys) -> Result<Self::Ok, Self::Err> {
         let state = crate::launcher::state()?;
-        Ok(state.clusters.list().await?)
+        let mut catalog = state.versions.metadata("").await;
+        if catalog.is_empty() {
+            state.versions.sync(&state.services).await?;
+            catalog = state.versions.metadata("").await;
+        }
+        let offered: std::collections::HashSet<(String, String)> = catalog
+            .iter()
+            .filter_map(|m| Some((m.mc_version()?, m.loader.as_ref()?.to_lowercase())))
+            .collect();
+
+        let mut clusters = state.clusters.list().await?;
+        // Ray Client only offers the releases in the built-in catalog. Instances an older
+        // build provisioned for other versions are hidden, not deleted, so no worlds are lost
+        clusters.retain(|cluster| {
+            cluster.user_created
+                || cluster.kind != ClusterKind::RayClient
+                || offered.contains(&(
+                    cluster.mc_version.clone(),
+                    cluster.mc_loader.to_string().to_lowercase(),
+                ))
+        });
+        Ok(clusters)
     }
 }
 

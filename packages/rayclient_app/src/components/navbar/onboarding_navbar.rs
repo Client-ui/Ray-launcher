@@ -1,6 +1,6 @@
 use freya::prelude::*;
 
-use crate::components::{Icon, IconType, window_controls};
+use crate::components::window_controls;
 use crate::theme::{self, colors};
 
 #[derive(PartialEq)]
@@ -38,10 +38,6 @@ fn logo() -> impl IntoElement {
         .horizontal()
         .cross_align(Alignment::Center)
         .spacing(18.)
-        .child(
-            Icon::new(IconType::IconLogo)
-                .size(32.)
-                .color(colors::brand()),
-        )
+        .child(theme::brand_mark(32.))
         .child(theme::wordmark(170., 36., colors::fg_primary()))
 }

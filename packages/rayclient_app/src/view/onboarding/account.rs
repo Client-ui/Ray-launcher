@@ -22,6 +22,7 @@ impl Component for OnboardingAccount {
         let msa = use_microsoft_login();
         let add_offline = use_add_offline_account();
         let username = use_state(String::new);
+        let mut show_offline = use_state(|| false);
 
         let account = try_default_account(&account_query);
         let has_account = account.is_some();
@@ -42,7 +43,12 @@ impl Component for OnboardingAccount {
                         MutationStateData::Settled { res: Err(err), .. } => Some(err.to_string()),
                         _ => None,
                     };
+                    // First press reveals the name field, the next one creates the account
                     let on_offline = move |_| {
+                        if !*show_offline.peek() {
+                            show_offline.set(true);
+                            return;
+                        }
                         let name = username.peek().trim().to_string();
                         if !name.is_empty() {
                             add_offline.mutate(AddOfflineAccountKeys { username: name });
@@ -52,6 +58,7 @@ impl Component for OnboardingAccount {
                         msa.pending,
                         msa.error.clone().or(offline_error),
                         username,
+                        *show_offline.read(),
                         move |_| start.start(),
                         on_offline,
                     )
@@ -119,52 +126,50 @@ fn sign_in_card(
     pending: bool,
     error: Option<String>,
     username: State<String>,
+    show_offline: bool,
     on_add: impl FnMut(Event<PressEventData>) + 'static,
     on_offline: impl FnMut(Event<PressEventData>) + 'static,
 ) -> impl IntoElement {
+    // Both options are the same kind of button on purpose: neither is the "lesser" choice
     rect()
         .vertical()
         .spacing(12.)
         .cross_align(Alignment::Start)
         .child(
-            Button::new()
-                .primary()
-                .large()
-                .enabled(!pending)
-                .on_press(on_add)
-                .child(Icon::new(IconType::Globe01).size(16.))
-                .text(if pending {
-                    t("oneclient.onboarding.account.signing_in")
-                } else {
-                    t("oneclient.onboarding.account.add")
-                }),
-        )
-        .child(
-            label()
-                .text(t("oneclient.onboarding.account.or_offline"))
-                .font_size(text_size(12.))
-                .color(colors::fg_secondary()),
-        )
-        .child(
             rect()
                 .horizontal()
                 .cross_align(Alignment::Center)
-                .spacing(8.)
+                .spacing(12.)
                 .child(
-                    rect()
-                        .width(Size::px(240.))
-                        .child(TextInput::new(username).placeholder(t(
-                            "oneclient.settings.accounts.offline.username_placeholder",
-                        ))),
+                    Button::new()
+                        .primary()
+                        .large()
+                        .enabled(!pending)
+                        .on_press(on_add)
+                        .child(Icon::new(IconType::Globe01).size(16.))
+                        .text(if pending {
+                            t("oneclient.onboarding.account.signing_in")
+                        } else {
+                            t("oneclient.onboarding.account.add")
+                        }),
                 )
                 .child(
                     Button::new()
-                        .secondary()
+                        .primary()
+                        .large()
                         .on_press(on_offline)
-                        .child(Icon::new(IconType::Plus).size(16.))
+                        .child(Icon::new(IconType::Users01).size(16.))
                         .text(t("oneclient.onboarding.account.add_offline")),
                 ),
         )
+        .maybe_child(show_offline.then(|| {
+            rect()
+                .width(Size::px(320.))
+                .child(TextInput::new(username).auto_focus(true).placeholder(t(
+                    "oneclient.settings.accounts.offline.username_placeholder",
+                )))
+                .into_element()
+        }))
         .maybe_child(error.map(|message| {
             rect()
                 .horizontal()

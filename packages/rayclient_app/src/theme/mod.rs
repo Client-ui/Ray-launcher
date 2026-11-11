@@ -253,6 +253,19 @@ pub fn pixel_icon_size(size: f32, cells: f32) -> f32 {
     (size * scale / cells).round().max(1.) * cells / scale
 }
 
+/// The full-colour Ray "R" mark, shown beside the wordmark
+pub fn brand_mark(size: f32) -> Element {
+    ImageViewer::new((
+        "logo-mark.png",
+        AppAssets::get_bytes("logo-mark.png").unwrap_or_default(),
+    ))
+    .width(Size::px(size))
+    .height(Size::px(size))
+    .aspect_ratio(AspectRatio::Max)
+    .image_cover(ImageCover::Center)
+    .into_element()
+}
+
 pub fn wordmark(width: f32, height: f32, color: Color) -> Element {
     if colors::active_theme().pixel_icons {
         return label()

@@ -221,9 +221,9 @@ fn hero(
                                 )
                                 .child(
                                     Button::new()
-                                        .secondary()
+                                        .primary()
                                         .on_press(on_open_offline)
-                                        .child(Icon::new(IconType::Plus).size(16.))
+                                        .child(Icon::new(IconType::Users01).size(16.))
                                         .text(t("oneclient.settings.accounts.add_offline")),
                                 ),
                         )

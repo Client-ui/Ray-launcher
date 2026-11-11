@@ -263,7 +263,8 @@ jobs:
           for f in "${{ steps.outdir.outputs.dir }}"/*.dmg \
                    "${{ steps.outdir.outputs.dir }}"/*.deb \
                    "${{ steps.outdir.outputs.dir }}"/*.rpm \
-                   "${{ steps.outdir.outputs.dir }}"/*.AppImage; do
+                   "${{ steps.outdir.outputs.dir }}"/*.AppImage \
+                   "${{ steps.outdir.outputs.dir }}"/*-setup.exe; do
             [ -e "$f" ] || continue
             cp "$f" dist/
           done
@@ -318,6 +319,15 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           path: dist/*.AppImage
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: (Windows) Upload unsigned installer
+        if: matrix.os_key == 'windows'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: dist/*-setup.exe
           archive: false
           if-no-files-found: error
           retention-days: 14
