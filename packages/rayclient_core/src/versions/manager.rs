@@ -43,7 +43,7 @@ impl VersionsManager {
         }
     }
 
-    #[tracing::instrument(level = "debug", skip(self, services))]
+    #[tracing::instrument(level = "debug", skip(self, _services))]
     pub async fn sync(&self, _services: &LauncherServices) -> LauncherResult<bool> {
         let _guard = self.syncing.lock().await;
 
