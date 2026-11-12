@@ -531,7 +531,7 @@ fn wallpaper_tile(
                 .height(Size::px(84.))
                 .corner_radius(CornerRadius::new_all(8.))
                 .overflow(Overflow::Clip)
-                .background(colors::component())
+                .background(colors::component_bg())
                 .border(border_all_color(
                     if selected { 2. } else { 1. },
                     border_color,
