@@ -122,7 +122,11 @@ mod tests {
         let selected = default_selection(&catalog(), None);
 
         assert!(selected.contains(&pkg_key(1, "Ray Launcher 1.21.11 Fabric [QoL]", "qol-a")));
-        assert!(selected.contains(&pkg_key(1, "Ray Launcher 1.21.11 Fabric [Utility]", "util-a")));
+        assert!(selected.contains(&pkg_key(
+            1,
+            "Ray Launcher 1.21.11 Fabric [Utility]",
+            "util-a"
+        )));
     }
 
     #[test]
@@ -141,7 +145,11 @@ mod tests {
         let cats = vec!["SkyBlock".to_string()];
         let selected = default_selection(&catalog(), Some(&cats));
 
-        assert!(selected.contains(&pkg_key(1, "Ray Launcher 1.21.11 Fabric [SkyBlock]", "sb-a")));
+        assert!(selected.contains(&pkg_key(
+            1,
+            "Ray Launcher 1.21.11 Fabric [SkyBlock]",
+            "sb-a"
+        )));
         assert!(selected.contains(&pkg_key(1, "Ray Launcher 1.21.11 Fabric [QoL]", "qol-a")));
         assert!(!selected.iter().any(|k| k.contains("[PvP]")));
     }
@@ -151,7 +159,11 @@ mod tests {
         let cats = vec!["skyblock".to_string()];
         let selected = default_selection(&catalog(), Some(&cats));
 
-        assert!(selected.contains(&pkg_key(1, "Ray Launcher 1.21.11 Fabric [SkyBlock]", "sb-a")));
+        assert!(selected.contains(&pkg_key(
+            1,
+            "Ray Launcher 1.21.11 Fabric [SkyBlock]",
+            "sb-a"
+        )));
     }
 
     #[test]

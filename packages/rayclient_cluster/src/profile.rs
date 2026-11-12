@@ -49,6 +49,9 @@ impl Default for SettingsOsExtra {
     }
 }
 
+/// Smoother frame times by default: G1 tuned for short pauses. Editable in Java settings
+pub const DEFAULT_JVM_ARGS: &str = "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:G1HeapRegionSize=16M";
+
 impl GameSettingsProfile {
     pub fn default_global_profile() -> Self {
         Self {
@@ -57,7 +60,7 @@ impl GameSettingsProfile {
             resolution: None,
             force_fullscreen: Some(false),
             mem_max: Some(rayclient_common::default_mem_max()),
-            launch_args: None,
+            launch_args: Some(DEFAULT_JVM_ARGS.into()),
             game_args: None,
             launch_env: None,
             hook_pre: None,

@@ -68,6 +68,12 @@ pub struct LauncherSettings {
     pub run_in_background: bool,
     pub show_tray_icon: bool,
     pub dynamic_background_enabled: bool,
+    /// Bundled wallpaper path chosen by the user; `None` keeps the automatic per-instance mix
+    pub wallpaper: Option<String>,
+    /// Derive the accent colour from the chosen wallpaper instead of the accent setting
+    pub wallpaper_accent: bool,
+    /// How strongly the home wallpaper is darkened: 0 off, 1 light, 2 medium, 3 strong
+    pub wallpaper_dim: u8,
     pub start_maximized: bool,
     pub animations_enabled: bool,
     pub theme: String,
@@ -131,6 +137,9 @@ impl Default for LauncherSettings {
             run_in_background: false,
             show_tray_icon: true,
             dynamic_background_enabled: true,
+            wallpaper: None,
+            wallpaper_accent: false,
+            wallpaper_dim: 0,
             start_maximized: false,
             animations_enabled: true,
             theme: "dark".to_string(),

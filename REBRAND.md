@@ -74,3 +74,10 @@ cargo run -p rayclient_app
 - Eight bundled orange wallpapers, picked per instance; wallpapers fade in.
 - App icons regenerated from the new R logo.
 - Fabric API in the bundle is pinned by Modrinth version id (0.141.3+1.21.11); its sha1 field is a placeholder because install resolves it by id.
+
+## Round 3
+
+- Bundled Lithuanian translation (`packages/rayclient_app/lang/lt_LT.json`), listed in Settings → Language, works offline.
+- 22 bundled wallpapers; six extra themes (AMOLED, Midnight, Ocean, Forest, Rose, Sunset).
+- New installs default to tuned G1 JVM flags (editable in Java settings).
+- Nightly CI: the Apple Silicon job can no longer fail the whole run.

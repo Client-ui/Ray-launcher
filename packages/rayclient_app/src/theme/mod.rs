@@ -12,6 +12,7 @@ use crate::AppAssets;
 use colors::Palette;
 
 pub mod colors;
+pub mod wallpaper_accent;
 
 pub const NAVBAR_HEIGHT_PX: f32 = 80.;
 pub const HOME_PADDING_PX: f32 = 48.;
@@ -21,7 +22,9 @@ const PIXEL_BOOST_MAX: f32 = 2.5;
 const PIXEL_BOOST_END: f32 = 17.;
 const PIXEL_BOOST_RANGE: f32 = 8.;
 
-const BUILTIN_THEMES: [&str; 2] = ["dark", "light"];
+const BUILTIN_THEMES: [&str; 8] = [
+    "dark", "light", "amoled", "midnight", "ocean", "forest", "rose", "sunset",
+];
 
 thread_local! {
     static THEMES: RefCell<Vec<Rc<Theme>>> =
@@ -85,7 +88,7 @@ pub fn system_aware(id: &str, system_dark: bool) -> &str {
 
 pub fn resolve_theme(id: &str) -> Rc<Theme> {
     let id = match id {
-        "amoled" | "grey" | "minecraft-dark" => "dark",
+        "grey" | "minecraft-dark" => "dark",
         "white" | "minecraft-light" => "light",
         id => id,
     };
@@ -339,4 +342,18 @@ pub fn load_fonts() -> Vec<(Cow<'static, str>, Bytes)> {
     }
 
     fonts
+}
+
+/// The accent to paint with: the wallpaper's colour when enabled and chosen, else the manual one
+pub fn effective_accent(
+    manual: Option<&str>,
+    wallpaper: Option<&str>,
+    from_wallpaper: bool,
+) -> Option<String> {
+    if from_wallpaper && let Some(path) = wallpaper {
+        if let Some(hex) = wallpaper_accent::accent_for(path) {
+            return Some(hex);
+        }
+    }
+    manual.map(str::to_string)
 }

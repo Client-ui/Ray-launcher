@@ -1,0 +1,14 @@
+{
+  "name": "Ray Forest",
+  "colors": {
+    "light": false,
+    "page": "#0A100B",
+    "page_elevated": "#101A12",
+    "card": "#17241A",
+    "component": "#223323",
+    "border": "#8FE0A022",
+    "text": "#F0F7F0",
+    "text_secondary": "#A2B8A4",
+    "accent": "#4FC96B"
+  }
+}

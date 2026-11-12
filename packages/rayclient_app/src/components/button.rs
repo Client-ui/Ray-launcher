@@ -358,9 +358,15 @@ impl Component for Button {
             && colors::active_theme().pixel_icons
         {
             let (lit, shade) = if pressing() {
-                (Color::from_argb(70, 0, 0, 0), Color::from_argb(40, 255, 255, 255))
+                (
+                    Color::from_argb(70, 0, 0, 0),
+                    Color::from_argb(40, 255, 255, 255),
+                )
             } else {
-                (Color::from_argb(55, 255, 255, 255), Color::from_argb(95, 0, 0, 0))
+                (
+                    Color::from_argb(55, 255, 255, 255),
+                    Color::from_argb(95, 0, 0, 0),
+                )
             };
             rect = rect
                 .border(

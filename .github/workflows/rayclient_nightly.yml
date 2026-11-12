@@ -57,6 +57,9 @@ jobs:
             formats: nsis
 
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 60
+    # GitHub's Apple Silicon runners are often capacity-limited; do not fail the run over them
+    continue-on-error: ${{ matrix.target == 'aarch64-apple-darwin' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 

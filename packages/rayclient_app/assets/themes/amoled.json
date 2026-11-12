@@ -1,0 +1,14 @@
+{
+  "name": "Ray AMOLED",
+  "colors": {
+    "light": false,
+    "page": "#000000",
+    "page_elevated": "#070708",
+    "card": "#0F0F11",
+    "component": "#19191C",
+    "border": "#FFFFFF1A",
+    "text": "#F5F5F7",
+    "text_secondary": "#9A9AA5",
+    "accent": "#FF7A1A"
+  }
+}

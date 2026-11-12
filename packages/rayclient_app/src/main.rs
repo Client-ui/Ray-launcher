@@ -106,9 +106,14 @@ impl App for RayClientApp {
         let system_dark = *platform.preferred_theme.read() == PreferredTheme::Dark;
         let scale_factor = *platform.scale_factor.read() as f32;
         let theme_id = theme::system_aware(&appearance.theme, system_dark).to_string();
-        theme::colors::apply(&theme_id, appearance.accent_color.as_deref());
+        let accent = theme::effective_accent(
+            appearance.accent_color.as_deref(),
+            appearance.wallpaper.as_deref(),
+            appearance.wallpaper_accent,
+        );
+        theme::colors::apply(&theme_id, accent.as_deref());
         theme::set_scale_factor(scale_factor);
-        let deps = (theme_id, appearance.accent_color, scale_factor.to_bits());
+        let deps = (theme_id, accent, scale_factor.to_bits());
         use_side_effect_with_deps(&deps, move |_| {
             *palette_revision.write() += 1;
         });
@@ -229,7 +234,12 @@ fn main() {
     #[cfg(target_os = "macos")]
     rayclient_app::platform::macos::loop_memory_collector();
 
-    theme::colors::apply(&settings.theme, settings.accent_color.as_deref());
+    let accent = theme::effective_accent(
+        settings.accent_color.as_deref(),
+        settings.wallpaper.as_deref(),
+        settings.wallpaper_accent,
+    );
+    theme::colors::apply(&settings.theme, accent.as_deref());
     translations::init(settings.language.clone());
 
     let start_maximized = settings.start_maximized;

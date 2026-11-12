@@ -129,9 +129,7 @@ fn can_self_update() -> bool {
         return false;
     }
 
-    if std::env::var_os("RAY_DISABLE_AUTOUPDATE")
-        .is_some_and(|val| val.eq_ignore_ascii_case("1"))
-    {
+    if std::env::var_os("RAY_DISABLE_AUTOUPDATE").is_some_and(|val| val.eq_ignore_ascii_case("1")) {
         return false;
     }
 

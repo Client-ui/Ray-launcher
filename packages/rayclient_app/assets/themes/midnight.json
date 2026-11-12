@@ -1,0 +1,14 @@
+{
+  "name": "Ray Midnight",
+  "colors": {
+    "light": false,
+    "page": "#0A0B14",
+    "page_elevated": "#10121F",
+    "card": "#171A2B",
+    "component": "#222640",
+    "border": "#9AA6FF22",
+    "text": "#F1F3FF",
+    "text_secondary": "#A3A9C9",
+    "accent": "#7C6CFF"
+  }
+}

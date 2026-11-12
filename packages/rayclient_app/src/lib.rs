@@ -33,6 +33,7 @@ mod ui;
 pub mod updater;
 pub(crate) mod utils;
 mod view;
+pub(crate) mod wallpaper;
 
 pub mod constants;
 

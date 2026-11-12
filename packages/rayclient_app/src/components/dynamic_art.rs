@@ -14,7 +14,7 @@ use rayclient_core::images::{DEFAULT_IMAGE_EDGE, PREVIEW_IMAGE_EDGE};
 use crate::AppAssets;
 use crate::hooks::{
     loaded_image, resolve_art_url, settled_or_loading, use_cached_image, use_local_image,
-    use_version_art, use_version_metadata,
+    use_settings_snapshot, use_version_art, use_version_metadata,
 };
 use crate::layout::HOME_BACKGROUND_ASSET;
 use crate::theme::colors;
@@ -127,22 +127,47 @@ impl DynamicArt {
 
 pub fn use_art_bytes(art: &DynamicArt) -> (String, Bytes) {
     let max_edge = art.max_edge;
-    use_resolved_art(art).unwrap_or_else(|| bundled_art(max_edge, art.variant()))
+    let chosen = use_settings_snapshot().settings.wallpaper;
+    use_resolved_art(art).unwrap_or_else(|| {
+        chosen_art(max_edge, chosen.as_deref())
+            .unwrap_or_else(|| bundled_art(max_edge, art.variant_with(chosen.as_deref())))
+    })
 }
 
 /// Every wallpaper that ships inside the launcher; picked by seed so instances differ
-pub const BUNDLED_WALLPAPERS: [&str; 8] = [
+pub const BUNDLED_WALLPAPERS: [&str; 22] = [
     HOME_BACKGROUND_ASSET,
-    "backgrounds/RayDusk.jpg",
-    "backgrounds/RayRays.jpg",
-    "backgrounds/RayHorizon.jpg",
-    "backgrounds/RayNebula.jpg",
+    "backgrounds/RayAurora.jpg",
+    "backgrounds/RayCyber.jpg",
+    "backgrounds/RayDawn.jpg",
     "backgrounds/RayDunes.jpg",
-    "backgrounds/RaySparks.jpg",
+    "backgrounds/RayDusk.jpg",
+    "backgrounds/RayEmbers.jpg",
     "backgrounds/RayFlare.jpg",
+    "backgrounds/RayForest.jpg",
+    "backgrounds/RayHorizon.jpg",
+    "backgrounds/RayLava.jpg",
+    "backgrounds/RayMono.jpg",
+    "backgrounds/RayNebula.jpg",
+    "backgrounds/RayNeon.jpg",
+    "backgrounds/RayOcean.jpg",
+    "backgrounds/RayRays.jpg",
+    "backgrounds/RaySakura.jpg",
+    "backgrounds/RaySparks.jpg",
+    "backgrounds/RayStarfield.jpg",
+    "backgrounds/RaySunset.jpg",
+    "backgrounds/RayTwilight.jpg",
+    "backgrounds/RayWaves.jpg",
 ];
 
 impl DynamicArt {
+    /// The user's chosen wallpaper wins over the automatic per-instance pick
+    fn variant_with(&self, chosen: Option<&str>) -> usize {
+        chosen
+            .and_then(|path| BUNDLED_WALLPAPERS.iter().position(|w| *w == path))
+            .unwrap_or_else(|| self.variant())
+    }
+
     /// Index into [`BUNDLED_WALLPAPERS`]; mixes the version too so each release differs
     fn variant(&self) -> usize {
         let mut h = self.seed.wrapping_mul(0x9E37_79B9_7F4A_7C15);
@@ -155,6 +180,13 @@ impl DynamicArt {
         }
         ((h >> 32) as usize) % BUNDLED_WALLPAPERS.len()
     }
+}
+
+/// The user's own imported wallpaper, if that is what they picked
+fn chosen_art(max_edge: u32, chosen: Option<&str>) -> Option<(String, Bytes)> {
+    let chosen = chosen.filter(|path| crate::wallpaper::is_custom(path))?;
+    let bytes = crate::wallpaper::bytes_for(chosen)?;
+    Some((format!("{max_edge}|{chosen}"), bytes))
 }
 
 fn bundled_art(max_edge: u32, variant: usize) -> (String, Bytes) {
@@ -223,11 +255,13 @@ fn use_resolved_art(art: &DynamicArt) -> Option<(String, Bytes)> {
 
 impl Component for DynamicArt {
     fn render(&self) -> impl IntoElement {
+        let chosen = use_settings_snapshot().settings.wallpaper;
         let resolved = use_resolved_art(self);
         let show_skeleton = self.skeleton && resolved.is_none();
-        let (key, bytes) = resolved
-            .clone()
-            .unwrap_or_else(|| bundled_art(self.max_edge, self.variant()));
+        let (key, bytes) = resolved.clone().unwrap_or_else(|| {
+            chosen_art(self.max_edge, chosen.as_deref())
+                .unwrap_or_else(|| bundled_art(self.max_edge, self.variant_with(chosen.as_deref())))
+        });
 
         // New art eases in rather than popping, so swapping wallpapers feels smooth
         let fade = use_animation_with_dependencies(&key, |conf, _| {

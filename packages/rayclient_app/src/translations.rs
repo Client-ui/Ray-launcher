@@ -16,6 +16,9 @@ const FILE_NAME: &str = "oneclient.json";
 const MANIFEST_TTL: Duration = Duration::from_secs(6 * 60 * 60);
 const RETRY_DELAY: Duration = Duration::from_secs(10 * 60);
 
+/// Translations that ship inside the launcher, so they work offline and are always complete
+const BUNDLED: &[(&str, &str)] = &[("lt_LT", include_str!("../lang/lt_LT.json"))];
+
 const NAMES: &[(&str, &str, &str)] = &[
     ("ar_SA", "العربية", "Arabic"),
     ("bg_BG", "Български", "Bulgarian"),
@@ -76,7 +79,21 @@ pub fn subscribe() -> watch::Receiver<u64> {
 }
 
 pub fn available() -> Vec<String> {
-    AVAILABLE.read().unwrap_or_else(|e| e.into_inner()).clone()
+    let mut codes = AVAILABLE.read().unwrap_or_else(|e| e.into_inner()).clone();
+    for (code, _) in BUNDLED {
+        if !codes.iter().any(|known| known.eq_ignore_ascii_case(code)) {
+            codes.push((*code).to_string());
+        }
+    }
+    codes.sort();
+    codes
+}
+
+fn bundled(code: &str) -> Option<HashMap<String, String>> {
+    BUNDLED
+        .iter()
+        .find(|(known, _)| known.eq_ignore_ascii_case(code))
+        .and_then(|(_, json)| parse_translations(json.as_bytes()))
 }
 
 pub fn names(code: Option<&str>) -> (String, String) {
@@ -222,10 +239,13 @@ fn notify_changed() {
 }
 
 fn install_cached(code: Option<&str>) {
-    let table = code
-        .and_then(newest_cached)
-        .and_then(|path| std::fs::read(path).ok())
-        .and_then(|bytes| parse_translations(&bytes));
+    let table = code.and_then(|code| {
+        bundled(code).or_else(|| {
+            newest_cached(code)
+                .and_then(|path| std::fs::read(path).ok())
+                .and_then(|bytes| parse_translations(&bytes))
+        })
+    });
     i18n::install(table);
     notify_changed();
 }
@@ -326,6 +346,12 @@ fn prune_older(dir: &Path, current: &Path) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn bundled_lithuanian_covers_every_string() {
+        let table = bundled("lt_LT").expect("bundled Lithuanian parses");
+        assert_eq!(table.len(), i18n::source().len());
+    }
 
     #[test]
     fn manifest_keeps_only_safe_launcher_files() {

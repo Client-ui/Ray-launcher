@@ -1,0 +1,14 @@
+{
+  "name": "Ray Rose",
+  "colors": {
+    "light": false,
+    "page": "#120A0F",
+    "page_elevated": "#1B1017",
+    "card": "#251720",
+    "component": "#35212D",
+    "border": "#FF8FBF22",
+    "text": "#FBF1F6",
+    "text_secondary": "#C0A3B1",
+    "accent": "#FF4F9A"
+  }
+}

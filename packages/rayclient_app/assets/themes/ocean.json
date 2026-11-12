@@ -1,0 +1,14 @@
+{
+  "name": "Ray Ocean",
+  "colors": {
+    "light": false,
+    "page": "#07110F",
+    "page_elevated": "#0C1A18",
+    "card": "#122421",
+    "component": "#1B332F",
+    "border": "#5CF2D622",
+    "text": "#EEF9F7",
+    "text_secondary": "#9DBDB8",
+    "accent": "#1FC8B0"
+  }
+}

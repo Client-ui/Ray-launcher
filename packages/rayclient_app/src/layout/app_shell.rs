@@ -325,6 +325,7 @@ impl Component for AppHomeBackground {
             art_bytes,
             fade_opacity,
             parallax_enabled,
+            dim: use_settings_snapshot().settings.wallpaper_dim,
         }
         .into_element()
     }
@@ -335,6 +336,8 @@ pub struct ParallaxArt {
     pub art_bytes: Bytes,
     pub fade_opacity: f32,
     pub parallax_enabled: bool,
+    /// Darkening level 0..=3 laid over the wallpaper for readability
+    pub dim: u8,
 }
 
 impl Component for ParallaxArt {
@@ -484,6 +487,20 @@ impl Component for ParallaxArt {
                     .layer(Layer::Relative(1))
                     .child(gradient_overlay_radial()),
             )
+            .maybe(self.dim > 0, |el| {
+                let alpha = match self.dim {
+                    1 => 56,
+                    2 => 110,
+                    _ => 160,
+                };
+                el.child(
+                    rect()
+                        .expanded()
+                        .position(Position::new_absolute())
+                        .layer(Layer::Relative(2))
+                        .background(Color::from_argb(alpha, 0, 0, 0)),
+                )
+            })
             .child(
                 rect()
                     .width(Size::fill())

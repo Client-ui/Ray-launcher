@@ -1,0 +1,14 @@
+{
+  "name": "Ray Sunset",
+  "colors": {
+    "light": false,
+    "page": "#100B0C",
+    "page_elevated": "#1A1113",
+    "card": "#251A1D",
+    "component": "#352529",
+    "border": "#FF8F6A22",
+    "text": "#FBF2EF",
+    "text_secondary": "#BFA6A0",
+    "accent": "#FF5A5F"
+  }
+}

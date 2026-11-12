@@ -5,7 +5,9 @@ use freya::router::RouterContext;
 use rayclient_core::settings::LauncherSettings;
 
 use super::settings_page;
-use crate::components::{ColorPicker, IconType, link_button, toggle};
+use crate::components::{
+    BUNDLED_WALLPAPERS, ColorPicker, IconType, Segment, SegmentedControl, link_button, toggle,
+};
 use crate::hooks::{Actions, use_debounced, use_dispatch, use_settings_snapshot};
 use crate::i18n::t;
 use crate::routes::Route;
@@ -16,6 +18,7 @@ use crate::theme::{
 };
 use crate::ui::border_all_color;
 use crate::view::app::settings::{resettable, settings_row};
+use crate::wallpaper;
 
 #[derive(PartialEq)]
 pub struct SettingsAppearance;
@@ -51,6 +54,36 @@ impl Component for SettingsAppearance {
             });
         });
 
+        let wallpaper_accent = use_state({
+            let v = settings.wallpaper_accent;
+            move || v
+        });
+        let mut wallpaper_ready = use_state(|| false);
+        let persist_wallpaper_accent = dispatch.clone();
+        use_side_effect(move || {
+            let value = *wallpaper_accent.read();
+            if !*wallpaper_ready.peek() {
+                wallpaper_ready.set(true);
+                return;
+            }
+            persist_wallpaper_accent.edit_settings(|settings| settings.wallpaper_accent = value);
+        });
+
+        let dim = use_state({
+            let v = settings.wallpaper_dim;
+            move || v
+        });
+        let mut dim_ready = use_state(|| false);
+        let persist_dim = dispatch.clone();
+        use_side_effect(move || {
+            let value = *dim.read();
+            if !*dim_ready.peek() {
+                dim_ready.set(true);
+                return;
+            }
+            persist_dim.edit_settings(|settings| settings.wallpaper_dim = value);
+        });
+
         let accent = use_state({
             let v = settings.accent_color.clone();
             move || v
@@ -83,6 +116,33 @@ impl Component for SettingsAppearance {
                     ))
                     .child(animations_row(animations_on, defaults.animations_enabled)),
             )
+            .child(settings_row(
+                IconType::Eye,
+                t("oneclient.settings.appearance.wallpaper_accent.title"),
+                t("oneclient.settings.appearance.wallpaper_accent.description"),
+                resettable(
+                    toggle(wallpaper_accent),
+                    wallpaper_accent,
+                    defaults.wallpaper_accent,
+                ),
+            ))
+            .child(settings_row(
+                IconType::Eye,
+                t("oneclient.settings.appearance.wallpaper_dim.title"),
+                t("oneclient.settings.appearance.wallpaper_dim.description"),
+                SegmentedControl::new(dim).segments([
+                    Segment::new(0u8).label(t("oneclient.settings.appearance.wallpaper_dim.off")),
+                    Segment::new(1u8).label(t("oneclient.settings.appearance.wallpaper_dim.light")),
+                    Segment::new(2u8)
+                        .label(t("oneclient.settings.appearance.wallpaper_dim.medium")),
+                    Segment::new(3u8)
+                        .label(t("oneclient.settings.appearance.wallpaper_dim.strong")),
+                ]),
+            ))
+            .child(wallpaper_section(
+                settings.wallpaper.clone(),
+                dispatch.clone(),
+            ))
             .child(
                 rect().padding(Gaps::new(8., 0., 0., 0.)).child(
                     label()
@@ -319,4 +379,182 @@ fn animations_row(animations_on: State<bool>, default: bool) -> impl IntoElement
         t("oneclient.settings.appearance.animations.description"),
         resettable(toggle(animations_on), animations_on, default),
     )
+}
+
+fn wallpaper_section(selected: Option<String>, dispatch: Actions) -> impl IntoElement {
+    let custom_selected = selected
+        .as_deref()
+        .filter(|path| wallpaper::is_custom(path));
+
+    let auto_dispatch = dispatch.clone();
+    let mut tiles: Vec<Element> = vec![wallpaper_tile(
+        glyph_preview("\u{2726}"),
+        t("oneclient.settings.appearance.wallpaper.automatic"),
+        selected.is_none(),
+        move || auto_dispatch.edit_settings(|settings| settings.wallpaper = None),
+    )];
+
+    let upload_dispatch = dispatch.clone();
+    tiles.push(wallpaper_tile(
+        glyph_preview("+"),
+        t("oneclient.settings.appearance.wallpaper.upload"),
+        false,
+        move || {
+            let dispatch = upload_dispatch.clone();
+            spawn(async move {
+                let Some(handle) = rfd::AsyncFileDialog::new()
+                    .set_title(t("oneclient.settings.appearance.wallpaper.upload_title"))
+                    .add_filter("Images", &["png", "jpg", "jpeg"])
+                    .pick_file()
+                    .await
+                else {
+                    return;
+                };
+                if let Some(path) = wallpaper::import(handle.path().to_path_buf()).await {
+                    dispatch.edit_settings(|settings| {
+                        settings.wallpaper = Some(path);
+                        settings.wallpaper_accent = true;
+                    });
+                }
+            });
+        },
+    ));
+
+    if let Some(path) = custom_selected {
+        tiles.push(wallpaper_tile(
+            image_preview(path.to_string()),
+            t("oneclient.settings.appearance.wallpaper.custom"),
+            true,
+            || {},
+        ));
+    }
+
+    for path in BUNDLED_WALLPAPERS {
+        let dispatch = dispatch.clone();
+        let name = wallpaper_name(path);
+        tiles.push(wallpaper_tile(
+            image_preview(path.to_string()),
+            name,
+            selected.as_deref() == Some(path),
+            move || {
+                dispatch.edit_settings(|settings| settings.wallpaper = Some(path.to_string()));
+            },
+        ));
+    }
+
+    rect()
+        .vertical()
+        .width(Size::fill())
+        .spacing(8.)
+        .padding(Gaps::new(12., 0., 0., 0.))
+        .child(
+            label()
+                .text(t("oneclient.settings.appearance.wallpaper.title"))
+                .font_size(text_size(15.))
+                .font_weight(FontWeight::MEDIUM)
+                .color(colors::fg_primary()),
+        )
+        .child(
+            label()
+                .text(t("oneclient.settings.appearance.wallpaper.description"))
+                .font_size(text_size(12.))
+                .color(colors::fg_secondary()),
+        )
+        .child(
+            rect()
+                .horizontal()
+                .width(Size::fill())
+                .content(Content::Wrap {
+                    wrap_spacing: Some(12.),
+                })
+                .spacing(12.)
+                .children(tiles),
+        )
+}
+
+fn glyph_preview(glyph: &'static str) -> Element {
+    rect()
+        .width(Size::fill())
+        .height(Size::fill())
+        .center()
+        .child(
+            label()
+                .text(glyph)
+                .font_size(text_size(22.))
+                .color(colors::brand()),
+        )
+        .into_element()
+}
+
+fn image_preview(path: String) -> Element {
+    ImageViewer::new((
+        format!("wallpaper-thumb|{path}"),
+        wallpaper::bytes_for(&path).unwrap_or_default(),
+    ))
+    .width(Size::fill())
+    .height(Size::fill())
+    .aspect_ratio(AspectRatio::Max)
+    .image_cover(ImageCover::Center)
+    .into_element()
+}
+
+/// `backgrounds/RayEmber.jpg` -> `Ember`
+fn wallpaper_name(path: &str) -> String {
+    let stem = path
+        .rsplit('/')
+        .next()
+        .and_then(|file| file.strip_suffix(".jpg"))
+        .unwrap_or(path);
+    stem.strip_prefix("Ray").unwrap_or(stem).to_string()
+}
+
+fn wallpaper_tile(
+    preview: Element,
+    name: impl Into<String>,
+    selected: bool,
+    on_pick: impl Fn() + 'static,
+) -> Element {
+    let border_color = if selected {
+        colors::brand()
+    } else {
+        colors::component_border()
+    };
+
+    rect()
+        .vertical()
+        .spacing(6.)
+        .cursor(CursorIcon::Pointer)
+        .on_press(move |_| on_pick())
+        .child(
+            rect()
+                .width(Size::px(150.))
+                .height(Size::px(84.))
+                .corner_radius(CornerRadius::new_all(8.))
+                .overflow(Overflow::Clip)
+                .background(colors::component())
+                .border(border_all_color(
+                    if selected { 2. } else { 1. },
+                    border_color,
+                ))
+                .child(preview),
+        )
+        .child(
+            label()
+                .text(name.into())
+                .width(Size::px(150.))
+                .max_lines(1)
+                .text_overflow(TextOverflow::Ellipsis)
+                .font_size(text_size(12.))
+                .font_weight(if selected {
+                    FontWeight::MEDIUM
+                } else {
+                    FontWeight::NORMAL
+                })
+                .color(if selected {
+                    colors::fg_primary()
+                } else {
+                    colors::fg_secondary()
+                }),
+        )
+        .into_element()
 }
