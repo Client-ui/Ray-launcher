@@ -23,6 +23,7 @@ mod notifications;
 pub mod platform;
 pub mod protocol;
 pub mod recovery;
+pub(crate) mod release_check;
 mod routes;
 pub mod shortcut;
 pub mod state;

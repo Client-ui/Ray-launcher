@@ -6,11 +6,11 @@ use reqwest::Method;
 use tokio::sync::Mutex;
 
 use crate::{LauncherError, LauncherResult};
+use polyio::sha1_bytes;
 use rayclient_common::paths;
 use rayclient_net::RequestClient;
 use rayclient_net::RequestError;
 use rayclient_net::{EtagPolicy, fetch_cached};
-use polyio::sha1_bytes;
 
 pub const DEFAULT_IMAGE_EDGE: u32 = 1200;
 

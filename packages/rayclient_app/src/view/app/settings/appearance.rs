@@ -394,6 +394,18 @@ fn wallpaper_section(selected: Option<String>, dispatch: Actions) -> impl IntoEl
         move || auto_dispatch.edit_settings(|settings| settings.wallpaper = None),
     )];
 
+    let shuffle_dispatch = dispatch.clone();
+    tiles.push(wallpaper_tile(
+        glyph_preview("~"),
+        t("oneclient.settings.appearance.wallpaper.shuffle"),
+        selected.as_deref() == Some(wallpaper::SHUFFLE),
+        move || {
+            shuffle_dispatch.edit_settings(|settings| {
+                settings.wallpaper = Some(wallpaper::SHUFFLE.to_string())
+            });
+        },
+    ));
+
     let upload_dispatch = dispatch.clone();
     tiles.push(wallpaper_tile(
         glyph_preview("+"),

@@ -34,6 +34,10 @@ pub use game_options::{read_graphics_backend, write_graphics_backend};
 pub use heal::clear_zeroed_files;
 pub use launch::{LaunchedGame, crash_mod_issues, is_running, launch_cluster, repair_cluster};
 pub use mod_problems::{ModProblem, ModProblemKind, ModRef};
+pub use process::{
+    DirBusy, GameProcess, GameProcessManager, SyncBlock, SyncGuard, is_process_alive, kill_process,
+    process_start_time,
+};
 pub use rayclient_mc::{
     DownloadPlan, GameVersionInfo, GameVersionKind, NativesMode, NativesReport, PlannedLibrary,
     check_natives, confirm_incomplete_install, download_minecraft, download_version_info,
@@ -41,10 +45,6 @@ pub use rayclient_mc::{
     get_loaders_for_version, get_version_ids, get_versions_for_loader, is_version_updated,
     libraries_missing, natives_missing, plan_downloads, resolve_minecraft_version, validate_rules,
     verify_game_files,
-};
-pub use process::{
-    DirBusy, GameProcess, GameProcessManager, SyncBlock, SyncGuard, is_process_alive, kill_process,
-    process_start_time,
 };
 pub use reattach::recover_sessions;
 pub(crate) use shared_dir::lock_mods_sync;

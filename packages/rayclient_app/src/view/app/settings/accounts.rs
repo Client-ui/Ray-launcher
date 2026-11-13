@@ -5,16 +5,16 @@ use freya::query::{MutationCapability, MutationStateData, UseMutation};
 use rayclient_auth::{AccountKind, MinecraftAccount};
 use uuid::Uuid;
 
-use super::{section_header, settings_page};
+use super::{resettable, section_header, settings_page, settings_row};
 use crate::components::{
-    Avatar, Button, Icon, IconType, MicrosoftLogin, OverlayPopup, PlayerModel, TextInput,
+    Avatar, Button, Icon, IconType, MicrosoftLogin, OverlayPopup, PlayerModel, TextInput, toggle,
     use_microsoft_login,
 };
 use crate::hooks::{
     AddOfflineAccountKeys, RefreshAccountKeys, RemoveAccountKeys, SetDefaultAccountKeys,
     accounts_have_microsoft, try_accounts, try_default_account, use_accounts,
-    use_add_offline_account, use_current_account, use_refresh_account, use_remove_account,
-    use_set_default_account,
+    use_add_offline_account, use_current_account, use_dispatch, use_refresh_account,
+    use_remove_account, use_set_default_account, use_settings_snapshot,
 };
 use crate::i18n::t;
 use crate::theme::{colors, rounded, text_size};
@@ -103,6 +103,24 @@ impl Component for SettingsAccounts {
             rows.push(empty_state());
         }
 
+        let custom_skin = use_state({
+            let v = use_settings_snapshot().settings.offline_custom_skin;
+            move || v
+        });
+        let mut skin_ready = use_state(|| false);
+        let persist_skin = use_dispatch();
+        use_side_effect(move || {
+            let value = *custom_skin.read();
+            if !*skin_ready.peek() {
+                skin_ready.set(true);
+                return;
+            }
+            persist_skin.edit_settings(|settings| settings.offline_custom_skin = value);
+        });
+        let has_offline = accounts
+            .iter()
+            .any(|account| account.kind == AccountKind::Offline);
+
         settings_page()
             .child(hero(
                 default_account,
@@ -119,6 +137,15 @@ impl Component for SettingsAccounts {
                 "oneclient.settings.accounts.section.your_accounts",
             )))
             .children(rows)
+            .maybe_child(has_offline.then(|| {
+                settings_row(
+                    IconType::Users01,
+                    t("oneclient.settings.accounts.custom_skin.title"),
+                    t("oneclient.settings.accounts.custom_skin.description"),
+                    resettable(toggle(custom_skin), custom_skin, true),
+                )
+                .into_element()
+            }))
             .maybe_child(show_offline.read().then(|| {
                 offline_dialog(
                     username,
@@ -603,8 +630,19 @@ impl Component for AccountRow {
                 Button::new()
                     .ghost()
                     .icon()
-                    .enabled(false)
-                    .tooltip(t("oneclient.common.edit"))
+                    .enabled(!is_microsoft)
+                    .tooltip(if is_microsoft {
+                        t("oneclient.common.edit")
+                    } else {
+                        t("oneclient.settings.accounts.skin.change")
+                    })
+                    .on_press({
+                        let username = self.username.clone();
+                        move |e: Event<PressEventData>| {
+                            e.stop_propagation();
+                            pick_skin(username.clone());
+                        }
+                    })
                     .child(
                         Icon::new(IconType::Pencil01)
                             .size(18.)
@@ -714,4 +752,33 @@ fn empty_state() -> Element {
                 .color(colors::fg_secondary()),
         )
         .into_element()
+}
+
+/// Lets the user choose a skin PNG for an offline account and reports how it went
+fn pick_skin(username: String) {
+    spawn(async move {
+        let Some(handle) = rfd::AsyncFileDialog::new()
+            .set_title(t("oneclient.settings.accounts.skin.pick_title"))
+            .add_filter("PNG", &["png"])
+            .pick_file()
+            .await
+        else {
+            return;
+        };
+        let Ok(state) = crate::launcher::state() else {
+            return;
+        };
+        let events = state.services.events.clone();
+        match rayclient_core::skins::import_skin(&username, handle.path()) {
+            Ok(()) => events
+                .notify(t("oneclient.settings.accounts.skin.changed_title"))
+                .body(t("oneclient.settings.accounts.skin.changed_body"))
+                .send(),
+            Err(_) => events
+                .notify(t("oneclient.settings.accounts.skin.invalid_title"))
+                .body(t("oneclient.settings.accounts.skin.invalid_body"))
+                .error()
+                .send(),
+        }
+    });
 }

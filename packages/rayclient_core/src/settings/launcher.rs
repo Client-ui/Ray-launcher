@@ -74,6 +74,8 @@ pub struct LauncherSettings {
     pub wallpaper_accent: bool,
     /// How strongly the home wallpaper is darkened: 0 off, 1 light, 2 medium, 3 strong
     pub wallpaper_dim: u8,
+    /// Load the skin mod for offline accounts so their custom skin shows in game
+    pub offline_custom_skin: bool,
     pub start_maximized: bool,
     pub animations_enabled: bool,
     pub theme: String,
@@ -140,6 +142,7 @@ impl Default for LauncherSettings {
             wallpaper: None,
             wallpaper_accent: false,
             wallpaper_dim: 0,
+            offline_custom_skin: true,
             start_maximized: false,
             animations_enabled: true,
             theme: "dark".to_string(),

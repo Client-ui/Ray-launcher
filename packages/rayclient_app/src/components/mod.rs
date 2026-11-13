@@ -90,6 +90,7 @@ pub use crash_dialog::CrashDialog;
 pub use date_range_picker::{DateRange, DateRangePicker};
 pub use disable_dependents_popup::DisableDependentsOverlay;
 pub use dropdown::Dropdown;
+pub(crate) use dynamic_art::shuffled_path;
 pub use dynamic_art::{ART_PREVIEW_EDGE, BUNDLED_WALLPAPERS, DynamicArt};
 pub use essential_confirm::EssentialConfirmOverlay;
 pub use file_drop::{FileDropOverlay, accept_drop};

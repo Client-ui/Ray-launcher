@@ -203,6 +203,16 @@ async fn start(
     {
         tracing::warn!(cluster_id, error = %err, "failed to install bundle content");
     }
+    // Offline accounts get the skin mod only when the setting allows it; Microsoft accounts
+    // keep their own skin and never load it
+    let skin_mod = account.is_offline() && state.settings.read().offline_custom_skin;
+    if let Err(err) = crate::skins::set_mod_enabled(&game_dir, skin_mod) {
+        tracing::warn!(cluster_id, error = %err, "could not switch the skin mod");
+    }
+    if skin_mod && let Err(err) = crate::skins::install_for_launch(&game_dir, &account.username) {
+        tracing::warn!(cluster_id, error = %err, "could not install the offline skin");
+    }
+
     let cluster = match crate::clusters::auto_update_loader(state, &cluster).await {
         Ok(updated) => updated.unwrap_or(cluster),
         Err(err) => {
@@ -295,9 +305,8 @@ async fn start(
     // Stats every library and the asset tree, the same work `plan_downloads`
     // already keeps off the runtime threads. `block_in_place` because
     // `VersionInfo` is not `Clone` and the sweep only reads it
-    let missing = tokio::task::block_in_place(|| {
-        game_files_missing(&version_info, &java.os_arch, updated)
-    });
+    let missing =
+        tokio::task::block_in_place(|| game_files_missing(&version_info, &java.os_arch, updated));
     match missing {
         Ok(true) => {
             tracing::info!(cluster_id, "missing game files; repairing");

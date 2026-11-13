@@ -1,7 +1,7 @@
 use std::path::Path;
 
-use rayclient_events::{EventBus, GroupedProgressChild, TaskPhase};
 use polyio::{Checksum, ChecksumStream, normalize_hash};
+use rayclient_events::{EventBus, GroupedProgressChild, TaskPhase};
 use reqwest::Method;
 
 use crate::error::RequestError;

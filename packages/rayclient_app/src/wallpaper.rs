@@ -14,6 +14,9 @@ const FOLDER: &str = "wallpapers";
 static CUSTOM: LazyLock<Mutex<HashMap<String, Bytes>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+/// Marker stored in the settings for "a different bundled wallpaper every launch"
+pub const SHUFFLE: &str = "shuffle";
+
 /// Chosen wallpapers are either a bundled asset path or an absolute path of an import
 pub fn is_custom(chosen: &str) -> bool {
     Path::new(chosen).is_absolute()
@@ -21,6 +24,9 @@ pub fn is_custom(chosen: &str) -> bool {
 
 /// Bytes of whichever wallpaper `chosen` names, cached after the first read
 pub fn bytes_for(chosen: &str) -> Option<Bytes> {
+    if chosen == SHUFFLE {
+        return AppAssets::get_bytes(crate::components::shuffled_path());
+    }
     if !is_custom(chosen) {
         return AppAssets::get_bytes(chosen);
     }

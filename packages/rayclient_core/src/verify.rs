@@ -2,12 +2,12 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
+use polyio::{normalize_hash, sha1_file};
 use rayclient_common::paths;
 use rayclient_content::packages::PackageStore;
 use rayclient_content::packages::store::artifact_absolute_path;
 use rayclient_db::dao::artifact as artifact_dao;
 use rayclient_events::{GroupedProgressSession, TaskCategory, TaskPhase};
-use polyio::{normalize_hash, sha1_file};
 
 use crate::LauncherResult;
 use crate::clusters::prepare::prepare_cluster_locked;

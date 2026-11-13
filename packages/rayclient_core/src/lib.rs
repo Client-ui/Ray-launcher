@@ -19,6 +19,7 @@ pub mod reporting;
 pub mod settings;
 pub mod sharing;
 pub mod simulate;
+pub mod skins;
 mod state;
 pub mod storage;
 pub mod sync;

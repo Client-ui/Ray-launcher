@@ -163,6 +163,9 @@ pub const BUNDLED_WALLPAPERS: [&str; 22] = [
 impl DynamicArt {
     /// The user's chosen wallpaper wins over the automatic per-instance pick
     fn variant_with(&self, chosen: Option<&str>) -> usize {
+        if chosen == Some(crate::wallpaper::SHUFFLE) {
+            return shuffled_index();
+        }
         chosen
             .and_then(|path| BUNDLED_WALLPAPERS.iter().position(|w| *w == path))
             .unwrap_or_else(|| self.variant())
@@ -180,6 +183,21 @@ impl DynamicArt {
         }
         ((h >> 32) as usize) % BUNDLED_WALLPAPERS.len()
     }
+}
+
+/// One random wallpaper per launch for the "Shuffle" choice
+fn shuffled_index() -> usize {
+    static INDEX: LazyLock<usize> = LazyLock::new(|| {
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| d.subsec_nanos() as usize);
+        nanos % BUNDLED_WALLPAPERS.len()
+    });
+    *INDEX
+}
+
+pub(crate) fn shuffled_path() -> &'static str {
+    BUNDLED_WALLPAPERS[shuffled_index()]
 }
 
 /// The user's own imported wallpaper, if that is what they picked

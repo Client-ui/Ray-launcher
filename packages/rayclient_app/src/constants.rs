@@ -17,6 +17,13 @@ pub const RELEASES_URL: &str = match option_env!("RAY_RELEASES_URL") {
     None => "https://github.com/your-org/RayLauncher/releases/latest",
 };
 
+/// `owner/name` of the GitHub repository whose Releases page is checked for new versions;
+/// CI fills it in from the repository the build runs in
+pub const RELEASES_REPO: &str = match option_env!("RAY_RELEASES_REPO") {
+    Some(repo) => repo,
+    None => "",
+};
+
 #[allow(clippy::const_is_empty)]
 pub const fn updates_configured() -> bool {
     !UPDATER_ENDPOINT.is_empty() && !UPDATER_PUBKEY.is_empty()
