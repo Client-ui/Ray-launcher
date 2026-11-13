@@ -905,7 +905,6 @@ impl Component for StoreDetailPanel {
         };
         let variant = data.shop_variant(&item);
         let owned = data.owned_ids().contains(&variant.id);
-        let in_cart = data.cart_keys.contains(&cart_key(variant.id));
         let variants = item.ui_variants();
         let mut picks = shared.store_picks;
 
@@ -950,21 +949,6 @@ impl Component for StoreDetailPanel {
                     .unwrap_or_default()
             })
             .collect();
-
-        let add = {
-            let item = item.clone();
-            let variant = variant.clone();
-            EventHandler::new(move |()| {
-                if !in_cart {
-                    add_to_cart(owned, shared.cart, shared.status, &item, &variant);
-                }
-            })
-        };
-        let buy = shared.run(WardrobeAction::BuyNow {
-            account: data.account,
-            cosmetic: variant.id,
-            name: cart_name(&item, &variant),
-        });
 
         let info = rect()
             .vertical()
@@ -1071,31 +1055,10 @@ impl Component for StoreDetailPanel {
                             .color(colors::fg_secondary())
                             .into_element()
                     } else {
-                        rect()
-                            .horizontal()
-                            .spacing(8.)
-                            .child(
-                                Button::new()
-                                    .secondary()
-                                    .enabled(!in_cart && !data.busy && data.plus.is_some())
-                                    .on_press(move |_| add.call(()))
-                                    .maybe_child(
-                                        (!in_cart).then(|| Icon::new(IconType::Plus).size(14.)),
-                                    )
-                                    .text(if in_cart {
-                                        t("oneclient.wardrobe.action.in_cart")
-                                    } else {
-                                        t("oneclient.wardrobe.action.add_to_cart")
-                                    }),
-                            )
-                            .child(
-                                Button::new()
-                                    .primary()
-                                    .enabled(!data.busy && data.plus.is_some())
-                                    .on_press(move |_| buy.call(()))
-                                    .child(Icon::new(IconType::LinkExternal01).size(14.))
-                                    .text(t("oneclient.wardrobe.action.buy_now")),
-                            )
+                        label()
+                            .text(t("oneclient.wardrobe.preview.preview_only"))
+                            .font_size(text_size(12.))
+                            .color(colors::fg_secondary())
                             .into_element()
                     }),
             )
@@ -1120,18 +1083,6 @@ impl Component for BundleDetailPanel {
                 .height(Size::fill())
                 .into_element();
         };
-        let mut status_state = shared.status;
-        let buy = match bundle.store_product_id.clone() {
-            Some(product) => shared.run(WardrobeAction::Checkout {
-                account: self.data.account,
-                products: vec![product],
-            }),
-            None => {
-                let message = tf("oneclient.wardrobe.not_purchasable", &[&bundle.name]);
-                EventHandler::new(move |()| status_state.set(Some(message.clone())))
-            }
-        };
-
         wardrobe_panel()
             .vertical()
             .width(Size::fill())
@@ -1184,15 +1135,6 @@ impl Component for BundleDetailPanel {
             )
             .child(rect().width(Size::fill()).height(Size::flex(1.0)))
             .maybe_child(status_text(&status))
-            .child(
-                Button::new()
-                    .primary()
-                    .width(Size::fill())
-                    .enabled(!self.data.busy)
-                    .on_press(move |_| buy.call(()))
-                    .child(Icon::new(IconType::LinkExternal01).size(14.))
-                    .text(t("oneclient.wardrobe.action.buy_now")),
-            )
             .into_element()
     }
 }

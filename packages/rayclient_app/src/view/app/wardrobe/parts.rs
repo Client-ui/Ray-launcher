@@ -160,53 +160,13 @@ pub(super) fn money(amount: f32) -> String {
     format!("${amount:.2}")
 }
 
+/// Prices are not shown anywhere in the launcher
 pub(super) fn price_label(
-    base: Option<f32>,
-    final_price: Option<f32>,
-    discounted: bool,
+    _base: Option<f32>,
+    _final_price: Option<f32>,
+    _discounted: bool,
 ) -> Element {
-    let row = rect()
-        .horizontal()
-        .cross_align(Alignment::Center)
-        .spacing(4.);
-    let row = match final_price {
-        None => row.child(
-            label()
-                .text("—")
-                .font_size(text_size(14.))
-                .color(colors::fg_secondary()),
-        ),
-        Some(price) if price <= 0. => row.child(
-            label()
-                .text(t("oneclient.wardrobe.price.free"))
-                .font_size(text_size(14.))
-                .font_weight(FontWeight::MEDIUM)
-                .color(colors::success()),
-        ),
-        Some(price) if discounted && base.is_some() => row
-            .child(
-                label()
-                    .text(money(base.unwrap_or_default()))
-                    .font_size(text_size(10.))
-                    .text_decoration(TextDecoration::LineThrough)
-                    .color(colors::fg_secondary()),
-            )
-            .child(
-                label()
-                    .text(money(price))
-                    .font_size(text_size(14.))
-                    .font_weight(FontWeight::MEDIUM)
-                    .color(colors::success()),
-            ),
-        Some(price) => row.child(
-            label()
-                .text(money(price))
-                .font_size(text_size(14.))
-                .font_weight(FontWeight::MEDIUM)
-                .color(colors::fg_primary()),
-        ),
-    };
-    row.into_element()
+    rect().into_element()
 }
 
 #[derive(Clone, PartialEq)]

@@ -1309,7 +1309,7 @@ impl Header {
             .cross_align(Alignment::Center)
             .spacing(8.)
             .child(chips)
-            .maybe_child(store_enabled.then(|| {
+            .maybe_child((store_enabled && SHOW_CART).then(|| {
                 Button::new()
                     .primary()
                     .on_press(move |_| {
@@ -1444,10 +1444,14 @@ const ANCHOR_HEIGHT: f32 = 24.;
 const HEADING_HEIGHT: f32 = 28.;
 const NOTICE_HEIGHT: f32 = 57.;
 const INTRO_HEIGHT: f32 = 33.;
+
+/// Purchasing is not offered, so the cart button stays hidden
+const SHOW_CART: bool = false;
 const OVERSCAN: f32 = 480.;
 
 #[derive(Clone, Hash)]
 pub(super) enum Card {
+    NoCape,
     Mojang(String),
     Owned(i32),
     Shop(i32),
@@ -1524,6 +1528,7 @@ fn card_height(grid_width: f32) -> f32 {
 fn card_element(ctx: &GridCtx, card: &Card) -> Option<Element> {
     let data = ctx.data;
     match card {
+        Card::NoCape => Some(no_cape_card(ctx)),
         Card::Mojang(id) => data.mojang_cape(id).map(|cape| mojang_card(ctx, cape)),
         Card::Owned(id) => data.group(*id).map(|group| owned_card(ctx, group)),
         Card::Shop(id) => data.store_item(*id).map(|item| shop_card(ctx, item)),
@@ -1942,14 +1947,12 @@ fn cape_groups(ctx: &GridCtx) -> Vec<Block> {
                     "oneclient.wardrobe.capes.minecraft.no_match",
                 )));
             } else {
-                out.push(
-                    ctx.grid(
-                        capes
-                            .into_iter()
-                            .map(|cape| Card::Mojang(cape.id.clone()))
-                            .collect(),
-                    ),
-                );
+                let mut cards: Vec<Card> = Vec::new();
+                if !searching {
+                    cards.push(Card::NoCape);
+                }
+                cards.extend(capes.into_iter().map(|cape| Card::Mojang(cape.id.clone())));
+                out.push(ctx.grid(cards));
             }
         }
     }
@@ -1990,6 +1993,65 @@ fn cape_groups(ctx: &GridCtx) -> Vec<Block> {
     }
 
     out
+}
+
+/// Takes the cape off: a Poly+ cape first (it shows over the Minecraft one), then the active
+/// Minecraft cape
+fn no_cape_card(ctx: &GridCtx) -> Element {
+    let data = ctx.data;
+    let plus_cape_on = data
+        .plus
+        .as_ref()
+        .is_some_and(|plus| plus.equipped.contains_key(&BodySlot::Cape));
+    let mojang_cape_on = data.look.as_ref().and_then(active_cape).is_some();
+    let none_on = !plus_cape_on && !mojang_cape_on;
+
+    let remove = if plus_cape_on {
+        ctx.run(WardrobeAction::Equip {
+            account: data.account,
+            slot: BodySlot::Cape,
+            cosmetic: None,
+            name: t("oneclient.wardrobe.capes.none").to_string(),
+        })
+    } else {
+        ctx.run(WardrobeAction::MojangCape {
+            account: data.account,
+            cape: None,
+            name: t("oneclient.wardrobe.capes.none").to_string(),
+        })
+    };
+    let (action_label, action_icon) = equip_strip(none_on);
+
+    WardrobeCard {
+        name: t("oneclient.wardrobe.capes.none").to_string(),
+        detail: detail_text(t("oneclient.wardrobe.capes.none.description")),
+        action_label,
+        action_icon,
+        equipped: none_on,
+        action_enabled: !none_on,
+        selected: false,
+        badge: None,
+        thumbnail: LookThumb {
+            uuid: data.uuid.clone(),
+            skin: None,
+            cape: None,
+            cosmetics: Vec::new(),
+            emote: None,
+            particle_color: None,
+            yaw: BACK_YAW,
+            zoom: CAPE_ZOOM,
+            interactive: false,
+        }
+        .into_element(),
+        menu: Vec::new(),
+        rename: None,
+        enabled: !data.busy,
+        swatches: Vec::new(),
+        on_pick: None,
+        on_select: EventHandler::new(|()| {}),
+        on_action: ctx.equip(remove),
+    }
+    .into_element()
 }
 
 fn mojang_card(ctx: &GridCtx, cape: &MojangCape) -> Element {
@@ -2161,8 +2223,6 @@ fn shop_card(ctx: &GridCtx, item: &StoreItem) -> Element {
     let owned = data.fully_owned(item) || owned_ids.contains(&variant.id);
     let in_cart = data.cart_keys.contains(&cart_key(variant.id));
     let variants = item.ui_variants();
-    let ownership_known = data.plus.is_some();
-
     let (action_label, action_icon, action_enabled) = if owned {
         (t("oneclient.wardrobe.action.owned"), IconType::Check, false)
     } else if in_cart {
@@ -2172,23 +2232,11 @@ fn shop_card(ctx: &GridCtx, item: &StoreItem) -> Element {
             false,
         )
     } else {
-        (
-            t("oneclient.wardrobe.action.add_to_cart"),
-            IconType::Plus,
-            ownership_known,
-        )
+        (t("oneclient.wardrobe.action.preview"), IconType::Eye, true)
     };
 
     let badge = if owned {
         None
-    } else if item.discounted() {
-        Some(Badge::text(
-            tf(
-                "oneclient.wardrobe.badge.off",
-                &[&item.discount_percent().unwrap_or(0)],
-            ),
-            BadgeStyle::Sale,
-        ))
     } else if is_new(&item.created_at) {
         Some(Badge::text(
             t("oneclient.wardrobe.badge.new"),
@@ -2198,36 +2246,8 @@ fn shop_card(ctx: &GridCtx, item: &StoreItem) -> Element {
         None
     };
 
-    let detail = rect()
-        .horizontal()
-        .cross_align(Alignment::Center)
-        .spacing(6.)
-        .child(price_label(
-            item.base_price,
-            item.final_price(),
-            item.discounted(),
-        ))
-        .maybe_child((variants.len() > 1).then(|| {
-            label()
-                .text(tf("oneclient.wardrobe.variants", &[&variants.len()]))
-                .font_size(text_size(11.))
-                .color(colors::fg_secondary())
-        }))
-        .into_element();
+    let detail = detail_text(collection_label(item.kind));
 
-    let add = {
-        let cart = ctx.shared.cart;
-        let status = ctx.shared.status;
-        let item = item.clone();
-        let variant = variant.clone();
-        let already_owned = owned_ids.contains(&variant.id);
-        EventHandler::new(move |()| add_to_cart(already_owned, cart, status, &item, &variant))
-    };
-    let buy = ctx.run(WardrobeAction::BuyNow {
-        account: data.account,
-        cosmetic: variant.id,
-        name: cart_name(item, &variant),
-    });
     let preview = ctx.select(Selection::Shop(item.id));
 
     let swatches: Vec<Swatch> = variants
@@ -2258,38 +2278,21 @@ fn shop_card(ctx: &GridCtx, item: &StoreItem) -> Element {
         selected: ctx.selected() == Some(Selection::Shop(item.id)),
         badge,
         thumbnail: shop_thumbnail(data, item, &variant, false),
-        menu: vec![
-            {
-                let preview = preview.clone();
-                MenuAction::new(
-                    IconType::Eye,
-                    t("oneclient.wardrobe.action.preview"),
-                    true,
-                    move |()| preview.call(()),
-                )
-            },
-            {
-                let add = add.clone();
-                MenuAction::new(
-                    IconType::Plus,
-                    t("oneclient.wardrobe.action.add_to_cart"),
-                    !in_cart && !owned && ownership_known,
-                    move |()| add.call(()),
-                )
-            },
+        menu: vec![{
+            let preview = preview.clone();
             MenuAction::new(
-                IconType::LinkExternal01,
-                t("oneclient.wardrobe.action.buy_now"),
-                !owned && ownership_known,
-                move |()| buy.call(()),
-            ),
-        ],
+                IconType::Eye,
+                t("oneclient.wardrobe.action.preview"),
+                true,
+                move |()| preview.call(()),
+            )
+        }],
         rename: None,
         enabled: true,
         swatches,
         on_pick: Some(on_pick),
-        on_select: preview,
-        on_action: add,
+        on_select: preview.clone(),
+        on_action: preview,
     }
     .into_element()
 }
@@ -2297,58 +2300,31 @@ fn shop_card(ctx: &GridCtx, item: &StoreItem) -> Element {
 fn bundle_card(ctx: &GridCtx, bundle: &BundleInfo) -> Element {
     let data = ctx.data;
     let view = ctx.select(Selection::Bundle(bundle.id));
-    let mut status = ctx.shared.status;
-    let buy = match bundle.store_product_id.clone() {
-        Some(product) => ctx.run(WardrobeAction::Checkout {
-            account: data.account,
-            products: vec![product],
-        }),
-        None => {
-            let message = tf("oneclient.wardrobe.not_purchasable", &[&bundle.name]);
-            EventHandler::new(move |()| status.set(Some(message.clone())))
-        }
-    };
-
     WardrobeCard {
         name: bundle.name.clone(),
-        detail: price_label(bundle.base_price, bundle.final_price(), bundle.discounted()),
+        detail: detail_text(t("oneclient.wardrobe.badge.bundle")),
         action_label: t("oneclient.wardrobe.action.view_bundle"),
         action_icon: IconType::ArrowRight,
         equipped: false,
         action_enabled: true,
         selected: ctx.selected() == Some(Selection::Bundle(bundle.id)),
-        badge: Some(if bundle.discounted() {
-            Badge::text(
-                tf(
-                    "oneclient.wardrobe.badge.save",
-                    &[&bundle.discount_percent().unwrap_or(0)],
-                ),
-                BadgeStyle::Sale,
-            )
-        } else {
-            Badge::text(t("oneclient.wardrobe.badge.bundle"), BadgeStyle::Accent)
-        }),
+        badge: Some(Badge::text(
+            t("oneclient.wardrobe.badge.bundle"),
+            BadgeStyle::Accent,
+        )),
         thumbnail: CoverThumb {
             url: bundle.asset_id.map(api::asset_url),
         }
         .into_element(),
-        menu: vec![
-            {
-                let view = view.clone();
-                MenuAction::new(
-                    IconType::ArrowRight,
-                    t("oneclient.wardrobe.action.view_bundle"),
-                    true,
-                    move |()| view.call(()),
-                )
-            },
+        menu: vec![{
+            let view = view.clone();
             MenuAction::new(
-                IconType::LinkExternal01,
-                t("oneclient.wardrobe.action.buy_now"),
+                IconType::ArrowRight,
+                t("oneclient.wardrobe.action.view_bundle"),
                 true,
-                move |()| buy.call(()),
-            ),
-        ],
+                move |()| view.call(()),
+            )
+        }],
         rename: None,
         enabled: true,
         swatches: Vec::new(),
