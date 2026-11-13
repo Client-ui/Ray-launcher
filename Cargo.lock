@@ -4971,7 +4971,7 @@ checksum = "2f3a9f18d041e6d0e102a0a46750538147e5e8992d3b4873aaafee2520b00ce3"
 
 [[package]]
 name = "polyio"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "astral-tokio-tar",
  "async-compression",
@@ -5403,7 +5403,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_app"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "accesskit",
  "anyhow",
@@ -5459,7 +5459,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_auth"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -5483,7 +5483,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_cluster"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "bytes 1.12.1",
  "chrono",
@@ -5507,7 +5507,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_common"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "directories",
  "interfrost",
@@ -5520,7 +5520,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_content"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "async-trait",
  "async_zip",
@@ -5548,7 +5548,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_core"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "async-compression",
  "async-stream",
@@ -5613,7 +5613,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_db"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "async-tempfile",
  "chrono",
@@ -5628,7 +5628,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_discord"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "chrono",
  "discord-rich-presence",
@@ -5640,7 +5640,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_events"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "thiserror 2.0.21",
  "tokio",
@@ -5650,7 +5650,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_java"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "astral-tokio-tar",
  "async-tempfile",
@@ -5673,7 +5673,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_macro"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5682,7 +5682,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_mc"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "base64 0.23.1",
  "chrono",
@@ -5704,7 +5704,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_net"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -5726,7 +5726,7 @@ dependencies = [
 
 [[package]]
 name = "rayclient_polyplus"
-version = "2.9.0"
+version = "2.10.0"
 dependencies = [
  "async-tungstenite 0.35.0",
  "bytes 1.12.1",

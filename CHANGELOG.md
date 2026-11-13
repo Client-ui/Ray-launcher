@@ -1,3 +1,77 @@
+## 2.10.0 (2026-11-13)
+
+### Features
+
+- Added ability to add custom shared directories for clusters
+- Added translations into the client
+- Added a Help menu to the macOS menu bar
+- Share instances with a code and sync them across your computers
+- The content list can be sorted by date added or by recently updated
+
+- Themes match OneConfig and can be customised
+
+### Fixes
+
+- Fixed the launcher going black on Windows with AMD iGPUs
+- Cached browser results no longer blink when switching pages
+- The browser now has tabs for mods, textures, shaders, datapacks, and modpacks instead of a dropdown
+- Adding a mod no longer reports a dependency as missing when a bundle already ships it, like Fabric Language Kotlin on 1.8.9
+- Fixed cosmetic previews in the wardrobe being off-center
+- Every setup step now has a colorful illustration that matches the welcome screen
+- The content list toolbar drops the Select button, and category tabs no longer have a scrollbar drawn over them
+- Open the game output log by default on the logs page
+- Added "Disable anyway" when trying to disable a dependency, it only disables the dependency without disabling all of its mods
+- Added an option in launcher settings to not show live log when lauching a cluster
+- The duplicate mods sheet marks which copy is Loaded, dims the Skipped ones, and shows the date and time each was added
+- Package galleries show small previews right away and no longer download the same image twice, and screenshot thumbnails stay loaded when coming back to the page
+- Fix the Flatpak publish workflow failing to upload the bundle to the release
+- Update Freya to 0.5.0
+- Launch the game with a UTF-8 locale on Linux so non-ASCII text and paths work regardless of the system locale
+- Fixed the opengl/vulkan dropdown overriding the graphic backend picked in game, it now reads and writes options.txt directly
+- The Minecraft theme's pixel icons are redrawn by hand so they line up and stay symmetrical
+- Fixed horizontal scrollbar in logs view being hard to click
+- Show native JVM crash logs (hs_err_pid) under crash reports
+- When users tries to download new java runtime, the jdk's he already has are flagged as "Installed"
+- Updates no longer bring back a desktop shortcut you deleted on Windows
+- Added a language picker to onboarding and the settings, listing the community translations
+- The launcher stays responsive while it checks game files before a launch
+- Fixed folders opening in a terminal and Minecraft failing to open folders from the AppImage on Linux
+- The Linux tray icon no longer needs GTK or libappindicator
+- Fixed loader update modal button order
+- Fixed long log names overlapping the dropdown arrow
+- Added manual update button in cluster settings
+- Added option to truncate the log it the middle if user wants to export it to mclogs, as well as keeping just the beginning
+- A mod that is installed both from a bundle and as your own copy now shows as one entry, with a "copies" button to manage each copy separately
+- The Minecraft themes use pixel-art icons, and custom themes can turn them on in the theme editor
+- Made small text larger in the Minecraft themes
+- The Minecraft theme centres its text properly, spaces icons in buttons evenly, and uses a pixel-art logo with the name in the bold Minecraft font
+- Added mojang as a jdk provider
+- Added new cluster picker instead of dropdowns
+- Removed radio buttons from category rows in new instance creator
+- Setup now has an Appearance step where you can pick a theme, and theme cards show their names
+- The setup screens show the Ray Launcher logo icon next to the name again
+- Cleared the window to opaque black instead of transparent
+- Added Ctrl+Shift+O (Cmd+Shift+O on macOS) to open the logs folder
+- Package names and icons show from the local cache right away instead of waiting on Modrinth and CurseForge
+- The Minecraft theme's Appearance icon is now a recognisable paintbrush
+- Minecraft-theme pixel icons stay crisp at fractional display scaling like 125%
+- Made polyplus 'turn off' warning show only once, if a player still disables it
+- Reset only the settings that fail to parse instead of the whole file
+- Minecraft taking too long to close is now explained instead of shown as an unknown crash
+- Lists no longer re-render on every frame of a page or tab transition
+- Scrolling with a mouse wheel is now smooth everywhere in the launcher
+- Saving a custom theme no longer pauses the launcher while the file is written
+- Instance sharing and cloud sync screens can be translated
+- Fixed mods published on CurseForge being flagged as unpublished when importing a modpack
+- Added version + loader info on home page for Ray Launcher clusters
+- Fixed wardrobe card border hidden behind the bottom button
+- Fixed the wardrobe crashing when switching between sections
+- Show a loading spinner on the wardrobe page and fade it in once loaded
+- Right-clicking a wardrobe item opens its menu
+- Fix changing your skin from the wardrobe, which Minecraft had started rejecting with a sign-in error
+- Added warning when user is about to import a modpack/cluster that shows if there are any mods not published by Modrinth/CurseForge
+- The first setup screen now greets you with a simple animated welcome, and the rest of the screen fades in after it
+
 ## 2.9.0 (2026-10-25)
 
 ### Features
