@@ -79,13 +79,8 @@ pub(super) enum Section {
     Cosmetics,
 }
 
-fn section_tabs() -> [(Section, &'static str, IconType); 5] {
+fn section_tabs() -> [(Section, &'static str, IconType); 4] {
     [
-        (
-            Section::Featured,
-            t("oneclient.wardrobe.section.featured"),
-            IconType::Rocket02,
-        ),
         (
             Section::Outfits,
             t("oneclient.wardrobe.section.outfits"),
@@ -890,7 +885,7 @@ impl Component for WardrobeBody {
         let store_query = use_store();
         let action = use_wardrobe_action();
 
-        let section = use_state(|| Section::Featured);
+        let section = use_state(|| Section::Outfits);
         let show_history = use_state(|| false);
         let sort = use_state(|| Sort::Popular);
         let query = use_state(String::new);
@@ -1280,7 +1275,7 @@ impl Header {
         let sections: Vec<(Section, &str, IconType)> = if store_enabled {
             section_tabs().to_vec()
         } else {
-            vec![section_tabs()[4]]
+            vec![section_tabs()[3]]
         };
 
         let mut chips = rect().horizontal().width(Size::flex(1.0)).spacing(8.);
