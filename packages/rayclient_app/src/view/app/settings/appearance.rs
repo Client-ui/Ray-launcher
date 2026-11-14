@@ -6,7 +6,8 @@ use rayclient_core::settings::LauncherSettings;
 
 use super::settings_page;
 use crate::components::{
-    BUNDLED_WALLPAPERS, ColorPicker, IconType, Segment, SegmentedControl, link_button, toggle,
+    BUNDLED_WALLPAPERS, Button, ColorPicker, IconType, Segment, SegmentedControl, link_button,
+    toggle,
 };
 use crate::hooks::{Actions, use_debounced, use_dispatch, use_settings_snapshot};
 use crate::i18n::t;
@@ -142,6 +143,30 @@ impl Component for SettingsAppearance {
             .child(wallpaper_section(
                 settings.wallpaper.clone(),
                 dispatch.clone(),
+            ))
+            .child(settings_row(
+                IconType::RefreshCw01,
+                t("oneclient.settings.appearance.reset_all.title"),
+                t("oneclient.settings.appearance.reset_all.description"),
+                Button::new()
+                    .secondary()
+                    .small()
+                    .on_press({
+                        let reset = dispatch.clone();
+                        move |_| {
+                            reset.edit_settings(|next| {
+                                let fresh = LauncherSettings::default();
+                                next.theme = fresh.theme;
+                                next.accent_color = fresh.accent_color;
+                                next.wallpaper = fresh.wallpaper;
+                                next.wallpaper_accent = fresh.wallpaper_accent;
+                                next.wallpaper_dim = fresh.wallpaper_dim;
+                                next.dynamic_background_enabled = fresh.dynamic_background_enabled;
+                                next.animations_enabled = fresh.animations_enabled;
+                            });
+                        }
+                    })
+                    .text(t("oneclient.common.reset")),
             ))
             .child(
                 rect().padding(Gaps::new(8., 0., 0., 0.)).child(
@@ -341,11 +366,19 @@ fn accent_color_row(accent: State<Option<String>>, default: Option<String>) -> i
         t("oneclient.settings.appearance.accent_color.title"),
         t("oneclient.settings.appearance.accent_color.description"),
         resettable(
-            ColorPicker::new(shown, move |picked: Color| {
-                let mut accent = accent;
-                accent.set(Some(colors::format_hex(picked)));
-            })
-            .into_element(),
+            rect()
+                .horizontal()
+                .cross_align(Alignment::Center)
+                .spacing(12.)
+                .child(accent_swatches(accent))
+                .child(
+                    ColorPicker::new(shown, move |picked: Color| {
+                        let mut accent = accent;
+                        accent.set(Some(colors::format_hex(picked)));
+                    })
+                    .into_element(),
+                )
+                .into_element(),
             accent,
             default,
         ),
@@ -568,5 +601,48 @@ fn wallpaper_tile(
                     colors::fg_secondary()
                 }),
         )
+        .into_element()
+}
+
+const ACCENT_PRESETS: [&str; 10] = [
+    "#FF7A1A", "#FFB02E", "#FF4D4D", "#FF5FA2", "#B58CFF", "#3DD6D0", "#4ADE80", "#4DA3FF",
+    "#F5F5F5", "#C8A27A",
+];
+
+/// One-click accent colors next to the free color picker
+fn accent_swatches(accent: State<Option<String>>) -> Element {
+    let current = accent.read().clone();
+    let swatches: Vec<Element> = ACCENT_PRESETS
+        .iter()
+        .map(|hex| {
+            let (r, g, b) = colors::parse_hex(hex).unwrap_or((255, 122, 26));
+            let active = current
+                .as_deref()
+                .is_some_and(|value| value.eq_ignore_ascii_case(hex));
+            let mut accent = accent;
+            rect()
+                .width(Size::px(20.))
+                .height(Size::px(20.))
+                .corner_radius(CornerRadius::new_all(10.))
+                .background(Color::from_rgb(r, g, b))
+                .border(border_all_color(
+                    if active { 2. } else { 1. },
+                    if active {
+                        colors::fg_primary()
+                    } else {
+                        Color::from_argb(60, 255, 255, 255)
+                    },
+                ))
+                .cursor(CursorIcon::Pointer)
+                .on_press(move |_| accent.set(Some((*hex).to_string())))
+                .into_element()
+        })
+        .collect();
+
+    rect()
+        .horizontal()
+        .cross_align(Alignment::Center)
+        .spacing(8.)
+        .children(swatches)
         .into_element()
 }

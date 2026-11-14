@@ -1,0 +1,14 @@
+{
+  "name": "Ray Ember",
+  "colors": {
+    "light": false,
+    "page": "#0E0907",
+    "page_elevated": "#17100C",
+    "card": "#211812",
+    "component": "#30231A",
+    "border": "#FFB27A24",
+    "text": "#FFF4EA",
+    "text_secondary": "#C2A894",
+    "accent": "#FF8A2B"
+  }
+}

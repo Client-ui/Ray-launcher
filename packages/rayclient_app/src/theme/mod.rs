@@ -22,8 +22,9 @@ const PIXEL_BOOST_MAX: f32 = 2.5;
 const PIXEL_BOOST_END: f32 = 17.;
 const PIXEL_BOOST_RANGE: f32 = 8.;
 
-const BUILTIN_THEMES: [&str; 8] = [
-    "dark", "light", "amoled", "midnight", "ocean", "forest", "rose", "sunset",
+const BUILTIN_THEMES: [&str; 15] = [
+    "dark", "light", "amoled", "midnight", "ocean", "forest", "rose", "sunset", "ember",
+    "graphite", "lavender", "copper", "crimson", "mint", "sand",
 ];
 
 thread_local! {

@@ -1,0 +1,14 @@
+{
+  "name": "Ray Crimson",
+  "colors": {
+    "light": false,
+    "page": "#0E0B0C",
+    "page_elevated": "#171113",
+    "card": "#221A1D",
+    "component": "#312327",
+    "border": "#FFFFFF22",
+    "text": "#F8F2F3",
+    "text_secondary": "#B9A9AD",
+    "accent": "#FF4D5E"
+  }
+}

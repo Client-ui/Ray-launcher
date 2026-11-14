@@ -1,0 +1,14 @@
+{
+  "name": "Ray Copper",
+  "colors": {
+    "light": false,
+    "page": "#100C0A",
+    "page_elevated": "#19120E",
+    "card": "#241A14",
+    "component": "#33251C",
+    "border": "#FFFFFF22",
+    "text": "#F6EFEA",
+    "text_secondary": "#BBAA9E",
+    "accent": "#E8884A"
+  }
+}

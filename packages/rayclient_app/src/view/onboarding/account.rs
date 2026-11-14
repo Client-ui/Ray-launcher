@@ -163,11 +163,22 @@ fn sign_in_card(
                 ),
         )
         .maybe_child(show_offline.then(|| {
+            let mut name = username;
             rect()
-                .width(Size::px(320.))
-                .child(TextInput::new(username).auto_focus(true).placeholder(t(
-                    "oneclient.settings.accounts.offline.username_placeholder",
-                )))
+                .horizontal()
+                .cross_align(Alignment::Center)
+                .spacing(8.)
+                .child(rect().width(Size::px(320.)).child(
+                    TextInput::new(username).auto_focus(true).placeholder(t(
+                        "oneclient.settings.accounts.offline.username_placeholder",
+                    )),
+                ))
+                .child(
+                    Button::new()
+                        .secondary()
+                        .on_press(move |_| name.set(random_name()))
+                        .text(t("oneclient.onboarding.account.random_name")),
+                )
                 .into_element()
         }))
         .maybe_child(error.map(|message| {
@@ -189,4 +200,25 @@ fn sign_in_card(
                 .into_element()
         }))
         .into_element()
+}
+
+/// A valid offline name (letters and digits, at most 16 characters) for people who have no idea
+fn random_name() -> String {
+    const FIRST: [&str; 12] = [
+        "Swift", "Ember", "Shadow", "Frost", "Blaze", "Pixel", "Iron", "Lunar", "Storm", "Crimson",
+        "Golden", "Silent",
+    ];
+    const LAST: [&str; 12] = [
+        "Fox", "Wolf", "Knight", "Raven", "Miner", "Archer", "Drake", "Ranger", "Golem", "Phantom",
+        "Smith", "Wisp",
+    ];
+    let seed = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.subsec_nanos() as usize ^ d.as_secs() as usize);
+    format!(
+        "{}{}{}",
+        FIRST[seed % 12],
+        LAST[(seed / 12) % 12],
+        (seed / 144) % 100
+    )
 }

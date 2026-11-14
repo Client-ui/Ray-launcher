@@ -9,7 +9,7 @@ use rayclient_core::storage::format_bytes;
 use super::{resettable, section_header, settings_page, settings_row};
 use crate::Route;
 use crate::components::{
-    Button, Dropdown, Icon, IconType, OverlayPopup, open_folder_button, toggle,
+    Button, Dropdown, Icon, IconType, OverlayPopup, TextInput, open_folder_button, toggle,
 };
 use crate::hooks::{
     Actions, DiscardLeftoversKeys, mutation_error, mutation_is_running, try_leftovers,
@@ -63,8 +63,20 @@ impl Component for SettingsLauncher {
             move || v
         });
 
+        let join_server = use_state({
+            let v = settings.join_server.clone();
+            move || v
+        });
+
+        let join_world = use_state({
+            let v = settings.join_world.clone();
+            move || v
+        });
+
         let mut first = use_state(|| true);
         use_side_effect(move || {
+            let server = join_server.read().trim().to_string();
+            let world = join_world.read().trim().to_string();
             let discord = *discord_rpc.read();
             let crash = *crash_reporting.read();
             let maximized = *start_maximized.read();
@@ -84,6 +96,8 @@ impl Component for SettingsLauncher {
                 next.show_tray_icon = tray;
                 next.launch_behaviour = behaviour;
                 next.open_game_log_on_launch = game_log;
+                next.join_server = server.clone();
+                next.join_world = world.clone();
             });
         });
 
@@ -178,6 +192,33 @@ impl Component for SettingsLauncher {
                     toggle(show_tray_icon),
                     show_tray_icon,
                     defaults.show_tray_icon,
+                ),
+            ))
+            .child(section_header(t(
+                "oneclient.settings.launcher.section.quick_play",
+            )))
+            .child(settings_row(
+                IconType::Globe01,
+                t("oneclient.settings.launcher.join_server.title"),
+                t("oneclient.settings.launcher.join_server.description"),
+                resettable(
+                    TextInput::new(join_server)
+                        .placeholder("play.example.net")
+                        .width(Size::px(220.)),
+                    join_server,
+                    String::new(),
+                ),
+            ))
+            .child(settings_row(
+                IconType::Play,
+                t("oneclient.settings.launcher.join_world.title"),
+                t("oneclient.settings.launcher.join_world.description"),
+                resettable(
+                    TextInput::new(join_world)
+                        .placeholder("New World")
+                        .width(Size::px(220.)),
+                    join_world,
+                    String::new(),
                 ),
             ))
             .child(section_header(t(

@@ -76,6 +76,10 @@ pub struct LauncherSettings {
     pub wallpaper_dim: u8,
     /// Load the skin mod for offline accounts so their custom skin shows in game
     pub offline_custom_skin: bool,
+    /// Server address joined straight after launch (Minecraft 1.20+)
+    pub join_server: String,
+    /// Singleplayer world opened straight after launch (Minecraft 1.20+)
+    pub join_world: String,
     pub start_maximized: bool,
     pub animations_enabled: bool,
     pub theme: String,
@@ -143,6 +147,8 @@ impl Default for LauncherSettings {
             wallpaper_accent: false,
             wallpaper_dim: 0,
             offline_custom_skin: true,
+            join_server: String::new(),
+            join_world: String::new(),
             start_maximized: false,
             animations_enabled: true,
             theme: "dark".to_string(),

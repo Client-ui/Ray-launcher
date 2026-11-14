@@ -1,0 +1,14 @@
+{
+  "name": "Ray Sand",
+  "colors": {
+    "light": true,
+    "page": "#F6F1EA",
+    "page_elevated": "#FFFFFF",
+    "card": "#FBF7F1",
+    "component": "#EDE5DA",
+    "border": "#00000022",
+    "text": "#1F1A15",
+    "text_secondary": "#6B6157",
+    "accent": "#E8681A"
+  }
+}

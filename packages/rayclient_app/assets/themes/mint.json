@@ -1,0 +1,14 @@
+{
+  "name": "Ray Mint",
+  "colors": {
+    "light": false,
+    "page": "#0A0F0E",
+    "page_elevated": "#101816",
+    "card": "#17221F",
+    "component": "#22312D",
+    "border": "#FFFFFF22",
+    "text": "#F1F8F6",
+    "text_secondary": "#A3B8B2",
+    "accent": "#2EE6A6"
+  }
+}

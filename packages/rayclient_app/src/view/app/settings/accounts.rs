@@ -653,6 +653,25 @@ impl Component for AccountRow {
                 Button::new()
                     .ghost()
                     .icon()
+                    .enabled(!is_microsoft && rayclient_core::skins::has_skin(&self.username))
+                    .tooltip(t("oneclient.settings.accounts.skin.reset"))
+                    .on_press({
+                        let username = self.username.clone();
+                        move |e: Event<PressEventData>| {
+                            e.stop_propagation();
+                            reset_skin(&username);
+                        }
+                    })
+                    .child(
+                        Icon::new(IconType::RefreshCw01)
+                            .size(18.)
+                            .color(colors::fg_secondary()),
+                    ),
+            )
+            .child(
+                Button::new()
+                    .ghost()
+                    .icon()
                     .tooltip(t("oneclient.settings.accounts.remove"))
                     .on_press(move |e: Event<PressEventData>| {
                         e.stop_propagation();
@@ -781,4 +800,18 @@ fn pick_skin(username: String) {
                 .send(),
         }
     });
+}
+
+fn reset_skin(username: &str) {
+    if rayclient_core::skins::remove_skin(username).is_err() {
+        return;
+    }
+    if let Ok(state) = crate::launcher::state() {
+        state
+            .services
+            .events
+            .notify(t("oneclient.settings.accounts.skin.reset_title"))
+            .body(t("oneclient.settings.accounts.skin.reset_body"))
+            .send();
+    }
 }

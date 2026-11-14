@@ -1,0 +1,14 @@
+{
+  "name": "Ray Graphite",
+  "colors": {
+    "light": false,
+    "page": "#0D0E10",
+    "page_elevated": "#15171A",
+    "card": "#1E2125",
+    "component": "#2B2F35",
+    "border": "#FFFFFF22",
+    "text": "#F3F5F7",
+    "text_secondary": "#A9B0B8",
+    "accent": "#FFB02E"
+  }
+}

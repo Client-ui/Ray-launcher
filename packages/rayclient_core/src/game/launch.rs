@@ -443,6 +443,24 @@ async fn start(
         profile.force_fullscreen,
         profile.game_args.as_deref(),
     );
+    {
+        let (server, world) = {
+            let settings = state.settings.read();
+            (
+                settings.join_server.trim().to_string(),
+                settings.join_world.trim().to_string(),
+            )
+        };
+        if supports_quick_play(&version.id) {
+            if !server.is_empty() {
+                mc_args.push("--quickPlayMultiplayer".to_string());
+                mc_args.push(server);
+            } else if !world.is_empty() {
+                mc_args.push("--quickPlaySingleplayer".to_string());
+                mc_args.push(world);
+            }
+        }
+    }
 
     drop(launch_slot);
 
@@ -608,6 +626,18 @@ async fn start(
     });
 
     Ok(LaunchedGame { cluster_id, pid })
+}
+
+/// Quick Play arguments exist from Minecraft 1.20 on, older versions reject unknown options
+fn supports_quick_play(version: &str) -> bool {
+    let mut parts = version.split('.');
+    let major = parts.next().and_then(|p| p.parse::<u32>().ok());
+    let minor = parts.next().and_then(|p| p.parse::<u32>().ok());
+    match (major, minor) {
+        (Some(1), Some(minor)) => minor >= 20,
+        (Some(major), _) => major >= 26,
+        _ => false,
+    }
 }
 
 async fn running_cluster_name(state: &Arc<LauncherState>, cluster_id: i64) -> String {
