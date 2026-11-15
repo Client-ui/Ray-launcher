@@ -672,6 +672,31 @@ impl Component for AccountRow {
                 Button::new()
                     .ghost()
                     .icon()
+                    .enabled(!is_microsoft)
+                    .tooltip(t("oneclient.settings.accounts.cape.change"))
+                    .on_press({
+                        let username = self.username.clone();
+                        move |e: Event<PressEventData>| {
+                            e.stop_propagation();
+                            if rayclient_core::skins::has_cape(&username) {
+                                reset_cape(&username);
+                            } else {
+                                pick_cape(username.clone());
+                            }
+                        }
+                    })
+                    .child(Icon::new(IconType::Colors).size(18.).color(
+                        if rayclient_core::skins::has_cape(&self.username) {
+                            colors::brand()
+                        } else {
+                            colors::fg_secondary()
+                        },
+                    )),
+            )
+            .child(
+                Button::new()
+                    .ghost()
+                    .icon()
                     .tooltip(t("oneclient.settings.accounts.remove"))
                     .on_press(move |e: Event<PressEventData>| {
                         e.stop_propagation();
@@ -812,6 +837,49 @@ fn reset_skin(username: &str) {
             .events
             .notify(t("oneclient.settings.accounts.skin.reset_title"))
             .body(t("oneclient.settings.accounts.skin.reset_body"))
+            .send();
+    }
+}
+
+/// Lets the user choose a cape PNG for an offline account and reports how it went
+fn pick_cape(username: String) {
+    spawn(async move {
+        let Some(handle) = rfd::AsyncFileDialog::new()
+            .set_title(t("oneclient.settings.accounts.cape.pick_title"))
+            .add_filter("PNG", &["png"])
+            .pick_file()
+            .await
+        else {
+            return;
+        };
+        let Ok(state) = crate::launcher::state() else {
+            return;
+        };
+        let events = state.services.events.clone();
+        match rayclient_core::skins::import_cape(&username, handle.path()) {
+            Ok(()) => events
+                .notify(t("oneclient.settings.accounts.cape.changed_title"))
+                .body(t("oneclient.settings.accounts.cape.changed_body"))
+                .send(),
+            Err(_) => events
+                .notify(t("oneclient.settings.accounts.cape.invalid_title"))
+                .body(t("oneclient.settings.accounts.cape.invalid_body"))
+                .error()
+                .send(),
+        }
+    });
+}
+
+fn reset_cape(username: &str) {
+    if rayclient_core::skins::remove_cape(username).is_err() {
+        return;
+    }
+    if let Ok(state) = crate::launcher::state() {
+        state
+            .services
+            .events
+            .notify(t("oneclient.settings.accounts.cape.reset_title"))
+            .body(t("oneclient.settings.accounts.cape.reset_body"))
             .send();
     }
 }

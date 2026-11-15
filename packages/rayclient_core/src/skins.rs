@@ -118,6 +118,71 @@ pub fn install_for_launch(game_dir: &Path, username: &str) -> io::Result<()> {
     } else if target.is_file() {
         std::fs::remove_file(target)?;
     }
+    install_cape_for_launch(game_dir, username)
+}
+
+const LOCAL_CAPES: [&str; 3] = ["CustomSkinLoader", "LocalSkin", "capes"];
+
+fn cape_store_dir() -> io::Result<PathBuf> {
+    rayclient_common::paths::data_dir()
+        .map(|dir| dir.join("capes"))
+        .map_err(|err| io::Error::other(err.to_string()))
+}
+
+/// Capes are 64x32, 22x17 or 46x22, or a whole multiple of one of those for HD capes
+fn validate_cape_png(bytes: &[u8]) -> io::Result<()> {
+    let invalid = || io::Error::new(io::ErrorKind::InvalidData, "not a valid Minecraft cape");
+    if bytes.len() < 24 || bytes[..8] != PNG_SIGNATURE {
+        return Err(invalid());
+    }
+    let width = u32::from_be_bytes([bytes[16], bytes[17], bytes[18], bytes[19]]);
+    let height = u32::from_be_bytes([bytes[20], bytes[21], bytes[22], bytes[23]]);
+    let fits = |base_w: u32, base_h: u32| {
+        width % base_w == 0 && width / base_w >= 1 && height == width / base_w * base_h
+    };
+    if width <= 4096 && (fits(64, 32) || fits(22, 17) || fits(46, 22)) {
+        Ok(())
+    } else {
+        Err(invalid())
+    }
+}
+
+pub fn has_cape(username: &str) -> bool {
+    cape_store_dir()
+        .and_then(|dir| Ok(dir.join(file_name(username)?)))
+        .is_ok_and(|path| path.is_file())
+}
+
+/// Validates and stores the PNG at `source` as the cape of the offline account `username`
+pub fn import_cape(username: &str, source: &Path) -> io::Result<()> {
+    let bytes = std::fs::read(source)?;
+    validate_cape_png(&bytes)?;
+    let dir = cape_store_dir()?;
+    std::fs::create_dir_all(&dir)?;
+    std::fs::write(dir.join(file_name(username)?), bytes)
+}
+
+pub fn remove_cape(username: &str) -> io::Result<()> {
+    match std::fs::remove_file(cape_store_dir()?.join(file_name(username)?)) {
+        Err(err) if err.kind() != io::ErrorKind::NotFound => Err(err),
+        _ => Ok(()),
+    }
+}
+
+fn install_cape_for_launch(game_dir: &Path, username: &str) -> io::Result<()> {
+    let name = file_name(username)?;
+    let target_dir = LOCAL_CAPES
+        .iter()
+        .fold(game_dir.to_path_buf(), |dir, part| dir.join(part));
+    let target = target_dir.join(&name);
+    let stored = cape_store_dir()?.join(&name);
+
+    if stored.is_file() {
+        std::fs::create_dir_all(&target_dir)?;
+        std::fs::copy(stored, target)?;
+    } else if target.is_file() {
+        std::fs::remove_file(target)?;
+    }
     Ok(())
 }
 
@@ -140,6 +205,15 @@ mod tests {
         assert!(validate_png(&png(64, 32)).is_ok());
         assert!(validate_png(&png(128, 128)).is_err());
         assert!(validate_png(b"not a png at all, really not").is_err());
+    }
+
+    #[test]
+    fn accepts_cape_sized_pngs() {
+        assert!(validate_cape_png(&png(64, 32)).is_ok());
+        assert!(validate_cape_png(&png(22, 17)).is_ok());
+        assert!(validate_cape_png(&png(46, 22)).is_ok());
+        assert!(validate_cape_png(&png(128, 64)).is_ok());
+        assert!(validate_cape_png(&png(64, 64)).is_err());
     }
 
     #[test]

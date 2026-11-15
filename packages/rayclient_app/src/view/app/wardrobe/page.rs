@@ -208,7 +208,8 @@ fn owned_set(plus: Option<&PlayerCosmetics>) -> HashSet<i32> {
 
 impl WardrobeData {
     pub fn plus_available(&self) -> bool {
-        self.plus.is_some() || self.plus_error.is_none()
+        // Poly+ is treated as down when its skin library fails, leaving the Microsoft-only view
+        (self.plus.is_some() || self.plus_error.is_none()) && self.skins_error.is_none()
     }
 
     pub fn matches(&self, name: &str) -> bool {
