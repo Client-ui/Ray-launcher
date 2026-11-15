@@ -17,7 +17,7 @@ license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/your-org/RayLauncher"
 rust-version = "1.97"
-version = "2.9.0"
+version = "2.10.0"
 
 [workspace.dependencies]
 # core
