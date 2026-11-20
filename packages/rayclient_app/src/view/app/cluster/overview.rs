@@ -5,7 +5,7 @@ use crate::hooks::{try_cluster_analytics, use_cluster_analytics};
 use crate::i18n::{t, tf};
 use crate::layout::cluster_content;
 use crate::theme::{colors, text_size};
-use crate::ui::centered_note;
+use crate::ui::{centered_note, eyebrow};
 use crate::view::app::{analytics_body, analytics_placeholder};
 
 use super::cluster_not_found;
@@ -58,19 +58,15 @@ impl Component for ClusterOverview {
 fn overview_header(name: &str) -> Element {
     rect()
         .vertical()
-        .spacing(2.)
+        .spacing(4.)
+        .padding(Gaps::new(4., 0., 4., 0.))
+        .child(eyebrow(tf("oneclient.cluster.overview.subtitle", &[&name])))
         .child(
             label()
                 .text(t("oneclient.cluster.overview.title"))
-                .font_size(text_size(20.))
-                .font_weight(FontWeight::SEMI_BOLD)
+                .font_size(text_size(24.))
+                .font_weight(FontWeight::BOLD)
                 .color(colors::fg_primary()),
-        )
-        .child(
-            label()
-                .text(tf("oneclient.cluster.overview.subtitle", &[&name]))
-                .font_size(text_size(12.))
-                .color(colors::fg_secondary()),
         )
         .into_element()
 }

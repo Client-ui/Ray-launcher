@@ -79,12 +79,9 @@ struct MarkdownPanel {
 
 impl Component for MarkdownPanel {
     fn render(&self) -> impl IntoElement {
-        rect()
+        crate::ui::raised_card()
             .width(Size::fill())
-            .padding(Gaps::new_all(20.))
-            .corner_radius(rounded(12.))
-            .background(colors::page_elevated())
-            .border(border_all_color(1., colors::component_border()))
+            .padding(Gaps::new_all(24.))
             .child(
                 Markdown::new(self.body.clone())
                     .width(Size::fill())
@@ -133,10 +130,11 @@ pub(super) fn versions_panel(
             )
             .into_element()
     } else {
-        rect()
+        crate::ui::raised_card()
             .vertical()
             .width(Size::fill())
             .spacing(8.)
+            .padding(Gaps::new_all(14.))
             .children(versions.into_iter().map(move |v| {
                 let tag = installed
                     .as_ref()
@@ -184,7 +182,7 @@ fn version_pager(current: usize, total_pages: usize, page: State<usize>) -> impl
             .center()
             .width(Size::px(32.))
             .height(Size::px(32.))
-            .corner_radius(rounded(8.))
+            .corner_radius(rounded(10.))
             .background(colors::component_bg())
             .border(border_all_color(1., colors::component_border()))
             .maybe(enabled, |el| {
@@ -270,9 +268,9 @@ fn version_row(
         .cross_align(Alignment::Center)
         .spacing(12.)
         .content(Content::Flex)
-        .padding(Gaps::new_all(12.))
-        .corner_radius(rounded(10.))
-        .background(colors::page_elevated())
+        .padding(Gaps::new_all(14.))
+        .corner_radius(rounded(14.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
         .child(release_badge(v.release_type))
         .child(

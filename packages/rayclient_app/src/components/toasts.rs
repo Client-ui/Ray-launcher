@@ -255,8 +255,16 @@ fn toast_shell(entry: &InboxEntry) -> Rect {
     };
     rect()
         .width(Size::px(TOAST_W))
-        .background(colors::component_bg())
-        .corner_radius(rounded(12.))
+        .background(colors::page_elevated().with_a(235))
+        .corner_radius(rounded(20.))
+        .shadow(
+            Shadow::new()
+                .x(0.)
+                .y(10.)
+                .blur(32.)
+                .spread(0.)
+                .color(Color::from_argb(110, 0, 0, 0)),
+        )
         .overflow(Overflow::Clip)
         .border(
             Border::new()
@@ -264,16 +272,22 @@ fn toast_shell(entry: &InboxEntry) -> Rect {
                 .width(1.)
                 .alignment(BorderAlignment::Inner),
         )
+        .border(crate::ui::top_sheen())
 }
 
 fn icon_badge(entry: &InboxEntry) -> impl IntoElement {
     let (icon, color) = entry_icon(entry);
+    let tile = match entry.level {
+        Level::Error => color.with_a(34),
+        Level::Info => colors::brand_glow(34),
+    };
     rect()
-        .width(Size::px(32.))
-        .height(Size::px(32.))
-        .corner_radius(rounded(6.))
+        .width(Size::px(40.))
+        .height(Size::px(40.))
+        .corner_radius(rounded(12.))
+        .background(tile)
         .center()
-        .child(Icon::new(entry.icon.unwrap_or(icon)).size(24.).color(color))
+        .child(Icon::new(entry.icon.unwrap_or(icon)).size(22.).color(color))
 }
 
 fn header(entry: &InboxEntry) -> impl IntoElement {
@@ -291,8 +305,8 @@ fn header(entry: &InboxEntry) -> impl IntoElement {
         .child(
             label()
                 .text(entry.title.clone())
-                .font_size(text_size(16.))
-                .font_weight(FontWeight::SEMI_BOLD)
+                .font_size(text_size(15.))
+                .font_weight(FontWeight::BOLD)
                 .color(title_color),
         )
         .child(

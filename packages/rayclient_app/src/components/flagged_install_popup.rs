@@ -2,6 +2,7 @@ use freya::prelude::*;
 use freya::router::RouterContext;
 use rayclient_content::packages::ResolvedAlternative;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{
     Button, Icon, IconType, Markdown, MarkdownStyle, OverlayPopup, ScrollArea, remote_icon,
 };
@@ -19,7 +20,6 @@ const ICON_SIZE: f32 = 32.;
 const ROW_GAP: f32 = 6.;
 const SECTION_GAP: f32 = 14.;
 const CONTENT_MAX_H: f32 = 400.;
-const DIALOG_PADDING: f32 = 20.;
 
 #[derive(PartialEq)]
 pub struct FlaggedInstallPopup;
@@ -61,58 +61,55 @@ fn dialog(prompt: FlaggedInstallPrompt, dispatch: crate::Actions) -> impl IntoEl
         )
     };
 
-    let mut body = rect()
+    let body = rect()
         .vertical()
         .width(Size::px(DIALOG_W))
         .height(Size::Inner)
         .max_width(Size::window_percent(90.))
         .max_height(Size::window_percent(85.))
         .overflow(Overflow::Clip)
-        .spacing(SECTION_GAP)
-        .padding(Gaps::new_all(DIALOG_PADDING))
-        .corner_radius(rounded(14.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .child(
-            rect()
-                .vertical()
-                .width(Size::fill())
-                .spacing(SECTION_GAP)
-                .child(
-                    rect()
-                        .horizontal()
-                        .cross_align(Alignment::Center)
-                        .spacing(10.)
-                        .child(
-                            Icon::new(IconType::AlertTriangle)
-                                .size(20.)
-                                .color(colors::code_warn()),
-                        )
-                        .child(
-                            label()
-                                .text(t("oneclient.components.flagged_install_popup.title"))
-                                .font_size(text_size(16.))
-                                .font_weight(FontWeight::SEMI_BOLD)
-                                .color(colors::fg_primary()),
-                        ),
-                )
-                .child(
-                    label()
-                        .text(description)
-                        .font_size(text_size(12.))
-                        .width(Size::fill())
-                        .color(colors::fg_secondary()),
-                ),
-        );
+        .dialog_surface();
+
+    let mut inner = dialog_body().child(
+        rect()
+            .vertical()
+            .width(Size::fill())
+            .spacing(SECTION_GAP)
+            .child(
+                rect()
+                    .horizontal()
+                    .cross_align(Alignment::Center)
+                    .spacing(10.)
+                    .child(
+                        Icon::new(IconType::AlertTriangle)
+                            .size(20.)
+                            .color(colors::code_warn()),
+                    )
+                    .child(
+                        label()
+                            .text(t("oneclient.components.flagged_install_popup.title"))
+                            .font_size(text_size(18.))
+                            .font_weight(FontWeight::BOLD)
+                            .color(colors::fg_primary()),
+                    ),
+            )
+            .child(
+                label()
+                    .text(description)
+                    .font_size(text_size(12.))
+                    .width(Size::fill())
+                    .color(colors::fg_secondary()),
+            ),
+    );
 
     if prompt.explanation.is_some() || !prompt.alternatives.is_empty() {
-        body = body.child(flagged_content(&prompt));
+        inner = inner.child(flagged_content(&prompt));
     }
 
     let cancel = dispatch.clone();
     let anyway = dispatch;
 
-    body.child(
+    body.child(inner).child(dialog_footer(
         rect()
             .horizontal()
             .width(Size::fill())
@@ -132,7 +129,7 @@ fn dialog(prompt: FlaggedInstallPrompt, dispatch: crate::Actions) -> impl IntoEl
                         "oneclient.components.flagged_install_popup.install_anyway",
                     )),
             ),
-    )
+    ))
 }
 
 fn flagged_content(prompt: &FlaggedInstallPrompt) -> impl IntoElement {

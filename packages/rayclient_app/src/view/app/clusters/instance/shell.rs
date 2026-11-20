@@ -60,7 +60,15 @@ pub fn shell(parts: Shell) -> Element {
                         .max_width(Size::window_percent(94.))
                         .max_height(Size::window_percent(92.))
                         .content(Content::Flex)
-                        .corner_radius(rounded(16.))
+                        .corner_radius(rounded(18.))
+                        .shadow(
+                            Shadow::new()
+                                .x(0.)
+                                .y(10.)
+                                .blur(32.)
+                                .spread(0.)
+                                .color(Color::from_argb(110, 0, 0, 0)),
+                        )
                         .overflow(Overflow::Clip)
                         .background(colors::page_elevated())
                         .border(border_all_color(1., colors::component_border()))
@@ -136,15 +144,15 @@ fn header(
                     label()
                         .text(eyebrow)
                         .font_size(text_size(11.))
-                        .font_weight(FontWeight::MEDIUM)
+                        .font_weight(FontWeight::BOLD)
                         .letter_spacing(1.6)
-                        .color(colors::fg_secondary())
+                        .color(colors::brand())
                 }))
                 .child(
                     label()
                         .text(title)
-                        .font_size(text_size(20.))
-                        .font_weight(FontWeight::SEMI_BOLD)
+                        .font_size(text_size(26.))
+                        .font_weight(FontWeight::BOLD)
                         .color(colors::fg_primary()),
                 )
                 .child(

@@ -52,6 +52,9 @@ pub fn parse_mc_version(version: &str) -> Option<ParsedMcVersion> {
 pub fn format_mc_version(major: u32, minor: u32, patch: Option<u32>) -> String {
     let base = if major >= 26 {
         format!("{major}.{minor}")
+    } else if minor == 0 && patch.is_none() {
+        // Mojang names the first release of a line `1.21`, never `1.21.0`
+        format!("1.{major}")
     } else {
         format!("1.{major}.{minor}")
     };
@@ -110,6 +113,15 @@ mod tests {
         assert_eq!(format_mc_version(26, 1, None), "26.1");
         assert_eq!(format_mc_version(26, 1, Some(2)), "26.1.2");
         assert_eq!(format_mc_version(21, 5, None), "1.21.5");
+        assert_eq!(format_mc_version(21, 0, None), "1.21");
+        assert_eq!(format_mc_version(20, 0, None), "1.20");
+    }
+
+    #[test]
+    fn a_bare_legacy_version_stays_a_whole_line_when_parsed() {
+        let v = parse_mc_version("1.20").unwrap();
+        assert_eq!((v.major, v.minor, v.patch), (20, None, None));
+        assert_eq!(parse_mc_version("1.20.1").unwrap().minor, Some(1));
     }
 
     #[test]

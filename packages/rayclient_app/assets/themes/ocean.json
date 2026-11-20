@@ -1,14 +1,14 @@
 {
   "name": "Ray Ocean",
+  "radius_scale": 1.2,
   "colors": {
-    "light": false,
-    "page": "#07110F",
-    "page_elevated": "#0C1A18",
-    "card": "#122421",
-    "component": "#1B332F",
-    "border": "#5CF2D622",
-    "text": "#EEF9F7",
-    "text_secondary": "#9DBDB8",
-    "accent": "#1FC8B0"
+    "page": "#050E0E",
+    "page_elevated": "#0A1817",
+    "card": "#102321",
+    "component": "#19332F",
+    "border": "#5CF2D61A",
+    "text": "#EDF9F7",
+    "text_secondary": "#9FC0BB",
+    "accent": "#22D3B8"
   }
 }

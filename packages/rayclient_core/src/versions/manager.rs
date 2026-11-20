@@ -7,7 +7,7 @@ use crate::versions::manifest::{
     ReleaseTarget, RemoteMigration, VersionMetadata, VersionsManifest, added_release_targets,
 };
 
-/// The only release the launcher offers; there is no remote catalog to fetch
+/// The releases the launcher offers (Ray Client 1.20 to 1.21.11); there is no remote catalog to fetch
 const EMBEDDED_VERSIONS: &str = include_str!("../../assets/versions.json");
 
 fn embedded_manifest() -> VersionsManifest {
@@ -100,10 +100,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn embedded_catalog_is_only_1_21_11_fabric() {
+    fn embedded_catalog_lists_every_ray_client_version_on_fabric() {
         let metadata = embedded_manifest().metadata("");
-        let versions: Vec<String> = metadata.iter().filter_map(|m| m.mc_version()).collect();
-        assert_eq!(versions, ["1.21.11"]);
+        let mut versions: Vec<String> = metadata.iter().filter_map(|m| m.mc_version()).collect();
+        versions.sort();
+
+        let mut expected: Vec<String> = [
+            "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.6", "1.21", "1.21.1", "1.21.2",
+            "1.21.3", "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10",
+            "1.21.11",
+        ]
+        .iter()
+        .map(ToString::to_string)
+        .collect();
+        expected.sort();
+
+        assert_eq!(versions, expected);
         assert!(
             metadata
                 .iter()

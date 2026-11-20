@@ -5,6 +5,7 @@ use freya::router::RouterContext;
 use notify::{Event, EventKind};
 use rayclient_content::modpacks::BlockedFile;
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{Button, Icon, IconType, OverlayPopup, ScrollArea};
 use crate::hooks::{use_dispatch, use_folder_watch, use_notifications_snapshot};
 use crate::i18n::{t, tf};
@@ -343,16 +344,7 @@ fn dialog(
         .max_width(Size::window_percent(95.))
         .max_height(Size::window_percent(85.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .dialog_surface()
         .child(
             rect()
                 .vertical()

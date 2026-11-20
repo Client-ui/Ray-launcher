@@ -56,7 +56,7 @@ pub struct Theme {
 }
 
 fn default_radius_scale() -> f32 {
-    1.
+    1.2
 }
 
 fn default_font() -> String {

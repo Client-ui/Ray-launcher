@@ -297,7 +297,7 @@ fn version_card(
         .width(Size::fill())
         .spacing(12.)
         .padding(Gaps::new_symmetric(12., 14.))
-        .corner_radius(rounded(10.))
+        .corner_radius(rounded(12.))
         .background(bg)
         .border(border_all_color(1., border_color))
         .child(header);
@@ -364,7 +364,7 @@ fn import_choice_card(
         .cross_align(Alignment::Center)
         .spacing(10.)
         .padding(Gaps::new_symmetric(12., 14.))
-        .corner_radius(rounded(10.))
+        .corner_radius(rounded(12.))
         .background(bg)
         .border(border_all_color(1., border_color))
         .a11y_role(AccessibilityRole::Button)

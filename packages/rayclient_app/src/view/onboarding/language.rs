@@ -93,7 +93,7 @@ fn language_row(
         .content(Content::Flex)
         .cross_align(Alignment::Center)
         .padding(Gaps::new_symmetric(14., 20.))
-        .corner_radius(rounded(10.))
+        .corner_radius(rounded(12.))
         .background(background)
         .maybe(active, |el| {
             el.border(border_all_color(1., colors::brand()))

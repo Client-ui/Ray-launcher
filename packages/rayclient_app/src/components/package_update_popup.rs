@@ -9,6 +9,7 @@ use rayclient_content::packages::{CachedPackageMeta, ProviderId};
 use rayclient_core::{BrowserPackageUpdate, ProfileUpdate};
 use rayclient_db::models::ClusterId;
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{
     Button, Dropdown, Icon, IconType, OverlayPopup, ScrollArea, Spinner, checkbox_labeled,
 };
@@ -19,7 +20,6 @@ use crate::hooks::{
 use crate::i18n::{t, tf};
 use crate::notifications::PackageUpdateGroup;
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
 
 const DIALOG_W: f32 = 520.;
 const DIALOG_H: f32 = 420.;
@@ -171,16 +171,7 @@ fn dialog(
         .height(Size::px(DIALOG_H))
         .max_width(Size::window_percent(95.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .dialog_surface()
         .child(content(
             groups,
             meta,

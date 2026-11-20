@@ -151,8 +151,13 @@ impl Component for PackageCard {
             .vertical()
             .width(Size::flex(1.0))
             .height(Size::px(CARD_H))
-            .corner_radius(rounded(8.))
-            .background(colors::component_bg())
+            .corner_radius(rounded(18.))
+            .background(
+                LinearGradient::new()
+                    .angle(0.)
+                    .stop((colors::lighten(colors::card(), 0.04), 0.))
+                    .stop((colors::card(), 100.)),
+            )
             .border(border_all_color(
                 1.,
                 if focused {
@@ -293,8 +298,8 @@ impl Component for ListRow {
             .cross_align(Alignment::Center)
             .spacing(12.)
             .padding(Gaps::new_all(16.))
-            .corner_radius(rounded(8.))
-            .background(colors::component_bg())
+            .corner_radius(rounded(14.))
+            .background(colors::card())
             .border(border_all_color(
                 1.,
                 if focused {
@@ -461,7 +466,7 @@ impl Component for InstallButton {
                 .height(Size::px(INSTALL_BUTTON_H))
                 .spacing(6.)
                 .padding(Gaps::new_symmetric(0., 10.))
-                .corner_radius(rounded(6.))
+                .corner_radius(rounded(999.))
                 .background(colors::component_bg())
                 .border(border_all_color(1., colors::component_border()))
                 .child(Icon::new(IconType::CheckCircle).size(12.).color(color))

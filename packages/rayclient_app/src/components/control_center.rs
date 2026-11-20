@@ -53,28 +53,23 @@ impl Component for ControlPanel {
         rect()
             .vertical()
             .width(Size::px(PANEL_WIDTH))
-            .padding(Gaps::new_all(12.))
-            .spacing(10.)
+            .padding(Gaps::new_all(16.))
+            .spacing(12.)
             .opacity(progress)
             .margin(Gaps::new((1.0 - progress) * -8.0, 0., 0., 0.))
             .background(colors::page_elevated().with_a(220))
             .backdrop_blur(12.)
-            .corner_radius(rounded(14.))
-            .border(
-                Border::new()
-                    .fill(colors::component_border())
-                    .width(1.)
-                    .alignment(BorderAlignment::Inner),
-            )
+            .corner_radius(rounded(22.))
+            .border(border_all_color(1., colors::component_border()))
+            .border(crate::ui::top_sheen())
             .shadow(Shadow::from((
                 0.,
-                8.,
-                32.,
+                14.,
+                40.,
                 0.,
-                Color::from_argb(120, 0, 0, 0),
+                Color::from_argb(130, 0, 0, 0),
             )))
             .child(AccountHeader)
-            .child(divider())
             .child(
                 rect()
                     .vertical()
@@ -105,8 +100,8 @@ fn section_label(text: &'static str) -> impl IntoElement {
         .text(text)
         .font_size(text_size(11.))
         .letter_spacing(0.8)
-        .font_weight(FontWeight::SEMI_BOLD)
-        .color(colors::fg_secondary())
+        .font_weight(FontWeight::BOLD)
+        .color(colors::brand())
 }
 
 #[derive(PartialEq)]
@@ -171,14 +166,14 @@ impl Component for AccountHeader {
             }
         };
 
-        rect()
+        crate::ui::raised_card()
             .horizontal()
             .width(Size::fill())
             .content(Content::Flex)
             .cross_align(Alignment::Center)
-            .spacing(10.)
-            .padding(Gaps::new_all(4.))
-            .child(Avatar::new(uuid).width(Size::px(40.)).height(Size::px(40.)))
+            .spacing(12.)
+            .padding(Gaps::new_all(12.))
+            .child(Avatar::new(uuid).width(Size::px(48.)).height(Size::px(48.)))
             .child(
                 rect()
                     .vertical()
@@ -187,8 +182,8 @@ impl Component for AccountHeader {
                     .child(
                         label()
                             .text(username)
-                            .font_size(text_size(16.))
-                            .font_weight(FontWeight::MEDIUM)
+                            .font_size(text_size(17.))
+                            .font_weight(FontWeight::BOLD)
                             .max_lines(1)
                             .color(colors::fg_primary()),
                     )
@@ -205,9 +200,10 @@ impl Component for AccountHeader {
                     .horizontal()
                     .cross_align(Alignment::Center)
                     .spacing(6.)
-                    .padding(Gaps::new_symmetric(6., 8.))
-                    .corner_radius(rounded(8.))
-                    .background(Color::RED.with_a(0))
+                    .padding(Gaps::new_symmetric(7., 12.))
+                    .corner_radius(rounded(999.))
+                    .background(colors::brand_glow(34))
+                    .border(border_all_color(1., colors::brand_glow(90)))
                     .maybe(*hovered.read(), |el| {
                         el.background(colors::ghost_overlay_hover())
                     })
@@ -252,12 +248,12 @@ impl Component for NavRow {
         rect()
             .horizontal()
             .width(Size::fill())
-            .height(Size::px(42.))
+            .height(Size::px(48.))
             .content(Content::Flex)
             .cross_align(Alignment::Center)
             .spacing(12.)
             .padding(Gaps::new_symmetric(0., 8.))
-            .corner_radius(rounded(8.))
+            .corner_radius(rounded(12.))
             .background(Color::RED.with_a(0))
             .maybe(*hovered.read(), |el| {
                 el.background(colors::ghost_overlay_hover())
@@ -267,11 +263,20 @@ impl Component for NavRow {
             .on_pointer_enter(move |_| hovered.set(true))
             .on_pointer_leave(move |_| hovered.set(false))
             .on_press(go)
-            .child(Icon::new(self.icon).size(20.).color(colors::fg_secondary()))
+            .child(
+                rect()
+                    .width(Size::px(34.))
+                    .height(Size::px(34.))
+                    .corner_radius(rounded(10.))
+                    .background(colors::brand_glow(34))
+                    .center()
+                    .child(Icon::new(self.icon).size(18.).color(colors::brand())),
+            )
             .child(
                 label()
                     .text(self.row_label)
                     .font_size(text_size(15.))
+                    .font_weight(FontWeight::MEDIUM)
                     .width(Size::flex(1.0))
                     .color(colors::fg_primary()),
             )
@@ -390,12 +395,12 @@ impl Component for QuickTile {
         rect()
             .horizontal()
             .width(Size::flex(1.0))
-            .height(Size::px(64.))
+            .height(Size::px(68.))
             .content(Content::Flex)
             .cross_align(Alignment::Center)
             .spacing(10.)
-            .padding(Gaps::new_symmetric(0., 12.))
-            .corner_radius(rounded(10.))
+            .padding(Gaps::new_symmetric(0., 14.))
+            .corner_radius(rounded(16.))
             .background(background)
             .maybe(!enabled, |el| el.opacity(0.45))
             .maybe(!on || !enabled, |el| {

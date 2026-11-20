@@ -9,8 +9,9 @@ use crate::{
     ui,
 };
 
-const WIDTH: f32 = 40.;
-const HANDLE_SIZE: f32 = 16.;
+const WIDTH: f32 = 44.;
+const HEIGHT: f32 = 24.;
+const HANDLE_SIZE: f32 = 18.;
 const TIME: u64 = 180;
 
 pub fn toggle(value: State<bool>) -> impl IntoElement {
@@ -86,6 +87,8 @@ impl Component for Switch {
 
         let track_border = if focus().is_focused() && !disabled {
             colors::fg_primary()
+        } else if on && !disabled {
+            colors::brand_glow(90)
         } else {
             colors::control_border()
         };
@@ -139,8 +142,8 @@ impl Component for Switch {
             .child(
                 rect()
                     .width(Size::px(WIDTH))
-                    .height(Size::px(22.))
-                    .corner_radius(rounded(11.))
+                    .height(Size::px(HEIGHT))
+                    .corner_radius(rounded(12.))
                     .padding(Gaps::new_all(3.))
                     .main_align(knob_align)
                     .cross_align(Alignment::Center)
@@ -150,11 +153,29 @@ impl Component for Switch {
                         background.read().value()
                     })
                     .border(ui::border_all_color(1., track_border))
+                    .maybe(on && !disabled, |el| {
+                        el.shadow(
+                            Shadow::new()
+                                .x(0.)
+                                .y(0.)
+                                .blur(12.)
+                                .spread(0.)
+                                .color(colors::brand_glow(70)),
+                        )
+                    })
                     .child(
                         rect()
                             .width(Size::px(HANDLE_SIZE))
                             .height(Size::px(HANDLE_SIZE))
-                            .corner_radius(rounded(8.))
+                            .corner_radius(rounded(9.))
+                            .shadow(
+                                Shadow::new()
+                                    .x(0.)
+                                    .y(1.)
+                                    .blur(4.)
+                                    .spread(0.)
+                                    .color(Color::from_argb(90, 0, 0, 0)),
+                            )
                             .background(if disabled {
                                 colors::fg_secondary()
                             } else if on {

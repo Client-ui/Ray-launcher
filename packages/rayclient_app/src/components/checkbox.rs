@@ -9,7 +9,7 @@ use crate::{
     ui,
 };
 
-const BOX_SIZE: f32 = 18.;
+const BOX_SIZE: f32 = 20.;
 const MARK_SIZE: f32 = 12.;
 const TIME: u64 = 180;
 
@@ -44,7 +44,7 @@ impl Component for Check {
         let box_border = if focus().is_focused() && !disabled {
             colors::fg_primary()
         } else if checked && !disabled {
-            colors::brand()
+            colors::brand_glow(90)
         } else {
             colors::control_border()
         };
@@ -98,7 +98,7 @@ impl Component for Check {
                 rect()
                     .width(Size::px(BOX_SIZE))
                     .height(Size::px(BOX_SIZE))
-                    .corner_radius(rounded(5.))
+                    .corner_radius(rounded(7.))
                     .main_align(Alignment::Center)
                     .cross_align(Alignment::Center)
                     .background(if disabled {
@@ -107,6 +107,16 @@ impl Component for Check {
                         background.read().value()
                     })
                     .border(ui::border_all_color(1., box_border))
+                    .maybe(checked && !disabled, |el| {
+                        el.shadow(
+                            Shadow::new()
+                                .x(0.)
+                                .y(0.)
+                                .blur(10.)
+                                .spread(0.)
+                                .color(colors::brand_glow(70)),
+                        )
+                    })
                     .maybe_child((checked || mark_opacity > 0.).then(|| {
                         rect().opacity(mark_opacity).scale(mark_scale).child(
                             Icon::new(IconType::Check)

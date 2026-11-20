@@ -122,8 +122,8 @@ impl<T: Copy + PartialEq + 'static> Component for SegmentedControl<T> {
             .cross_align(Alignment::Center)
             .spacing(2.)
             .padding(Gaps::new_all(3.))
-            .corner_radius(rounded(9.))
-            .background(colors::component_bg())
+            .corner_radius(rounded(14.))
+            .background(colors::page_elevated().with_a(180))
             .border(border_all_color(1., colors::component_border()))
             .children(self.segments.iter().map(move |seg| {
                 SegmentButton {
@@ -183,7 +183,7 @@ impl<T: Copy + PartialEq + 'static> Component for SegmentButton<T> {
             .height(Size::fill())
             .cross_align(Alignment::Center)
             .spacing(6.)
-            .corner_radius(rounded(6.))
+            .corner_radius(rounded(11.))
             .a11y_id(a11y_id)
             .a11y_focusable(!disabled)
             .a11y_role(AccessibilityRole::Button)
@@ -194,12 +194,23 @@ impl<T: Copy + PartialEq + 'static> Component for SegmentButton<T> {
                 el.padding(Gaps::new_symmetric(0., 12.))
             })
             .background(if is_selected {
-                colors::component_bg_pressed()
+                colors::brand_glow(34)
             } else {
                 Color::TRANSPARENT
             })
+            .maybe(is_selected && !disabled, |el| {
+                el.border(border_all_color(1., colors::brand_glow(90)))
+                    .shadow(
+                        Shadow::new()
+                            .x(0.)
+                            .y(2.)
+                            .blur(10.)
+                            .spread(0.)
+                            .color(colors::brand_glow(40)),
+                    )
+            })
             .maybe(focused && !disabled, |el| {
-                el.border(border_all_color(1., colors::brand()))
+                el.border(border_all_color(1.5, colors::brand()))
             })
             .maybe(!disabled, |el| {
                 el.cursor(CursorIcon::Pointer)
@@ -220,7 +231,7 @@ impl<T: Copy + PartialEq + 'static> Component for SegmentButton<T> {
                     .text(text)
                     .font_size(text_size(13.))
                     .font_weight(if is_selected {
-                        FontWeight::MEDIUM
+                        FontWeight::SEMI_BOLD
                     } else {
                         FontWeight::NORMAL
                     })

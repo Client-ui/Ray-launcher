@@ -10,7 +10,7 @@ use crate::hooks::{
     use_migration, use_onboarding_bundles, use_provide_onboarding_selection, use_settings_snapshot,
 };
 use crate::i18n::t;
-use crate::theme::{colors, text_size};
+use crate::theme::{colors, rounded, text_size};
 use crate::view::onboarding::{default_selection, onboarding_step_index, onboarding_total};
 
 #[derive(PartialEq)]
@@ -80,6 +80,7 @@ impl Component for OnboardingShell {
             .background(colors::page())
             .color(colors::fg_primary())
             .overflow(Overflow::Clip)
+            .child(top_glow())
             .child(
                 rect()
                     .vertical()
@@ -116,17 +117,49 @@ impl Component for OnboardingShell {
 }
 
 fn progress_bar(step_index: usize, total: usize) -> impl IntoElement {
-    let filled = ((step_index + 1) as f32 / total as f32) * 100.;
+    let mut pills = rect()
+        .horizontal()
+        .main_align(Alignment::Center)
+        .cross_align(Alignment::Center)
+        .spacing(6.);
+
+    for i in 0..total {
+        let active = i == step_index;
+        let done = i < step_index;
+        pills = pills.child(
+            rect()
+                .width(Size::px(if active { 28. } else { 8. }))
+                .height(Size::px(8.))
+                .corner_radius(rounded(4.))
+                .background(if active {
+                    colors::brand()
+                } else if done {
+                    colors::brand_glow(110)
+                } else {
+                    colors::ghost_overlay_hover()
+                }),
+        );
+    }
 
     rect()
         .width(Size::fill())
-        .height(Size::px(3.))
-        .background(colors::ghost_overlay_hover())
-        .child(
-            rect()
-                .width(Size::percent(filled))
-                .height(Size::fill())
-                .background(colors::brand()),
+        .center()
+        .padding(Gaps::new_symmetric(10., 0.))
+        .child(pills)
+}
+
+/// A soft brand wash across the top of the page
+fn top_glow() -> impl IntoElement {
+    rect()
+        .position(Position::new_absolute().top(0.).left(0.))
+        .interactive(false)
+        .width(Size::fill())
+        .height(Size::px(320.))
+        .background(
+            LinearGradient::new()
+                .angle(0.)
+                .stop((colors::brand_glow(34), 0.))
+                .stop((colors::brand_glow(0), 100.)),
         )
 }
 

@@ -1,9 +1,9 @@
 use freya::prelude::*;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, Icon, IconType, OverlayPopup};
 use crate::i18n::{t, tf};
-use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::theme::{colors, text_size};
 
 pub fn use_shared_delete(
     cluster_id: i64,
@@ -87,37 +87,37 @@ impl Component for SharedPackageDeleteDialog {
                         .vertical()
                         .width(Size::px(440.))
                         .max_width(Size::window_percent(90.))
-                        .spacing(14.)
-                        .padding(Gaps::new_all(20.))
-                        .corner_radius(rounded(14.))
-                        .background(colors::card())
-                        .border(border_all_color(1., colors::component_border()))
+                        .overflow(Overflow::Clip)
+                        .dialog_surface()
                         .child(
-                            rect()
-                                .horizontal()
-                                .cross_align(Alignment::Center)
-                                .spacing(10.)
+                            dialog_body()
                                 .child(
-                                    Icon::new(IconType::AlertTriangle)
-                                        .size(20.)
-                                        .color(colors::code_warn()),
+                                    rect()
+                                        .horizontal()
+                                        .cross_align(Alignment::Center)
+                                        .spacing(10.)
+                                        .child(
+                                            Icon::new(IconType::AlertTriangle)
+                                                .size(20.)
+                                                .color(colors::code_warn()),
+                                        )
+                                        .child(
+                                            label()
+                                                .text(title)
+                                                .font_size(text_size(18.))
+                                                .font_weight(FontWeight::BOLD)
+                                                .color(colors::fg_primary()),
+                                        ),
                                 )
                                 .child(
                                     label()
-                                        .text(title)
-                                        .font_size(text_size(16.))
-                                        .font_weight(FontWeight::SEMI_BOLD)
-                                        .color(colors::fg_primary()),
+                                        .text(body)
+                                        .font_size(text_size(12.))
+                                        .width(Size::fill())
+                                        .color(colors::fg_secondary()),
                                 ),
                         )
-                        .child(
-                            label()
-                                .text(body)
-                                .font_size(text_size(12.))
-                                .width(Size::fill())
-                                .color(colors::fg_secondary()),
-                        )
-                        .child(
+                        .child(dialog_footer(
                             rect()
                                 .horizontal()
                                 .width(Size::fill())
@@ -136,7 +136,7 @@ impl Component for SharedPackageDeleteDialog {
                                         .child(Icon::new(IconType::Trash01).size(14.))
                                         .text(t("oneclient.common.delete")),
                                 ),
-                        ),
+                        )),
                 ),
         )
     }

@@ -65,7 +65,7 @@ impl Component for AccountPanel {
             }
         }
 
-        let mut rows = rect().vertical().width(Size::fill()).spacing(4.);
+        let mut rows = rect().vertical().width(Size::fill()).spacing(6.);
         if ordered.is_empty() {
             rows = rows.child(
                 label()
@@ -87,23 +87,19 @@ impl Component for AccountPanel {
         rect()
             .vertical()
             .width(Size::px(300.))
-            .padding(Gaps::new_all(12.))
-            .spacing(8.)
+            .padding(Gaps::new_all(16.))
+            .spacing(12.)
             .opacity(progress)
             .margin(Gaps::new((1.0 - progress) * -8.0, 0., 0., 0.))
             .background(colors::page_elevated().with_a(220))
             .backdrop_blur(12.)
-            .corner_radius(rounded(12.))
-            .border(
-                Border::new()
-                    .fill(colors::component_border())
-                    .width(1.)
-                    .alignment(BorderAlignment::Inner),
-            )
+            .corner_radius(rounded(22.))
+            .border(crate::ui::border_all_color(1., colors::component_border()))
+            .border(crate::ui::top_sheen())
             .shadow(Shadow::from((
                 0.,
-                8.,
-                32.,
+                14.,
+                40.,
                 0.,
                 Color::from_argb(120, 0, 0, 0),
             )))
@@ -117,8 +113,8 @@ impl Component for AccountPanel {
                     .child(
                         label()
                             .text(t("oneclient.components.account_switcher.title"))
-                            .font_size(text_size(18.))
-                            .font_weight(FontWeight::MEDIUM)
+                            .font_size(text_size(20.))
+                            .font_weight(FontWeight::BOLD)
                             .a11y_role(AccessibilityRole::TitleBar),
                     ),
             )
@@ -219,8 +215,12 @@ impl Component for AccountRow {
             .content(Content::Flex)
             .cross_align(Alignment::Center)
             .spacing(10.)
-            .padding(Gaps::new_all(8.))
-            .corner_radius(rounded(8.))
+            .padding(Gaps::new_all(10.))
+            .corner_radius(rounded(14.))
+            .maybe(active, |el| {
+                el.background(colors::brand_glow(34))
+                    .border(crate::ui::border_all_color(1., colors::brand_glow(90)))
+            })
             .maybe(*hovered.read() && !active, |el| {
                 el.background(colors::ghost_overlay_hover())
             })
@@ -230,8 +230,8 @@ impl Component for AccountRow {
             .on_press(switch)
             .child(
                 Avatar::new(id.to_string())
-                    .width(Size::px(32.))
-                    .height(Size::px(32.)),
+                    .width(Size::px(40.))
+                    .height(Size::px(40.)),
             )
             .child(
                 rect()
@@ -241,7 +241,7 @@ impl Component for AccountRow {
                         label()
                             .text(username)
                             .font_size(text_size(14.))
-                            .font_weight(FontWeight::MEDIUM)
+                            .font_weight(FontWeight::BOLD)
                             .max_lines(1)
                             .color(colors::fg_primary()),
                     )
@@ -257,7 +257,7 @@ impl Component for AccountRow {
             .maybe(active, |el| {
                 el.child(
                     Icon::new(IconType::CheckCircle)
-                        .size(18.)
+                        .size(20.)
                         .color(colors::success()),
                 )
             })

@@ -265,8 +265,8 @@ impl Component for ServerDetailsPopup {
             .max_height(Size::window_percent(70.))
             .padding(20.)
             .spacing(14.)
-            .corner_radius(rounded(14.))
-            .background(colors::page_elevated())
+            .corner_radius(rounded(16.))
+            .background(colors::card())
             .border(border_all_color(1., colors::component_border()))
             .child(
                 rect()

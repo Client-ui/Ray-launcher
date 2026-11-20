@@ -7,8 +7,8 @@ use crate::Route;
 use crate::components::{Button, Icon, IconType, progress_track};
 use crate::hooks::{Actions, use_dispatch, use_relocation};
 use crate::i18n::{t, tf};
-use crate::theme::{colors, text_size};
-use crate::ui::{note, path_block};
+use crate::theme::{colors, rounded, text_size};
+use crate::ui::{border_all_color, note, path_block};
 
 #[derive(PartialEq)]
 pub struct Relocating;
@@ -156,6 +156,10 @@ fn screen() -> Rect {
         .width(Size::px(460.))
         .max_width(Size::window_percent(90.))
         .spacing(14.)
+        .padding(24.)
+        .background(colors::card())
+        .border(border_all_color(1., colors::component_border()))
+        .corner_radius(rounded(18.))
 }
 
 fn heading(icon: IconType, title: &'static str, tint: Color) -> impl IntoElement {
@@ -167,7 +171,7 @@ fn heading(icon: IconType, title: &'static str, tint: Color) -> impl IntoElement
         .child(
             label()
                 .text(title)
-                .font_size(text_size(18.))
+                .font_size(text_size(20.))
                 .font_weight(FontWeight::SEMI_BOLD)
                 .color(colors::fg_primary()),
         )

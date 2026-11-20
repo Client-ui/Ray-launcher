@@ -115,6 +115,7 @@ pub(crate) use navbar::window_controls;
 pub use navbar::{AppNavbar, OnboardingNavbar};
 pub use notifications::{ChevronToggle, NotificationCenter};
 pub use optional_mods_popup::OptionalModsPopup;
+pub(crate) use overlay_popup::DialogSurface;
 pub use overlay_popup::{
     OVERLAY_BASE_LEVEL, OVERLAY_MAX_LEVEL, OverlayPopup, overlay_is_topmost, use_open_level,
 };

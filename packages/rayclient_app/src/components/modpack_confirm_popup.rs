@@ -6,6 +6,7 @@ use rayclient_content::packages::ResolvedAlternative;
 use rayclient_core::clusters::{ExistingPack, FlaggedModpack, FlaggedPackMod};
 
 use super::flagged_install_popup::explanation_panel;
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{
     Button, Icon, IconType, OverlayPopup, ScrollArea, caution_card, remote_icon, warning_card,
     warning_list,
@@ -384,16 +385,7 @@ fn dialog(
         .max_width(Size::window_percent(95.))
         .max_height(Size::window_percent(85.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .dialog_surface()
         .child(
             rect()
                 .vertical()

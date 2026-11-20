@@ -55,8 +55,8 @@ pub fn analytics_placeholder(note: &str) -> Element {
             rect()
                 .width(Size::fill())
                 .padding(Gaps::new_symmetric(16., 24.))
-                .corner_radius(rounded(12.))
-                .background(colors::page_elevated())
+                .corner_radius(rounded(16.))
+                .background(colors::card())
                 .border(border_all_color(1., colors::component_border()))
                 .center()
                 .child(
@@ -234,7 +234,7 @@ pub(super) fn card() -> Rect {
     rect()
         .vertical()
         .padding(20.)
-        .corner_radius(rounded(14.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
 }

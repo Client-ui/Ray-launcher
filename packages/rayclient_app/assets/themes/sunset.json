@@ -1,14 +1,14 @@
 {
   "name": "Ray Sunset",
+  "radius_scale": 1.2,
   "colors": {
-    "light": false,
-    "page": "#100B0C",
-    "page_elevated": "#1A1113",
-    "card": "#251A1D",
-    "component": "#352529",
-    "border": "#FF8F6A22",
-    "text": "#FBF2EF",
-    "text_secondary": "#BFA6A0",
+    "page": "#0E090A",
+    "page_elevated": "#181012",
+    "card": "#241719",
+    "component": "#342428",
+    "border": "#FF8F6A1A",
+    "text": "#FBF1EE",
+    "text_secondary": "#C2A9A3",
     "accent": "#FF5A5F"
   }
 }

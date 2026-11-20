@@ -5,8 +5,8 @@ use crate::i18n::t;
 use crate::theme::{colors, rounded, text_size};
 use crate::ui::clamp_to_window;
 
-const GAP_VERT: f32 = 8.0;
-const GAP_HORI: f32 = 12.0;
+const GAP_VERT: f32 = 10.0;
+const GAP_HORI: f32 = 14.0;
 
 const EXPANDED_WIDTH: f32 = 440.;
 const EXPANDED_HEIGHT: f32 = 180.;
@@ -14,11 +14,11 @@ const EXPANDED_HEIGHT: f32 = 180.;
 fn text_input(value: impl Into<WritableSetter<String>>) -> Input {
     Input::new(value)
         .padding(Gaps::new_symmetric(GAP_VERT, GAP_HORI))
-        .corner_radius(rounded(8.))
+        .corner_radius(rounded(12.))
         .background(colors::component_bg())
-        .focus_background(colors::component_bg_pressed())
+        .focus_background(colors::lighten(colors::component_bg(), 0.03))
         .border_fill(colors::component_border())
-        .focus_border_fill(colors::component_border_pressed())
+        .focus_border_fill(colors::brand())
         .color(colors::fg_primary())
         .placeholder_color(colors::fg_secondary())
 }
@@ -244,13 +244,13 @@ impl Component for TextInput {
                 .on_close(move |_| expanded.set(false))
                 .child(
                     rect()
-                        .corner_radius(rounded(8.))
+                        .corner_radius(rounded(10.))
                         .shadow(Shadow::from((
                             0.,
-                            8.,
+                            10.,
                             32.,
                             0.,
-                            Color::from_argb(120, 0, 0, 0),
+                            Color::from_argb(110, 0, 0, 0),
                         )))
                         .child(
                             self.input

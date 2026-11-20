@@ -752,7 +752,78 @@ pub async fn install_enabled_bundle_files(
         }
     }
 
+    if taken && let Err(err) = ensure_fabric_api(archive, cluster_id, &present, ctx).await {
+        tracing::warn!(error = %err, "could not add Fabric API for the Ray Client bundle");
+    }
+
     Ok(installed)
+}
+
+/// Modrinth project id of Fabric API
+const FABRIC_API_PROJECT_ID: &str = "P7dR8mSH";
+const RAY_CLIENT_CATEGORY: &str = "Ray Client";
+
+/// Ray Client needs Fabric API. The 1.21.11 bundle pins a build of it; the other bundles
+/// ship only the Ray jar, so the newest Fabric API for the instance's version is looked
+/// up here. Best effort: offline, or with no match, the install carries on without it
+async fn ensure_fabric_api(
+    archive: &BundleArchive,
+    cluster_id: i64,
+    present: &PresentContent,
+    ctx: &ContentCtx,
+) -> ContentResult<()> {
+    if archive.manifest.loader != GameLoader::Fabric
+        || archive.manifest.category != RAY_CLIENT_CATEGORY
+        // A bundle that lists files pins its own Fabric API build
+        || !archive.manifest.files.is_empty()
+        || present.projects.contains(FABRIC_API_PROJECT_ID)
+    {
+        return Ok(());
+    }
+
+    let provider_id = ProviderId::Modrinth;
+    let provider = ctx.providers.get(provider_id)?;
+    let Some(target) = crate::packages::dependencies::find_mod_for_cluster(
+        provider,
+        FABRIC_API_PROJECT_ID,
+        Some("Fabric API"),
+        None,
+        cluster_id,
+        ctx,
+    )
+    .await?
+    else {
+        tracing::warn!(cluster_id, "no Fabric API build found for this instance");
+        return Ok(());
+    };
+
+    let project = crate::packages::cached_project_detail(
+        ctx,
+        provider_id,
+        &target.project_id,
+        ContentType::Mod,
+    )
+    .await;
+    let version = crate::packages::get_version_cached(
+        ctx,
+        provider_id,
+        &target.project_id,
+        &target.version_id,
+    )
+    .await?;
+    PackageStore::install_to_cluster(
+        provider_id,
+        &project,
+        &version,
+        cluster_id,
+        true,
+        false,
+        None,
+        ctx,
+    )
+    .await?;
+    tracing::info!(cluster_id, version = %version.version_id, "installed Fabric API for Ray Client");
+    Ok(())
 }
 
 pub(crate) async fn install_bundle_files(

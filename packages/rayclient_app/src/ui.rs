@@ -27,6 +27,61 @@ pub fn border_all_color(width: f32, color: Color) -> Border {
     })
 }
 
+/// The top edge highlight shared by raised surfaces
+pub fn top_sheen() -> Border {
+    Border::new()
+        .fill(theme::colors::sheen())
+        .width(BorderWidth {
+            top: 1.,
+            right: 0.,
+            bottom: 0.,
+            left: 0.,
+        })
+        .alignment(BorderAlignment::Inner)
+}
+
+/// A raised card: lit from above, hairline border, sheen on the top edge. Callers add
+/// size, padding and children
+pub fn raised_card() -> Rect {
+    let base = theme::colors::card();
+    rect()
+        .corner_radius(rounded(18.))
+        .background(
+            LinearGradient::new()
+                .angle(0.)
+                .stop((theme::colors::lighten(base, 0.045), 0.))
+                .stop((base, 100.)),
+        )
+        .border(border_all_color(1., theme::colors::component_border()))
+        .border(top_sheen())
+}
+
+/// A floating glass panel for bars and flyouts: translucent, bordered and shadowed
+pub fn glass_panel() -> Rect {
+    rect()
+        .corner_radius(rounded(20.))
+        .background(theme::colors::page_elevated().with_a(205))
+        .border(border_all_color(1., theme::colors::component_border()))
+        .border(top_sheen())
+        .shadow(
+            Shadow::new()
+                .x(0.)
+                .y(12.)
+                .blur(36.)
+                .spread(0.)
+                .color(Color::from_argb(120, 0, 0, 0)),
+        )
+}
+
+/// A small brand-coloured caption that sits above a section title
+pub fn eyebrow(text: String) -> Label {
+    label()
+        .text(text.to_uppercase())
+        .font_size(text_size(11.))
+        .font_weight(FontWeight::BOLD)
+        .color(theme::colors::brand())
+}
+
 /// A tinted strip of explanation under a row; `accent` washes the background
 pub fn note(message: String, accent: Color) -> Element {
     rect()

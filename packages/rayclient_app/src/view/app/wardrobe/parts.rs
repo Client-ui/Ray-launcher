@@ -440,8 +440,9 @@ impl Component for WardrobeCard {
             .width(Size::fill())
             .height(Size::fill())
             .content(Content::Flex)
-            .corner_radius(rounded(12.))
-            .background(colors::page_elevated())
+            .corner_radius(rounded(16.))
+            .background(colors::card())
+            .border(crate::ui::border_all_color(1., colors::component_border()))
             .overflow(Overflow::Clip)
             .opacity(if enabled { 1. } else { 0.5 })
             .cursor(if enabled {
@@ -652,8 +653,8 @@ impl Component for RenamePopup {
                     .width(Size::px(RENAME_WIDTH))
                     .padding(Gaps::new_all(10.))
                     .spacing(8.)
-                    .corner_radius(rounded(12.))
-                    .background(colors::page_elevated())
+                    .corner_radius(rounded(16.))
+                    .background(colors::card())
                     .border(hairline(colors::component_border()))
                     .child(
                         label()

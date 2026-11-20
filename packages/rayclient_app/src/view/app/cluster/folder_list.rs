@@ -5,6 +5,7 @@ use rayclient_common::parse_mc_version;
 use rayclient_core::clusters::Cluster;
 use rayclient_core::settings::ViewLayout;
 
+use crate::components::DialogSurface;
 use crate::components::{
     Button, CARD_GRID_H, CARD_H, CardLayout, GRID_GAP, GRID_MIN_W, Icon, IconType, LocalImage,
     OverlayPopup, ScrollArea, Segment, SegmentedControl, TextInput, badge, icon_box, kebab_button,
@@ -74,6 +75,7 @@ pub(super) fn toolbar_panel(leading: Option<Element>, controls: Vec<Element>) ->
         .padding(Gaps::new_symmetric(8., 12.))
         .corner_radius(top_corners)
         .background(colors::page_elevated())
+        .border(border_all_color(1., colors::component_border()))
         .child(
             rect()
                 .horizontal()
@@ -249,8 +251,9 @@ impl Component for FolderCard {
                 .cross_align(Alignment::Center)
                 .spacing(12.)
                 .padding(Gaps::new_all(10.))
-                .corner_radius(rounded(8.))
+                .corner_radius(rounded(12.))
                 .background(colors::card())
+                .border(border_all_color(1., colors::component_border()))
                 .content(Content::Flex)
                 .on_secondary_down(on_secondary(on_context.clone()))
                 .child(self.list_info(icon))
@@ -468,9 +471,7 @@ pub(crate) fn dialog(
                         .max_width(Size::window_percent(90.))
                         .spacing(14.)
                         .padding(Gaps::new_all(20.))
-                        .corner_radius(rounded(14.))
-                        .background(colors::card())
-                        .border(border_all_color(1., colors::component_border()))
+                        .dialog_surface()
                         .child(
                             label()
                                 .text(title)

@@ -1,14 +1,14 @@
 {
   "name": "Ray Lavender",
+  "radius_scale": 1.2,
   "colors": {
-    "light": false,
-    "page": "#0E0B14",
-    "page_elevated": "#171221",
-    "card": "#211A2F",
-    "component": "#2F2543",
-    "border": "#C9A8FF22",
+    "page": "#0C0912",
+    "page_elevated": "#150F1F",
+    "card": "#1F1830",
+    "component": "#2C2342",
+    "border": "#C9A8FF1C",
     "text": "#F6F1FF",
-    "text_secondary": "#B5A6CC",
+    "text_secondary": "#B8A9CF",
     "accent": "#B58CFF"
   }
 }

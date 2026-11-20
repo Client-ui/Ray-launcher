@@ -48,7 +48,7 @@ impl Component for OnboardingWelcome {
                     .width(Size::fill())
                     .height(Size::flex(1.0))
                     .center()
-                    .spacing(16.)
+                    .spacing(20.)
                     .child(
                         label()
                             .text(t("oneclient.onboarding.welcome.title"))
@@ -59,7 +59,7 @@ impl Component for OnboardingWelcome {
                     .child(
                         label()
                             .text(t("oneclient.onboarding.welcome.subtitle"))
-                            .font_size(text_size(18.))
+                            .font_size(text_size(20.))
                             .color(colors::fg_secondary())
                             .opacity(rest),
                     ),

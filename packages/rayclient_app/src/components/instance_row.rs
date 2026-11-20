@@ -91,14 +91,16 @@ impl Component for InstanceRow {
         let on_press = self.on_press.clone();
 
         let background = if selected {
-            colors::brand().with_a(36)
+            colors::brand_glow(34)
         } else if hovered {
             colors::component_bg_hover()
         } else {
             colors::component_bg()
         };
 
-        let border_color = if selected || focused {
+        let border_color = if selected {
+            colors::brand_glow(90)
+        } else if focused {
             colors::brand()
         } else if hovered {
             colors::component_border_hover()
@@ -115,7 +117,7 @@ impl Component for InstanceRow {
             .spacing(14.)
             .cross_align(Alignment::Center)
             .content(Content::Flex)
-            .corner_radius(rounded(12.))
+            .corner_radius(rounded(14.))
             .background(background)
             .border(border_all_color(1., border_color).alignment(BorderAlignment::Inner))
             .a11y_id(a11y_id)
@@ -138,7 +140,7 @@ impl Component for InstanceRow {
                 rect()
                     .width(Size::px(THUMB_PX))
                     .height(Size::px(THUMB_PX))
-                    .corner_radius(rounded(8.))
+                    .corner_radius(rounded(10.))
                     .overflow(Overflow::Clip)
                     .child(self.art.clone()),
             )

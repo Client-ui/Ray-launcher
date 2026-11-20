@@ -30,23 +30,27 @@ use crate::{
     components::{Button, Icon, IconType},
     i18n::t,
     theme::{colors, rounded, text_size},
-    ui::border_all_color,
+    ui::{border_all_color, eyebrow, raised_card},
 };
 
 pub fn settings_page() -> Rect {
-    rect().vertical().width(Size::fill()).spacing(4.)
+    rect().vertical().width(Size::fill()).spacing(8.)
 }
 
 pub fn section_header(text: &'static str) -> impl IntoElement {
     rect()
-        .padding(Gaps::new(16., 0., 8., 2.))
+        .horizontal()
+        .cross_align(Alignment::Center)
+        .spacing(8.)
+        .padding(Gaps::new(24., 0., 10., 4.))
         .child(
-            label()
-                .text(text)
-                .font_size(text_size(13.))
-                .font_weight(FontWeight::MEDIUM)
-                .color(colors::fg_secondary()),
+            rect()
+                .width(Size::px(3.))
+                .height(Size::px(12.))
+                .corner_radius(rounded(2.))
+                .background(colors::brand()),
         )
+        .child(eyebrow(text.to_string()))
         .into_element()
 }
 
@@ -94,34 +98,44 @@ fn settings_row_inner(
 ) -> impl IntoElement {
     let description = description.into();
     let danger = tone == RowTone::Danger;
-    rect()
-        .maybe(tone == RowTone::Disabled, |el| el.opacity(0.4))
+    let card = if danger {
+        rect()
+            .corner_radius(rounded(18.))
+            .background(colors::danger().with_a(26))
+            .border(border_all_color(1., colors::danger().with_a(128)))
+    } else {
+        raised_card()
+    };
+    card.maybe(tone == RowTone::Disabled, |el| el.opacity(0.4))
         .horizontal()
         .width(Size::fill())
         .content(Content::Flex)
         .cross_align(Alignment::Center)
         .spacing(16.)
-        .padding(Gaps::new_symmetric(12., 16.))
-        .corner_radius(rounded(12.))
-        .background(if danger {
-            colors::danger().with_a(26)
-        } else {
-            colors::page_elevated()
-        })
-        .maybe(danger, |el| {
-            el.border(border_all_color(1., colors::danger().with_a(128)))
-        })
-        .child(Icon::new(icon).maybe(danger, |icon| icon.color(colors::danger())))
+        .padding(Gaps::new_symmetric(16., 20.))
+        .child(
+            rect()
+                .center()
+                .width(Size::px(40.))
+                .height(Size::px(40.))
+                .corner_radius(rounded(12.))
+                .background(if danger {
+                    colors::danger().with_a(34)
+                } else {
+                    colors::brand_glow(24)
+                })
+                .child(Icon::new(icon).maybe(danger, |icon| icon.color(colors::danger()))),
+        )
         .child(
             rect()
                 .vertical()
                 .width(Size::flex(1.0))
-                .spacing(2.)
+                .spacing(3.)
                 .child(
                     label()
                         .text(title)
                         .font_size(text_size(16.))
-                        .font_weight(FontWeight::MEDIUM)
+                        .font_weight(FontWeight::SEMI_BOLD)
                         .color(colors::fg_primary()),
                 )
                 .child(

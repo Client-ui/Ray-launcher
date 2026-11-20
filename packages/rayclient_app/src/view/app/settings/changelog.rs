@@ -11,6 +11,7 @@ use crate::hooks::{
 };
 use crate::i18n::{t, tf};
 use crate::theme::{colors, rounded, text_size};
+use crate::ui::border_all_color;
 
 #[derive(PartialEq)]
 pub struct SettingsChangelog;
@@ -116,8 +117,9 @@ impl Component for ReleaseCard {
             .width(Size::fill())
             .spacing(8.)
             .padding(Gaps::new_symmetric(12., 16.))
-            .corner_radius(rounded(12.))
-            .background(colors::page_elevated())
+            .corner_radius(rounded(16.))
+            .background(colors::card())
+            .border(border_all_color(1., colors::component_border()))
             .child(
                 rect()
                     .horizontal()

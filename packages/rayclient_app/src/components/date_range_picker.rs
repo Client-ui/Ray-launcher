@@ -84,7 +84,7 @@ impl Component for DateRangePicker {
                     .cross_align(Alignment::Center)
                     .spacing(6.)
                     .padding(Gaps::new_symmetric(0., 10.))
-                    .corner_radius(rounded(9.))
+                    .corner_radius(rounded(10.))
                     .background(if hovering() {
                         colors::component_bg_hover()
                     } else {
@@ -138,9 +138,16 @@ impl Component for DateRangePicker {
                     .vertical()
                     .spacing(8.)
                     .padding(12.)
-                    .corner_radius(rounded(10.))
+                    .corner_radius(rounded(14.))
                     .border(border_all_color(1., colors::component_border()))
                     .background(colors::page_elevated())
+                    .shadow(Shadow::from((
+                        0.,
+                        10.,
+                        32.,
+                        0.,
+                        Color::from_argb(110, 0, 0, 0),
+                    )))
                     .on_sized(move |e: Event<SizedEventData>| {
                         panel_height.set_if_modified(e.area.height());
                     })

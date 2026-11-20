@@ -276,7 +276,15 @@ impl Component for ClusterPickerModal {
                             .max_height(Size::window_percent(85.))
                             .padding(Gaps::new(8., DIALOG_PADDING_X, 22., DIALOG_PADDING_X))
                             .spacing(14.)
-                            .corner_radius(rounded(16.))
+                            .corner_radius(rounded(18.))
+                            .shadow(
+                                Shadow::new()
+                                    .x(0.)
+                                    .y(10.)
+                                    .blur(32.)
+                                    .spread(0.)
+                                    .color(Color::from_argb(110, 0, 0, 0)),
+                            )
                             .background(colors::page())
                             .border(border_all_color(1., colors::component_border()))
                             .on_press(|e: Event<PressEventData>| e.stop_propagation())

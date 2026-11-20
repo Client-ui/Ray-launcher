@@ -137,7 +137,7 @@ impl Component for ColorPicker {
             .cross_align(Alignment::Center)
             .spacing(12.)
             .padding(Gaps::new_symmetric(8., 16.))
-            .corner_radius(rounded(8.))
+            .corner_radius(rounded(10.))
             .background(current)
             .border(border_all_color(1., colors::component_border()))
             .cursor(CursorIcon::Pointer)
@@ -367,15 +367,15 @@ impl Component for ColorPicker {
                         .vertical()
                         .spacing(14.)
                         .padding(POPUP_PADDING)
-                        .corner_radius(rounded(16.))
+                        .corner_radius(rounded(18.))
                         .background(colors::page_elevated())
                         .border(border_all_color(1., colors::component_border()))
                         .shadow(Shadow::from((
                             0.,
-                            8.,
+                            10.,
                             32.,
                             0.,
-                            Color::from_argb(120, 0, 0, 0),
+                            Color::from_argb(110, 0, 0, 0),
                         )))
                         .on_global_pointer_move(move |e: Event<PointerEventData>| match drag() {
                             Drag::Sv => pick_sv.clone()(e.global_location()),

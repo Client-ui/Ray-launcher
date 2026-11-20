@@ -129,16 +129,16 @@ impl Component for FilterPanel {
             .padding(Gaps::new_all(8.))
             .opacity(progress)
             .offset_y((progress - 1.0) * 6.)
-            .corner_radius(rounded(10.))
+            .corner_radius(rounded(14.))
             .background(colors::page_elevated().with_a(230))
             .backdrop_blur(12.)
             .border(crate::ui::border_all_color(1., colors::component_border()))
             .shadow(Shadow::from((
                 0.,
-                8.,
+                10.,
                 32.,
                 0.,
-                Color::from_argb(120, 0, 0, 0),
+                Color::from_argb(110, 0, 0, 0),
             )))
             .a11y_id(a11y_id)
             .a11y_role(AccessibilityRole::Dialog)
@@ -221,7 +221,7 @@ impl Component for ChoiceRow {
             .cross_align(Alignment::Center)
             .spacing(8.)
             .padding(Gaps::new_symmetric(5., 8.))
-            .corner_radius(rounded(6.))
+            .corner_radius(rounded(8.))
             .background(bg)
             .content(Content::Flex)
             .a11y_id(a11y_id)

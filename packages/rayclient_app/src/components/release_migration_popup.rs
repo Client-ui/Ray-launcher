@@ -11,6 +11,7 @@ use rayclient_content::packages::release_migration::{
 use rayclient_content::packages::{CachedPackageMeta, ProviderId};
 use rayclient_core::clusters::Cluster;
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{
     Button, Dropdown, DynamicArt, Icon, IconType, OverlayPopup, ScrollArea, checkbox_labeled,
 };
@@ -224,16 +225,7 @@ fn dialog(
         .max_width(Size::window_percent(95.))
         .max_height(Size::window_percent(92.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(18.))
-        .background(colors::page_elevated())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            24.,
-            64.,
-            0.,
-            Color::from_argb(160, 0, 0, 0),
-        )))
+        .dialog_surface()
         .content(Content::Flex)
         .child(art_panel(prompt, plan, &excluded.read()))
         .child(content_panel(

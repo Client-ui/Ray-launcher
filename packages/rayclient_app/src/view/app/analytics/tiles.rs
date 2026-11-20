@@ -144,8 +144,8 @@ fn hero_tile(caption: &str, value: String, note: String) -> Element {
         .width(Size::fill())
         .height(Size::fill())
         .main_align(Alignment::SpaceBetween)
-        .background(colors::brand().with_a(18))
-        .border(border_all_color(1., colors::brand().with_a(90)))
+        .background(colors::brand_glow(34))
+        .border(border_all_color(1., colors::brand_glow(90)))
         .child(
             label()
                 .text(caption.to_string())

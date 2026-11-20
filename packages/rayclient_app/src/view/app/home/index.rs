@@ -16,6 +16,7 @@ impl Component for Home {
             .overflow(Overflow::Clip)
             .padding(theme::HOME_PADDING_PX)
             .main_align(Alignment::Center)
+            .spacing(32.)
             .child(
                 rect()
                     .vertical()

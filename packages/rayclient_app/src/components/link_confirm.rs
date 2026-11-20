@@ -1,3 +1,4 @@
+use crate::components::overlay_popup::DialogSurface;
 use freya::prelude::*;
 
 use crate::components::{
@@ -5,8 +6,7 @@ use crate::components::{
 };
 use crate::hooks::{use_dispatch, use_link_confirm};
 use crate::i18n::t;
-use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::theme::{colors, text_size};
 
 #[derive(PartialEq)]
 pub struct ConfirmLinkOverlay;
@@ -47,9 +47,7 @@ impl Component for ConfirmLinkOverlay {
                             .max_width(Size::window_percent(90.))
                             .spacing(14.)
                             .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
+                            .dialog_surface()
                             .child(
                                 rect()
                                     .horizontal()

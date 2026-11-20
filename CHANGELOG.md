@@ -1,3 +1,20 @@
+## Unreleased
+
+### Features
+
+- Ray Client 1.1.1 for Minecraft 1.20, 1.20.1 to 1.20.4, 1.20.6 and 1.21 to 1.21.11 (Fabric). Each version ships its own bundle, built by `tools/build_version_bundles.py`
+- Fabric API is added automatically for the versions whose bundle only carries the Ray jar
+- Redesigned look: layered surfaces with hairline borders, softer corners (new "Default" corner preset), refreshed palettes for all 15 built-in themes
+- Primary buttons are lit from above with a soft brand glow, the active nav tab has a brand pill and bar, the selected version card glows
+- Softer corners and clearer selected states on dropdowns, menus, tooltips, toasts, segmented controls, pagination, settings cards, instance rows and package cards; deeper dialog backdrop and floating-layer shadows
+- Browser cards, package pages and filter chips, instance cards and dialogs (with floating shadows), analytics tiles, wardrobe panels and the onboarding, startup and relocating screens share the same card, corner and selected-state styling
+- "Ray Glass" design language: a floating glass nav capsule, lit raised cards with a top sheen, a shared dialog layer (body, hairline, tinted footer, large shadow) used by every popup, a redesigned settings sidebar and page headers, modern switch/checkbox/segmented/tab controls, raised secondary and glowing danger buttons, a bigger home hero and taller version cards with a hover lift, and an instance header card (helpers in `ui.rs`: `raised_card`, `glass_panel`, `eyebrow`, `top_sheen`)
+- Home shows the version as pills next to a larger Play button
+
+### Fixes
+
+- `format_mc_version(N, 0, None)` now gives `1.N` (Minecraft's name for the first release of a line) instead of `1.N.0`
+
 ## 2.10.0 (2026-11-15)
 
 ### Features

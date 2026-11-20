@@ -18,10 +18,11 @@ use crate::hooks::{latest_changelog_version, use_changelog, use_settings_snapsho
 use crate::i18n::{t, tf};
 use crate::routes::Route;
 use crate::theme::{colors, rounded, text_size};
+use crate::ui::{eyebrow, raised_card};
 use crate::use_dispatch;
 
 const SIDEBAR_WIDTH_PX: f32 = 225.;
-const ITEM_HEIGHT_PX: f32 = 33.;
+const ITEM_HEIGHT_PX: f32 = 38.;
 const SEARCH_WIDTH_PX: f32 = 256.;
 const SEARCH_MIN_WIDTH_PX: f32 = 120.;
 const SEARCH_RESULTS_MAX: usize = 12;
@@ -452,6 +453,7 @@ impl Component for SettingsShell {
                     .overflow(Overflow::Clip)
                     .spacing(24.)
                     .child(content_header(
+                        active_group_label(active),
                         active.label().to_string(),
                         search,
                         header_width,
@@ -473,7 +475,12 @@ impl Component for SettingsShell {
     }
 }
 
-fn content_header(title: String, search: State<String>, mut width: State<f32>) -> impl IntoElement {
+fn content_header(
+    group: &'static str,
+    title: String,
+    search: State<String>,
+    mut width: State<f32>,
+) -> impl IntoElement {
     let search_width = search_width_for(*width.read());
 
     rect()
@@ -489,15 +496,29 @@ fn content_header(title: String, search: State<String>, mut width: State<f32>) -
             }
         })
         .child(
-            label()
-                .text(title)
-                .font_size(text_size(30.))
-                .font_weight(FontWeight::SEMI_BOLD)
-                .max_lines(1)
+            rect()
+                .vertical()
                 .width(Size::flex(1.0))
-                .color(colors::fg_primary()),
+                .spacing(4.)
+                .child(eyebrow(group.to_string()))
+                .child(
+                    label()
+                        .text(title)
+                        .font_size(text_size(32.))
+                        .font_weight(FontWeight::BOLD)
+                        .max_lines(1)
+                        .color(colors::fg_primary()),
+                ),
         )
         .child(search_box(search, search_width))
+}
+
+fn active_group_label(active: SettingsTab) -> &'static str {
+    groups()
+        .into_iter()
+        .find(|group| group.tabs.contains(&active))
+        .map(|group| group.label)
+        .unwrap_or("")
 }
 
 fn search_width_for(header_width: f32) -> f32 {
@@ -663,30 +684,37 @@ fn has_unread_changelog() -> bool {
 }
 
 fn sidebar(active: SettingsTab, changelog_unread: bool) -> impl IntoElement {
-    rect()
+    raised_card()
         .vertical()
         .width(Size::px(SIDEBAR_WIDTH_PX))
         .min_width(Size::px(SIDEBAR_WIDTH_PX))
         .height(Size::fill())
         .overflow(Overflow::Clip)
-        .padding(Gaps::new(16., 0., 0., 0.))
+        .padding(Gaps::new_all(12.))
         .content(Content::Flex)
+        .shadow(Shadow::from((
+            0.,
+            10.,
+            28.,
+            0.,
+            Color::from_argb(70, 0, 0, 0),
+        )))
         .child(
             ScrollArea::new()
                 .width(Size::fill())
                 .height(Size::flex(1.0))
-                .spacing(16.)
+                .spacing(18.)
                 .children(groups().into_iter().map(|group| {
                     rect()
                         .vertical()
                         .width(Size::fill())
-                        .spacing(6.)
+                        .spacing(4.)
                         .child(
-                            rect().padding(Gaps::new(0., 0., 2., 6.)).child(
+                            rect().padding(Gaps::new(0., 0., 2., 10.)).child(
                                 label()
-                                    .text(group.label)
-                                    .font_size(text_size(11.))
-                                    .font_weight(FontWeight::MEDIUM)
+                                    .text(group.label.to_uppercase())
+                                    .font_size(text_size(10.))
+                                    .font_weight(FontWeight::BOLD)
                                     .color(colors::fg_secondary()),
                             ),
                         )
@@ -789,7 +817,7 @@ impl Component for SidebarInfo {
                 .width(Size::fill())
                 .spacing(4.)
                 .font_size(text_size(12.))
-                .padding(Gaps::new(15., 0., 0., 0.))
+                .padding(Gaps::new(12., 8., 4., 8.))
                 .color(colors::fg_secondary())
                 .children(
                     items
@@ -821,9 +849,9 @@ impl Component for SidebarItem {
         let route = tab.route();
 
         let background = if active {
-            colors::page_elevated()
+            colors::brand_glow(34)
         } else if *hovering.read() {
-            colors::ghost_overlay()
+            colors::ghost_overlay_hover()
         } else {
             Color::TRANSPARENT
         };
@@ -837,8 +865,8 @@ impl Component for SidebarItem {
             .height(Size::px(ITEM_HEIGHT_PX))
             .cross_align(Alignment::Center)
             .spacing(10.)
-            .padding(Gaps::new_symmetric(0., 12.))
-            .corner_radius(rounded(7.))
+            .padding(Gaps::new_symmetric(0., 14.))
+            .corner_radius(rounded(12.))
             .background(background)
             .a11y_id(a11y_id)
             .a11y_focusable(true)
@@ -859,23 +887,51 @@ impl Component for SidebarItem {
                     .width(1.)
                     .alignment(BorderAlignment::Inner),
             );
+        } else if active {
+            el = el.border(
+                Border::new()
+                    .fill(colors::brand_glow(90))
+                    .width(1.)
+                    .alignment(BorderAlignment::Inner),
+            );
         }
 
-        el.child(Icon::new(tab.icon()).size(18.).color(colors::fg_primary()))
-            .child(
-                rect()
-                    .horizontal()
-                    .width(Size::flex(1.0))
-                    .cross_align(Alignment::Center)
-                    .spacing(6.)
-                    .child(
-                        label()
-                            .text(tab.label())
-                            .font_size(text_size(14.))
-                            .color(colors::fg_primary()),
-                    )
-                    .maybe_child(has_dot.then(notification_dot)),
-            )
+        el.maybe_child(active.then(|| {
+            rect()
+                .position(Position::new_absolute().left(0.).top(9.))
+                .width(Size::px(3.))
+                .height(Size::px(ITEM_HEIGHT_PX - 18.))
+                .corner_radius(rounded(2.))
+                .background(colors::brand())
+        }))
+        .child(Icon::new(tab.icon()).size(18.).color(if active {
+            colors::brand()
+        } else {
+            colors::fg_secondary()
+        }))
+        .child(
+            rect()
+                .horizontal()
+                .width(Size::flex(1.0))
+                .cross_align(Alignment::Center)
+                .spacing(6.)
+                .child(
+                    label()
+                        .text(tab.label())
+                        .font_size(text_size(14.))
+                        .font_weight(if active {
+                            FontWeight::SEMI_BOLD
+                        } else {
+                            FontWeight::NORMAL
+                        })
+                        .color(if active {
+                            colors::fg_primary()
+                        } else {
+                            colors::fg_secondary()
+                        }),
+                )
+                .maybe_child(has_dot.then(notification_dot)),
+        )
     }
 }
 

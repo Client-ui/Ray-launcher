@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::components::overlay_popup::DialogSurface;
 use freya::prelude::*;
 use freya::router::*;
 
@@ -85,11 +86,9 @@ impl Component for CrashDialog {
                             .max_height(Size::window_percent(92.))
                             .content(Content::Flex)
                             .overflow(Overflow::Clip)
-                            .background(colors::page_elevated())
-                            .corner_radius(rounded(16.))
+                            .dialog_surface()
                             .padding(Gaps::new_all(DIALOG_PADDING))
                             .spacing(DIALOG_SPACING)
-                            .border(crate::ui::border_all_color(1., colors::component_border()))
                             .on_press(|e: Event<PressEventData>| e.stop_propagation())
                             .child(header(&crash))
                             .child(subtitle(&crash))

@@ -89,7 +89,7 @@ impl Button {
         layout.cross_alignment = Alignment::Center;
         layout.main_alignment = Alignment::Center;
         layout.direction = Direction::Horizontal;
-        layout.spacing.0 = 4.;
+        layout.spacing.0 = 6.;
 
         style.background = Fill::Color(colors.background);
         if let Some(border_color) = colors.border {
@@ -393,6 +393,68 @@ impl Component for Button {
                 );
         }
 
+        // Raised variants are lit from above with a top sheen; primary and danger also carry a
+        // soft glow that swells on hover and shrinks while pressed
+        if enabled() && !colors::active_theme().pixel_icons {
+            let lit = match self.variant {
+                ButtonVariant::Primary | ButtonVariant::Danger => 0.10,
+                ButtonVariant::Secondary => 0.05,
+                ButtonVariant::Ghost => 0.0,
+            };
+            if lit > 0.0 {
+                let top = if pressing() {
+                    background
+                } else {
+                    colors::lighten(background, lit)
+                };
+                rect = rect
+                    .background(
+                        LinearGradient::new()
+                            .angle(0.)
+                            .stop((top, 0.))
+                            .stop((background, 100.)),
+                    )
+                    .border(
+                        Border::new()
+                            .fill(colors::sheen())
+                            .width(BorderWidth {
+                                top: 1.,
+                                right: 0.,
+                                bottom: 0.,
+                                left: 0.,
+                            })
+                            .alignment(BorderAlignment::Inner),
+                    );
+            }
+            let glow_color = match self.variant {
+                ButtonVariant::Primary => Some(colors::brand_glow(0)),
+                ButtonVariant::Danger => Some(colors::danger()),
+                _ => None,
+            };
+            if let Some(base) = glow_color {
+                let alpha: u8 = if pressing() {
+                    40
+                } else if hovering() {
+                    95
+                } else {
+                    60
+                };
+                let color = if matches!(self.variant, ButtonVariant::Primary) {
+                    colors::brand_glow(alpha)
+                } else {
+                    base.with_a(alpha)
+                };
+                rect = rect.shadow(
+                    Shadow::new()
+                        .x(0.)
+                        .y(if pressing() { 1. } else { 3. })
+                        .blur(if hovering() { 20. } else { 14. })
+                        .spread(0.)
+                        .color(color),
+                );
+            }
+        }
+
         if enabled() {
             rect = rect
                 .on_pointer_down(move |_| pressing.set(true))
@@ -476,29 +538,29 @@ fn variant_colors(variant: ButtonVariant) -> ButtonColors {
 fn size_layout(size: ButtonSize) -> (Gaps, CornerRadius, f32, Size, Size) {
     match size {
         ButtonSize::Small => (
-            Gaps::new_symmetric(4., 8.),
-            rounded(6.),
+            Gaps::new_symmetric(5., 12.),
+            rounded(9.),
             12.,
             Size::auto(),
             Size::auto(),
         ),
         ButtonSize::Medium => (
-            Gaps::new_symmetric(6., 12.),
-            rounded(8.),
+            Gaps::new_symmetric(8., 16.),
+            rounded(11.),
             14.,
             Size::auto(),
             Size::auto(),
         ),
         ButtonSize::Large => (
-            Gaps::new_symmetric(8., 32.),
-            rounded(10.),
+            Gaps::new_symmetric(10., 32.),
+            rounded(14.),
             18.,
             Size::auto(),
             Size::auto(),
         ),
         ButtonSize::Icon => (
             Gaps::new_all(6.),
-            rounded(8.),
+            rounded(10.),
             14.,
             Size::px(32.),
             Size::px(32.),

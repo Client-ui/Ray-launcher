@@ -119,9 +119,9 @@ impl Component for GalleryTile {
             .vertical()
             .width(Size::flex(1.0))
             .max_width(Size::px(MAX_COL_W))
-            .corner_radius(rounded(10.))
+            .corner_radius(rounded(14.))
             .overflow(Overflow::Clip)
-            .background(colors::page_elevated())
+            .background(colors::card())
             .border(
                 border_all_color(
                     1.,

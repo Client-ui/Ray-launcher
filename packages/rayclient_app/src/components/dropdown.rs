@@ -141,6 +141,12 @@ impl Component for Dropdown {
             }
         };
 
+        let trigger_height = if outlined && self.height == Size::px(24.) {
+            Size::px(40.)
+        } else {
+            self.height.clone()
+        };
+
         rect()
             .width(self.width.clone())
             .on_global_key_down(move |e: Event<KeyboardEventData>| {
@@ -151,12 +157,12 @@ impl Component for Dropdown {
             .child(
                 rect()
                     .width(Size::fill())
-                    .height(self.height.clone())
+                    .height(trigger_height)
                     .horizontal()
                     .center()
                     .spacing(4.)
-                    .padding(Gaps::new_symmetric(0., if outlined { 12. } else { 8. }))
-                    .corner_radius(rounded(if outlined { 8. } else { 6. }))
+                    .padding(Gaps::new_symmetric(0., if outlined { 14. } else { 8. }))
+                    .corner_radius(rounded(if outlined { 12. } else { 8. }))
                     .background(trigger_bg)
                     .maybe(outlined, |el| {
                         el.main_align(Alignment::SpaceBetween)
@@ -166,7 +172,14 @@ impl Component for Dropdown {
                     .a11y_focusable(true)
                     .a11y_role(AccessibilityRole::Button)
                     .maybe(focus().is_focused(), |el| {
-                        el.border(border_all_color(1., colors::brand()))
+                        el.border(border_all_color(1.5, colors::brand())).shadow(
+                            Shadow::new()
+                                .x(0.)
+                                .y(0.)
+                                .blur(10.)
+                                .spread(0.)
+                                .color(colors::brand_glow(40)),
+                        )
                     })
                     .on_pointer_enter(move |_| hovering.set(true))
                     .on_pointer_leave(move |_| hovering.set(false))
@@ -206,10 +219,18 @@ impl Component for Dropdown {
                         .child(
                             rect()
                                 .width(Size::fill())
-                                .padding(4.)
-                                .corner_radius(rounded(8.))
+                                .padding(6.)
+                                .corner_radius(rounded(16.))
                                 .border(border_all_color(1., colors::component_border()))
                                 .background(colors::page_elevated())
+                                .shadow(
+                                    Shadow::new()
+                                        .x(0.)
+                                        .y(10.)
+                                        .blur(32.)
+                                        .spread(0.)
+                                        .color(Color::from_argb(110, 0, 0, 0)),
+                                )
                                 .overflow(Overflow::Clip)
                                 .child(
                                     ScrollArea::new()
@@ -280,12 +301,12 @@ impl Component for DropdownOption {
             .width(Size::fill())
             .height(Size::px(OPTION_HEIGHT))
             .padding(Gaps::new_symmetric(0., 8.))
-            .corner_radius(rounded(6.))
+            .corner_radius(rounded(8.))
             .a11y_id(a11y_id)
             .a11y_focusable(true)
             .a11y_role(AccessibilityRole::Button)
             .background(if hovering() || focus().is_focused() {
-                colors::ghost_overlay_hover()
+                colors::brand_glow(24)
             } else {
                 Color::TRANSPARENT
             })

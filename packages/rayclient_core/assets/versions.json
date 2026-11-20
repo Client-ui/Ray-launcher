@@ -3,14 +3,141 @@
     {
       "major_version": 21,
       "name": "1.21",
-      "long_description": "Ray Client for Minecraft 1.21.11 on Fabric, with Fabric API included.",
+      "long_description": "Ray Client for Minecraft 1.21.x on Fabric, with Fabric API included.",
       "tags": [],
       "entries": [
+        {
+          "minor_version": 0,
+          "loader": "fabric",
+          "name": "1.21",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 1,
+          "loader": "fabric",
+          "name": "1.21.1",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.1. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 2,
+          "loader": "fabric",
+          "name": "1.21.2",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.2. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 3,
+          "loader": "fabric",
+          "name": "1.21.3",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.3. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 4,
+          "loader": "fabric",
+          "name": "1.21.4",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.4. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 5,
+          "loader": "fabric",
+          "name": "1.21.5",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.5. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 6,
+          "loader": "fabric",
+          "name": "1.21.6",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.6. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 7,
+          "loader": "fabric",
+          "name": "1.21.7",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.7. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 8,
+          "loader": "fabric",
+          "name": "1.21.8",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.8. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 9,
+          "loader": "fabric",
+          "name": "1.21.9",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.9. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 10,
+          "loader": "fabric",
+          "name": "1.21.10",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.10. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
         {
           "minor_version": 11,
           "loader": "fabric",
           "name": "1.21.11",
-          "long_description": "Ray Client 1.0.5 with Fabric API. Modules, HUD, zoom, custom crosshair and more.",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.21.11. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        }
+      ]
+    },
+    {
+      "major_version": 20,
+      "name": "1.20",
+      "long_description": "Ray Client for Minecraft 1.20.x on Fabric, with Fabric API included.",
+      "tags": [],
+      "entries": [
+        {
+          "minor_version": 0,
+          "loader": "fabric",
+          "name": "1.20",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 1,
+          "loader": "fabric",
+          "name": "1.20.1",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20.1. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 2,
+          "loader": "fabric",
+          "name": "1.20.2",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20.2. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 3,
+          "loader": "fabric",
+          "name": "1.20.3",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20.3. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 4,
+          "loader": "fabric",
+          "name": "1.20.4",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20.4. Modules, HUD, zoom, custom crosshair and more.",
+          "tags": []
+        },
+        {
+          "minor_version": 6,
+          "loader": "fabric",
+          "name": "1.20.6",
+          "long_description": "Ray Client 1.1.1 for Minecraft 1.20.6. Modules, HUD, zoom, custom crosshair and more.",
           "tags": []
         }
       ]

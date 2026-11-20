@@ -9,9 +9,8 @@ use crate::components::{
 };
 use crate::i18n::t;
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::ui::{border_all_color, raised_card};
 
-const CARD_RADIUS: f32 = 12.;
 const TAG_ROW_H: f32 = 28.;
 const PREVIEW_W: f32 = 132.;
 const PREVIEW_H: f32 = 74.;
@@ -501,16 +500,13 @@ fn cover_field(
             .into_element()
     });
 
-    rect()
+    raised_card()
         .horizontal()
         .width(Size::fill())
         .content(Content::Flex)
         .cross_align(Alignment::Center)
-        .spacing(14.)
-        .padding(Gaps::new_all(12.))
-        .corner_radius(rounded(CARD_RADIUS))
-        .background(colors::component_bg())
-        .border(border_all_color(1., colors::component_border()))
+        .spacing(18.)
+        .padding(Gaps::new_all(16.))
         .child(
             rect()
                 .width(Size::px(PREVIEW_W))

@@ -1,14 +1,14 @@
 {
   "name": "Ray Rose",
+  "radius_scale": 1.2,
   "colors": {
-    "light": false,
-    "page": "#120A0F",
-    "page_elevated": "#1B1017",
-    "card": "#251720",
-    "component": "#35212D",
-    "border": "#FF8FBF22",
-    "text": "#FBF1F6",
-    "text_secondary": "#C0A3B1",
+    "page": "#0F0709",
+    "page_elevated": "#190F15",
+    "card": "#24151E",
+    "component": "#34202C",
+    "border": "#FF8FBF1A",
+    "text": "#FBF0F5",
+    "text_secondary": "#C3A5B4",
     "accent": "#FF4F9A"
   }
 }

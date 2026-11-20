@@ -11,7 +11,7 @@ use crate::i18n::{t, tf};
 use crate::routes::Route;
 use crate::theme::{colors, rounded, text_size};
 
-const BAR_HEIGHT: f32 = 34.;
+const BAR_HEIGHT: f32 = 38.;
 const AMBER: Color = Color::from_rgb(191, 122, 26);
 
 /// `Layer::RelativeOverlay(n)` saturates at `n = 16` putting children on the same
@@ -175,9 +175,9 @@ impl Component for StatusBanner {
         let close = issue.closeable().then(|| {
             rect()
                 .center()
-                .width(Size::px(22.))
-                .height(Size::px(22.))
-                .corner_radius(rounded(6.))
+                .width(Size::px(24.))
+                .height(Size::px(24.))
+                .corner_radius(rounded(12.))
                 .background(if *close_hover.read() {
                     Color::WHITE.with_a(46)
                 } else {
@@ -202,9 +202,9 @@ impl Component for StatusBanner {
         let action = issue.route().map(|route| {
             rect()
                 .center()
-                .height(Size::px(22.))
-                .padding(Gaps::new_symmetric(0., 8.))
-                .corner_radius(rounded(6.))
+                .height(Size::px(24.))
+                .padding(Gaps::new_symmetric(0., 12.))
+                .corner_radius(rounded(12.))
                 .background(if *action_hover.read() {
                     Color::WHITE.with_a(46)
                 } else {
@@ -252,20 +252,44 @@ impl Component for StatusBanner {
             .layer(Layer::Relative(1))
             .maybe_child(close);
 
-        rect()
-            .width(Size::window_percent(100.))
+        let capsule = rect()
             .height(Size::px(BAR_HEIGHT))
-            .position(Position::new_global().bottom(0.).left(0.))
-            .layer(Layer::OverlayLevel(BAR_LAYER))
-            .background(issue.background())
-            .opacity(p)
+            .min_width(Size::px(280.))
+            .corner_radius(rounded(BAR_HEIGHT / 2.))
+            .background(
+                LinearGradient::new()
+                    .angle(0.)
+                    .stop((colors::lighten(issue.background(), 0.12), 0.))
+                    .stop((issue.background(), 100.)),
+            )
+            .border(crate::ui::border_all_color(1., Color::WHITE.with_a(46)))
+            .border(crate::ui::top_sheen())
+            .shadow(
+                Shadow::new()
+                    .x(0.)
+                    .y(8.)
+                    .blur(26.)
+                    .spread(0.)
+                    .color(issue.background().with_a(90)),
+            )
             .horizontal()
             .content(Content::Flex)
             .cross_align(Alignment::Center)
             .spacing(8.)
-            .padding(Gaps::new_symmetric(0., 10.))
+            .padding(Gaps::new_symmetric(0., 14.))
             .child(leading)
             .child(message)
-            .child(trailing)
+            .child(trailing);
+
+        rect()
+            .width(Size::window_percent(100.))
+            .height(Size::px(BAR_HEIGHT + 16.))
+            .position(Position::new_global().bottom(0.).left(0.))
+            .layer(Layer::OverlayLevel(BAR_LAYER))
+            .opacity(p)
+            .horizontal()
+            .main_align(Alignment::Center)
+            .cross_align(Alignment::Start)
+            .child(capsule)
     }
 }

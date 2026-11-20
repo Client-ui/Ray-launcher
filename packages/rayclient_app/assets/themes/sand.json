@@ -1,14 +1,15 @@
 {
   "name": "Ray Sand",
+  "radius_scale": 1.2,
   "colors": {
     "light": true,
-    "page": "#F6F1EA",
-    "page_elevated": "#FFFFFF",
-    "card": "#FBF7F1",
-    "component": "#EDE5DA",
-    "border": "#00000022",
-    "text": "#1F1A15",
-    "text_secondary": "#6B6157",
-    "accent": "#E8681A"
+    "page": "#F3EDE3",
+    "page_elevated": "#FAF6EF",
+    "card": "#FFFDF9",
+    "component": "#EFE7DB",
+    "border": "#0000001C",
+    "text": "#1E1913",
+    "text_secondary": "#685E53",
+    "accent": "#DD5F14"
   }
 }

@@ -23,7 +23,7 @@ impl Component for NotFound {
             .child(
                 label()
                     .text(t("oneclient.not_found.title"))
-                    .font_size(text_size(32.))
+                    .font_size(text_size(36.))
                     .font_weight(FontWeight::BOLD)
                     .color(theme::colors::fg_primary()),
             )

@@ -446,10 +446,17 @@ impl Component for BrowserBody {
                             .width(Size::px(CATEGORY_SIDEBAR_W))
                             .height(Size::fill())
                             .maybe(!all_categories.is_empty(), |el| {
-                                el.child(CategorySidebar {
-                                    categories: all_categories,
-                                    selected: selected_categories,
-                                })
+                                el.child(
+                                    crate::ui::raised_card()
+                                        .vertical()
+                                        .width(Size::fill())
+                                        .height(Size::fill())
+                                        .padding(Gaps::new_symmetric(14., 10.))
+                                        .child(CategorySidebar {
+                                            categories: all_categories,
+                                            selected: selected_categories,
+                                        }),
+                                )
                             }),
                     )
                     .child(
@@ -566,10 +573,11 @@ fn header(
         .child(
             TextInput::new(query)
                 .width(Size::px(search_width))
+                .height(Size::px(40.))
                 .placeholder(t("oneclient.browser.index.search"))
                 .leading(
                     Icon::new(IconType::SearchMd)
-                        .size(14.)
+                        .size(16.)
                         .color(colors::fg_secondary())
                         .into_element(),
                 ),
@@ -584,7 +592,7 @@ fn target_pill(verb: &'static str, name: &str) -> impl IntoElement {
         .height(Size::px(30.))
         .spacing(6.)
         .padding(Gaps::new_symmetric(0., 10.))
-        .corner_radius(rounded(6.))
+        .corner_radius(rounded(10.))
         .background(colors::ghost_overlay())
         .child(
             label()
@@ -623,17 +631,20 @@ fn results_toolbar(
         _ => String::new(),
     };
 
-    rect()
+    crate::ui::raised_card()
         .horizontal()
         .width(Size::fill())
         .cross_align(Alignment::Center)
         .spacing(8.)
+        .corner_radius(rounded(14.))
+        .padding(Gaps::new_symmetric(8., 14.))
         .content(Content::Flex)
         .child(
             label()
                 .text(summary)
                 .font_size(text_size(12.))
-                .color(colors::fg_primary().with_a(140)),
+                .font_weight(FontWeight::MEDIUM)
+                .color(colors::fg_primary().with_a(170)),
         )
         .child(rect().width(Size::flex(1.0)))
         .maybe_child(loader.map(|loader| LoaderPicker { loader }))

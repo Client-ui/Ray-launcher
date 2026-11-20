@@ -1,14 +1,15 @@
 {
   "name": "Ray Light",
+  "radius_scale": 1.2,
   "colors": {
     "light": true,
-    "page": "#E9E9EE",
-    "page_elevated": "#F1F1F5",
-    "card": "#F7F7FA",
-    "component": "#FFFFFF",
-    "border": "#00000024",
-    "text": "#15151A",
-    "text_secondary": "#5B5B68",
-    "accent": "#E8630A"
+    "page": "#ECECF1",
+    "page_elevated": "#F4F4F8",
+    "card": "#FFFFFF",
+    "component": "#F3F3F7",
+    "border": "#0000001A",
+    "text": "#14141A",
+    "text_secondary": "#55556A",
+    "accent": "#E5610A"
   }
 }

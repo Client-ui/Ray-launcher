@@ -7,7 +7,7 @@ use crate::components::{AssetImage, Icon, IconType, pill};
 use crate::theme::{colors, rounded, text_size};
 use crate::ui::border_all_color;
 
-pub const CARD_RADIUS: f32 = 12.;
+pub const CARD_RADIUS: f32 = 16.;
 pub const VERSION_ROW_H: f32 = 48.;
 pub const VERSION_ROW_SPACING: f32 = 4.;
 pub const LOADER_MARK_SIZE: f32 = 22.;
@@ -45,7 +45,7 @@ impl Component for SelectCard {
         let ring = if focus() == Focus::Keyboard {
             colors::fg_primary()
         } else if self.selected {
-            colors::brand()
+            colors::brand_glow(90)
         } else if hovered || focused {
             colors::component_border_hover()
         } else {
@@ -59,7 +59,9 @@ impl Component for SelectCard {
             .padding(self.padding)
             .corner_radius(rounded(CARD_RADIUS))
             .overflow(Overflow::Clip)
-            .background(if hovered || focused {
+            .background(if self.selected {
+                colors::brand_glow(34)
+            } else if hovered || focused {
                 colors::component_bg_hover()
             } else {
                 colors::component_bg()

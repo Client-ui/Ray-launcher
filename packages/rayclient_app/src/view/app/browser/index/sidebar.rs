@@ -45,14 +45,13 @@ impl Component for CategorySidebar {
             .vertical()
             .width(Size::fill())
             .height(Size::flex(1.0))
-            .spacing(8.)
+            .spacing(10.)
             .child(
-                label()
-                    .text(t("oneclient.browser.index.categories"))
-                    .font_size(text_size(11.))
-                    .font_weight(FontWeight::MEDIUM)
-                    .letter_spacing(1.4)
-                    .color(colors::fg_secondary()),
+                rect()
+                    .padding(Gaps::new(0., 10., 0., 10.))
+                    .child(crate::ui::eyebrow(
+                        t("oneclient.browser.index.categories").to_string(),
+                    )),
             )
             .child(
                 ScrollArea::new()
@@ -100,10 +99,10 @@ impl Component for CategoryRow {
             .height(Size::px(29.))
             .cross_align(Alignment::Center)
             .padding(Gaps::new_symmetric(0., 10.))
-            .corner_radius(rounded(8.))
+            .corner_radius(rounded(10.))
             .maybe(selected, |el| {
-                el.background(colors::brand().with_a(40))
-                    .border(border_all_color(1., colors::brand().with_a(115)))
+                el.background(colors::brand_glow(34))
+                    .border(border_all_color(1., colors::brand_glow(90)))
             })
             .maybe(!selected && hovered, |el| {
                 el.background(colors::ghost_overlay())

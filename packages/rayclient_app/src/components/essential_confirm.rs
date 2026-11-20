@@ -1,5 +1,6 @@
 use freya::prelude::*;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{
     Button, Icon, IconType, Markdown, MarkdownStyle, OverlayPopup, ScrollArea,
 };
@@ -59,33 +60,33 @@ impl Component for EssentialConfirmOverlay {
                             .vertical()
                             .width(Size::px(440.))
                             .max_width(Size::window_percent(90.))
-                            .spacing(14.)
-                            .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
                             .child(
-                                rect()
-                                    .horizontal()
-                                    .cross_align(Alignment::Center)
-                                    .spacing(10.)
+                                dialog_body()
                                     .child(
-                                        Icon::new(IconType::AlertTriangle)
-                                            .size(20.)
-                                            .color(colors::code_warn()),
+                                        rect()
+                                            .horizontal()
+                                            .cross_align(Alignment::Center)
+                                            .spacing(10.)
+                                            .child(
+                                                Icon::new(IconType::AlertTriangle)
+                                                    .size(20.)
+                                                    .color(colors::code_warn()),
+                                            )
+                                            .child(
+                                                label()
+                                                    .text(title)
+                                                    .font_size(text_size(18.))
+                                                    .font_weight(FontWeight::BOLD)
+                                                    .color(colors::fg_primary()),
+                                            ),
                                     )
-                                    .child(
-                                        label()
-                                            .text(title)
-                                            .font_size(text_size(16.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
-                                            .color(colors::fg_primary()),
-                                    ),
+                                    .child(WarningBody {
+                                        body: request.body.clone(),
+                                    }),
                             )
-                            .child(WarningBody {
-                                body: request.body.clone(),
-                            })
-                            .child(
+                            .child(dialog_footer(
                                 rect()
                                     .horizontal()
                                     .width(Size::fill())
@@ -115,7 +116,7 @@ impl Component for EssentialConfirmOverlay {
                                             .on_press(move |_| pending.set(None))
                                             .text(t("oneclient.components.essential_confirm.keep")),
                                     ),
-                            ),
+                            )),
                     ),
             )
             .into_element()

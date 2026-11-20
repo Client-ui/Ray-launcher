@@ -81,9 +81,10 @@ impl Component for Pagination {
                     .center()
                     .width(Size::px(32.))
                     .height(Size::px(32.))
-                    .corner_radius(rounded(8.))
-                    .background(colors::component_bg_pressed())
-                    .border(border_all_color(1., colors::brand()))
+                    .corner_radius(rounded(10.))
+                    .background(colors::brand_glow(34))
+                    .border(border_all_color(1., colors::brand_glow(90)))
+                    .shadow(Shadow::from((0., 0., 10., 0., colors::brand_glow(40))))
                     .child(
                         label()
                             .text(format!("{}", target + 1))

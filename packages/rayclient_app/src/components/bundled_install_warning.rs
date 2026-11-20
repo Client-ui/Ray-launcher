@@ -1,11 +1,11 @@
 use freya::prelude::*;
 use rayclient_content::packages::ProviderId;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, Icon, IconType, OverlayPopup};
 use crate::hooks::use_dispatch;
 use crate::i18n::{t, tf};
-use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::theme::{colors, text_size};
 
 #[derive(Clone, PartialEq)]
 pub struct PendingBundledInstall {
@@ -50,6 +50,64 @@ impl Component for BundledInstallWarning {
 
         let body = bundled_install_body(&install);
 
+        let dialog_content = dialog_body()
+            .child(
+                rect()
+                    .horizontal()
+                    .cross_align(Alignment::Center)
+                    .spacing(10.)
+                    .child(
+                        Icon::new(IconType::AlertTriangle)
+                            .size(20.)
+                            .color(colors::code_warn()),
+                    )
+                    .child(
+                        label()
+                            .text(t("oneclient.components.bundled_install_warning.title"))
+                            .font_size(text_size(18.))
+                            .font_weight(FontWeight::BOLD)
+                            .color(colors::fg_primary()),
+                    ),
+            )
+            .child(
+                label()
+                    .text(body)
+                    .font_size(text_size(12.))
+                    .max_lines(8)
+                    .width(Size::fill())
+                    .color(colors::fg_secondary()),
+            );
+        let dialog_actions = dialog_footer(
+            rect()
+                .horizontal()
+                .width(Size::fill())
+                .main_align(Alignment::End)
+                .spacing(8.)
+                .child(
+                    Button::new()
+                        .secondary()
+                        .on_press(move |_| pending.set(None))
+                        .text(t("oneclient.common.cancel")),
+                )
+                .child(
+                    Button::new()
+                        .danger()
+                        .on_press(move |_| {
+                            dispatch.install_package(
+                                install.cluster_id,
+                                install.provider,
+                                install.project_id.clone(),
+                                install.version_id.clone(),
+                                None,
+                            );
+                            pending.set(None);
+                        })
+                        .child(Icon::new(IconType::Download01).size(14.))
+                        .text(t(
+                            "oneclient.components.bundled_install_warning.install_anyway",
+                        )),
+                ),
+        );
         OverlayPopup::new()
             .on_close(move |_| pending.set(None))
             .child(
@@ -62,70 +120,10 @@ impl Component for BundledInstallWarning {
                             .vertical()
                             .width(Size::px(440.))
                             .max_width(Size::window_percent(90.))
-                            .spacing(14.)
-                            .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .cross_align(Alignment::Center)
-                                    .spacing(10.)
-                                    .child(
-                                        Icon::new(IconType::AlertTriangle)
-                                            .size(20.)
-                                            .color(colors::code_warn()),
-                                    )
-                                    .child(
-                                        label()
-                                            .text(t(
-                                                "oneclient.components.bundled_install_warning.title",
-                                            ))
-                                            .font_size(text_size(16.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
-                                            .color(colors::fg_primary()),
-                                    ),
-                            )
-                            .child(
-                                label()
-                                    .text(body)
-                                    .font_size(text_size(12.))
-                                    .max_lines(8)
-                                    .width(Size::fill())
-                                    .color(colors::fg_secondary()),
-                            )
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .width(Size::fill())
-                                    .main_align(Alignment::End)
-                                    .spacing(8.)
-                                    .child(
-                                        Button::new()
-                                            .secondary()
-                                            .on_press(move |_| pending.set(None))
-                                            .text(t("oneclient.common.cancel")),
-                                    )
-                                    .child(
-                                        Button::new()
-                                            .danger()
-                                            .on_press(move |_| {
-                                                dispatch.install_package(
-                                                    install.cluster_id,
-                                                    install.provider,
-                                                    install.project_id.clone(),
-                                                    install.version_id.clone(),
-                                                    None,
-                                                );
-                                                pending.set(None);
-                                            })
-                                            .child(Icon::new(IconType::Download01).size(14.))
-                                            .text(t(
-                                                "oneclient.components.bundled_install_warning.install_anyway",
-                                            )),
-                                    ),
-                            ),
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
+                            .child(dialog_content)
+                            .child(dialog_actions),
                     ),
             )
             .into_element()

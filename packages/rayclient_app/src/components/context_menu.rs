@@ -133,7 +133,7 @@ impl Component for ContextMenu {
                         label()
                             .text(title.clone())
                             .font_size(text_size(11.))
-                            .font_weight(FontWeight::SEMI_BOLD)
+                            .font_weight(FontWeight::BOLD)
                             .max_lines(1)
                             .color(colors::fg_secondary()),
                     ),
@@ -189,8 +189,16 @@ impl Component for ContextMenu {
         let panel = rect()
             .vertical()
             .padding(Gaps::new_all(6.))
-            .corner_radius(rounded(12.))
-            .background(colors::card())
+            .corner_radius(rounded(18.))
+            .shadow(
+                Shadow::new()
+                    .x(0.)
+                    .y(14.)
+                    .blur(40.)
+                    .spread(0.)
+                    .color(Color::from_argb(110, 0, 0, 0)),
+            )
+            .background(colors::page_elevated().with_a(240))
             .border(
                 Border::new()
                     .fill(colors::component_border_hover())
@@ -248,10 +256,12 @@ impl Component for ContextMenuRow {
         root.horizontal()
             .cross_align(Alignment::Center)
             .spacing(8.)
-            .padding(Gaps::new_symmetric(5., 8.))
-            .corner_radius(rounded(6.))
-            .background(if *hovered.read() {
-                colors::component_bg_hover()
+            .padding(Gaps::new_symmetric(6., 10.))
+            .corner_radius(rounded(10.))
+            .background(if *hovered.read() && self.danger {
+                colors::danger().with_a(30)
+            } else if *hovered.read() {
+                colors::brand_glow(34)
             } else {
                 Color::TRANSPARENT
             })

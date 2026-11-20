@@ -15,9 +15,29 @@ use crate::error::ContentResult;
 use rayclient_common::domain::{GameLoader, ProviderId};
 use rayclient_common::paths;
 
-const EMBEDDED_BUNDLE: &[u8] = include_bytes!("../../assets/ray-client-1.21.11.polymrpack");
-const EMBEDDED_BUNDLE_FILE: &str = "ray-client-1.21.11.polymrpack";
-const EMBEDDED_BUNDLE_ID: &str = "local/ray-client-1.21.11.polymrpack";
+/// A Ray Client bundle compiled into the launcher
+struct EmbeddedBundle {
+    file: &'static str,
+    id: &'static str,
+    bytes: &'static [u8],
+}
+
+/// One entry per Minecraft version Ray Client ships for. The files are produced by
+/// `tools/build_version_bundles.py`; keep this list in step with `versions.json`
+macro_rules! embedded_bundles {
+    ($($mc:literal),+ $(,)?) => {
+        &[$(EmbeddedBundle {
+            file: concat!("ray-client-", $mc, ".polymrpack"),
+            id: concat!("local/ray-client-", $mc, ".polymrpack"),
+            bytes: include_bytes!(concat!("../../assets/ray-client-", $mc, ".polymrpack")),
+        }),+]
+    };
+}
+
+const EMBEDDED_BUNDLES: &[EmbeddedBundle] = embedded_bundles!(
+    "1.20", "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.6", "1.21", "1.21.1", "1.21.2", "1.21.3",
+    "1.21.4", "1.21.5", "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11",
+);
 
 #[derive(Debug, Clone)]
 pub struct Bundle {
@@ -67,19 +87,38 @@ impl BundlesManager {
         }
     }
 
-    /// Installs the Ray Client bundle that ships inside the launcher
+    /// Installs the Ray Client bundles that ship inside the launcher
     /// There is no remote catalog: the launcher is the only source, so startup needs no
-    /// network round trip and the bundle always matches this build
+    /// network round trip and the bundles always match this build
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self, ctx: &ContentCtx) -> ContentResult<bool> {
         let dir = paths::bundles_dir()?.join("bundles");
         polyio::create_dir_all(&dir).await?;
 
-        let disk_path = dir.join(EMBEDDED_BUNDLE_FILE);
-        let sha1 = polyio::sha1_bytes(EMBEDDED_BUNDLE);
+        let mut changed = false;
+        let mut ids = Vec::with_capacity(EMBEDDED_BUNDLES.len());
+        for embedded in EMBEDDED_BUNDLES {
+            changed |= self.sync_embedded(embedded, &dir, ctx).await?;
+            ids.push(embedded.id.to_string());
+        }
+
+        // Anything an older build fetched from a remote catalog stops being offered
+        bundle_dao::hide_bundles_not_in(&ctx.db, &ids).await?;
+
+        Ok(changed)
+    }
+
+    async fn sync_embedded(
+        &self,
+        embedded: &EmbeddedBundle,
+        dir: &Path,
+        ctx: &ContentCtx,
+    ) -> ContentResult<bool> {
+        let disk_path = dir.join(embedded.file);
+        let sha1 = polyio::sha1_bytes(embedded.bytes);
         let up_to_date = rayclient_net::matches_on_disk(&disk_path, &sha1).await;
         if !up_to_date {
-            polyio::write_atomic(&disk_path, EMBEDDED_BUNDLE).await?;
+            polyio::write_atomic(&disk_path, embedded.bytes).await?;
             self.archive_cache.write().await.clear();
         }
 
@@ -93,10 +132,10 @@ impl BundlesManager {
         bundle_dao::upsert_bundle(
             &ctx.db,
             NewBundle {
-                remote_path: EMBEDDED_BUNDLE_ID,
+                remote_path: embedded.id,
                 mc_version: &meta.mc_version,
                 mc_loader: meta.loader as i64,
-                file_name: EMBEDDED_BUNDLE_FILE,
+                file_name: embedded.file,
                 name: Some(&meta.name),
                 version_id: Some(&meta.version_id),
                 category: Some(&meta.category),
@@ -108,9 +147,6 @@ impl BundlesManager {
             },
         )
         .await?;
-
-        // Anything an older build fetched from a remote catalog stops being offered
-        bundle_dao::hide_bundles_not_in(&ctx.db, &[EMBEDDED_BUNDLE_ID.to_string()]).await?;
 
         Ok(!up_to_date)
     }

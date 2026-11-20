@@ -4,6 +4,7 @@ use freya::prelude::*;
 use rayclient_content::packages::{CachedPackageMeta, ProviderId};
 use rayclient_db::models::SeenStatus;
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{
     Button, CARD_GRID_H, GRID_GAP, GRID_MIN_W, Icon, IconType, OverlayPopup, PackageEntry,
     ScrollArea, grid_card, package_icon,
@@ -17,7 +18,6 @@ use crate::notifications::{
     ClusterUpdateItem, OptionalModRef, OptionalModsGroup, OptionalModsOutcome,
 };
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
 
 const DIALOG_W: f32 = 720.;
 const DIALOG_PAD: f32 = 22.;
@@ -154,16 +154,7 @@ fn dialog(
         .max_width(Size::window_percent(95.))
         .max_height(Size::window_percent(85.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .dialog_surface()
         .child(content(groups, meta, picked, dispatch))
 }
 

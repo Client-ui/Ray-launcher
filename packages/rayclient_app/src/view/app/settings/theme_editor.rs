@@ -13,10 +13,11 @@ use crate::theme::colors::{self, Hex, Palette};
 use crate::theme::{Theme, font_families, pixel_font_size_of, save_theme};
 
 const BORDER_OPACITIES: [u8; 7] = [5, 10, 15, 20, 30, 45, 60];
-const CORNERS: [(&str, f32); 4] = [
+const CORNERS: [(&str, f32); 5] = [
     ("Square", 0.),
     ("Subtle", 0.5),
-    ("Default", 1.),
+    ("Classic", 1.),
+    ("Default", 1.2),
     ("Round", 1.5),
 ];
 

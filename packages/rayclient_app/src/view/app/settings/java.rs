@@ -133,8 +133,9 @@ fn runtimes_table(
         return rect()
             .width(Size::fill())
             .padding(Gaps::new_symmetric(16., 16.))
-            .corner_radius(rounded(12.))
-            .background(colors::page_elevated())
+            .corner_radius(rounded(16.))
+            .background(colors::card())
+            .border(border_all_color(1., colors::component_border()))
             .child(
                 label()
                     .text(t("oneclient.settings.java.empty"))
@@ -147,8 +148,8 @@ fn runtimes_table(
     let mut table = rect()
         .vertical()
         .width(Size::fill())
-        .corner_radius(rounded(12.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
         .overflow(Overflow::Clip)
         .child(table_header());

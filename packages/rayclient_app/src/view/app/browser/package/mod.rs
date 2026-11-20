@@ -32,7 +32,7 @@ mod panels;
 mod sidebar;
 use gallery::gallery_panel;
 use panels::{about_panel, loading_body, tabs, versions_panel};
-use sidebar::sidebar;
+use sidebar::{hero, sidebar};
 
 const SIDEBAR_W: f32 = 280.;
 const SCROLLBAR_GUTTER: f32 = 18.;
@@ -386,15 +386,7 @@ impl Component for BrowserPackage {
             .cross_align(Alignment::Start)
             .spacing(24.)
             .content(Content::Flex)
-            .child(sidebar(
-                project,
-                latest_version,
-                installer,
-                confirm,
-                installed,
-                installing,
-                waiting,
-            ))
+            .child(sidebar(project.clone(), confirm))
             .child(
                 rect()
                     .vertical()
@@ -404,6 +396,17 @@ impl Component for BrowserPackage {
                     .child(body),
             )
             .into_element();
+
+        let hero_card = hero(
+            project.clone(),
+            latest_version,
+            installer,
+            confirm,
+            installed,
+            installing,
+            waiting,
+        )
+        .into_element();
 
         rect()
             .width(Size::fill())
@@ -416,7 +419,13 @@ impl Component for BrowserPackage {
                     .height(Size::fill())
                     .reset_key(current as u64)
                     .padding(Gaps::new(0., SCROLLBAR_GUTTER, 0., 0.))
-                    .children([row]),
+                    .children([rect()
+                        .vertical()
+                        .width(Size::fill())
+                        .spacing(20.)
+                        .child(hero_card)
+                        .child(row)
+                        .into_element()]),
             )
             .maybe_child(remove_dialog)
             .maybe_child(world_prompt.read().is_some().then(|| WorldInstallPrompt {

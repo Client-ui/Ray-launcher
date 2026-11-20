@@ -1,6 +1,7 @@
 use freya::prelude::*;
 use rayclient_core::UnpublishedFile;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{
     Button, OVERLAY_BASE_LEVEL, OverlayPopup, caution_card, warning_card, warning_list,
 };
@@ -8,11 +9,9 @@ use crate::hooks::{use_dispatch, use_notifications_snapshot};
 use crate::i18n::{t, tf};
 use crate::notifications::{UnpublishedImport, UnpublishedInstance};
 use crate::theme::colors;
-use crate::ui::border_all_color;
 use crate::utils::count_label;
 
 const DIALOG_W: f32 = 500.;
-const DIALOG_PAD: f32 = 22.;
 const SECTION_GAP: f32 = 16.;
 const BODY_MAX_H: f32 = 380.;
 
@@ -120,53 +119,46 @@ fn dialog(
         .vertical()
         .width(Size::px(DIALOG_W))
         .max_width(Size::window_percent(95.))
-        .spacing(SECTION_GAP)
-        .padding(Gaps::new_all(DIALOG_PAD))
-        .corner_radius(CornerRadius::new_all(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .overflow(Overflow::Clip)
+        .dialog_surface()
         .child(
-            rect()
-                .vertical()
-                .width(Size::fill())
-                .spacing(3.)
-                .child(
-                    label()
-                        .text(title)
-                        .font_size(17.)
-                        .font_weight(FontWeight::SEMI_BOLD)
-                        .max_lines(2)
-                        .color(colors::fg_primary()),
-                )
-                .child(
-                    label()
-                        .text(subtitle)
-                        .font_size(12.5)
-                        .max_lines(3)
-                        .color(colors::fg_secondary()),
-                ),
-        )
-        .child(
-            ScrollView::new()
-                .width(Size::fill())
-                .height(Size::Inner)
-                .max_height(Size::px(BODY_MAX_H))
+            dialog_body()
                 .child(
                     rect()
                         .vertical()
                         .width(Size::fill())
-                        .spacing(SECTION_GAP)
-                        .children(import.instances.iter().map(instance_card)),
+                        .spacing(3.)
+                        .child(
+                            label()
+                                .text(title)
+                                .font_size(17.)
+                                .font_weight(FontWeight::SEMI_BOLD)
+                                .max_lines(2)
+                                .color(colors::fg_primary()),
+                        )
+                        .child(
+                            label()
+                                .text(subtitle)
+                                .font_size(12.5)
+                                .max_lines(3)
+                                .color(colors::fg_secondary()),
+                        ),
+                )
+                .child(
+                    ScrollView::new()
+                        .width(Size::fill())
+                        .height(Size::Inner)
+                        .max_height(Size::px(BODY_MAX_H))
+                        .child(
+                            rect()
+                                .vertical()
+                                .width(Size::fill())
+                                .spacing(SECTION_GAP)
+                                .children(import.instances.iter().map(instance_card)),
+                        ),
                 ),
         )
-        .child(
+        .child(dialog_footer(
             rect()
                 .horizontal()
                 .width(Size::fill())
@@ -186,7 +178,7 @@ fn dialog(
                         .on_press(move |_| on_import_all())
                         .text(all_text),
                 ),
-        )
+        ))
 }
 
 fn instance_card(instance: &UnpublishedInstance) -> Element {

@@ -240,10 +240,19 @@ impl Component for TooltipBubble {
             .interactive(false)
             .opacity(if placed { fade.read().value() } else { 0. })
             .max_width(Size::px(MAX_WIDTH))
-            .padding(Gaps::new_symmetric(5., 9.))
-            .corner_radius(rounded(8.))
+            .padding(Gaps::new_symmetric(6., 11.))
+            .corner_radius(rounded(12.))
+            .shadow(
+                Shadow::new()
+                    .x(0.)
+                    .y(10.)
+                    .blur(32.)
+                    .spread(0.)
+                    .color(Color::from_argb(110, 0, 0, 0)),
+            )
             .background(colors::page_elevated())
             .border(border_all_color(1., colors::component_border()))
+            .border(crate::ui::top_sheen())
             .on_sized(move |e: Event<SizedEventData>| {
                 let bubble = e.area.size;
                 let previous = *size.peek();

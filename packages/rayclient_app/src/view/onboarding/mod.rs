@@ -238,7 +238,7 @@ pub(crate) fn choice_row_sized(
         .cross_align(Alignment::Center)
         .spacing(10.)
         .padding(Gaps::new_symmetric(8., 12.))
-        .corner_radius(rounded(8.))
+        .corner_radius(rounded(10.))
         .border(border_all_color(1., border_color))
         .a11y_role(AccessibilityRole::Button)
         .cursor(CursorIcon::Pointer)

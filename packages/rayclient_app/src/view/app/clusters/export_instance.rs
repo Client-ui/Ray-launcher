@@ -255,7 +255,15 @@ impl Component for ExportInstanceModal {
                             .max_width(Size::window_percent(92.))
                             .spacing(16.)
                             .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(16.))
+                            .corner_radius(rounded(18.))
+                            .shadow(
+                                Shadow::new()
+                                    .x(0.)
+                                    .y(10.)
+                                    .blur(32.)
+                                    .spread(0.)
+                                    .color(Color::from_argb(110, 0, 0, 0)),
+                            )
                             .background(colors::page_elevated())
                             .border(border_all_color(1., colors::component_border()))
                             .children(content),

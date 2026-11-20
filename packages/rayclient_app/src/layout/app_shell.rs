@@ -84,6 +84,10 @@ impl Component for AppShell {
             .height(Size::fill())
             .color(colors::fg_primary())
             .overflow(Overflow::Clip)
+            .border(
+                crate::ui::border_all_color(1., colors::component_border().with_a(90))
+                    .alignment(BorderAlignment::Inner),
+            )
             .on_global_file_hover(move |_| drop_hovering.set(true))
             .on_global_file_hover_cancelled(move |_| drop_hovering.set(false))
             .on_file_drop(move |e: Event<FileEventData>| {
@@ -140,14 +144,20 @@ impl Component for LaunchErrorDialog {
                     .center()
                     .on_press(move |_| outside_close.dismiss_game_error())
                     .child(
-                        rect()
+                        crate::ui::raised_card()
                             .vertical()
                             .width(Size::px(560.))
-                            .background(colors::page_elevated())
-                            .corner_radius(rounded(16.))
-                            .padding(Gaps::new_all(24.))
-                            .spacing(16.)
-                            .border(crate::ui::border_all_color(1., colors::component_border()))
+                            .max_width(Size::window_percent(92.))
+                            .corner_radius(rounded(22.))
+                            .padding(Gaps::new_all(28.))
+                            .spacing(18.)
+                            .shadow(Shadow::from((
+                                0.,
+                                20.,
+                                60.,
+                                0.,
+                                Color::from_argb(150, 0, 0, 0),
+                            )))
                             .on_press(|e: Event<PressEventData>| e.stop_propagation())
                             .child(
                                 rect()
@@ -162,8 +172,8 @@ impl Component for LaunchErrorDialog {
                                     .child(
                                         label()
                                             .text(t("oneclient.layout.game_error.title"))
-                                            .font_size(text_size(18.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
+                                            .font_size(text_size(20.))
+                                            .font_weight(FontWeight::BOLD)
                                             .color(colors::fg_primary()),
                                     ),
                             )
@@ -178,6 +188,7 @@ impl Component for LaunchErrorDialog {
                                     .background(colors::page())
                                     .height(260.),
                             )
+                            .child(crate::ui::divider())
                             .child(
                                 rect()
                                     .horizontal()

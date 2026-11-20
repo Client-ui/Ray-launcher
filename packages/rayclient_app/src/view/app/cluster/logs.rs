@@ -6,6 +6,7 @@ use freya::query::UseQuery;
 use rayclient_common::search::SearchQuery;
 use rayclient_core::{LogFileInfo, LogKind, LogLevel, LogTrim};
 
+use crate::components::DialogSurface;
 use crate::components::upload_mclogs::{UploadToMclogs, use_mclogs_feedback};
 use crate::components::{
     Button, Icon, IconType, LogViewer, OverlayPopup, ScrollArea, Segment, SegmentedControl,
@@ -745,9 +746,7 @@ pub fn confirm_overlay(
                         .max_width(Size::window_percent(90.))
                         .spacing(14.)
                         .padding(Gaps::new_all(20.))
-                        .corner_radius(rounded(14.))
-                        .background(colors::card())
-                        .border(ui::border_all_color(1., colors::component_border()))
+                        .dialog_surface()
                         .child(
                             rect()
                                 .horizontal()

@@ -272,7 +272,7 @@ impl Component for PackageRow {
                     on_context.clone(),
                     on_copies,
                 ),
-                8.,
+                14.,
             ),
             CardLayout::Grid => (
                 grid_card(
@@ -286,7 +286,7 @@ impl Component for PackageRow {
                     on_copies,
                     hovered,
                 ),
-                6.,
+                14.,
             ),
         };
 
@@ -601,9 +601,16 @@ fn list_card(
         .height(Size::px(CARD_H))
         .cross_align(Alignment::Center)
         .spacing(12.)
-        .padding(Gaps::new_all(10.))
-        .corner_radius(rounded(8.))
-        .background(colors::card())
+        .padding(Gaps::new_all(12.))
+        .corner_radius(rounded(16.))
+        .background(
+            LinearGradient::new()
+                .angle(0.)
+                .stop((colors::lighten(colors::card(), 0.04), 0.))
+                .stop((colors::card(), 100.)),
+        )
+        .border(border_all_color(1., colors::component_border()))
+        .border(crate::ui::top_sheen())
         .content(Content::Flex)
         .maybe(item.copy_status == Some(CopyStatus::Skipped), |el| {
             el.opacity(0.5)
@@ -728,7 +735,7 @@ pub(crate) fn grid_card(
         .height(Size::fill())
         .spacing(9.)
         .padding(Gaps::new_all(GRID_CARD_PADDING))
-        .corner_radius(rounded(6.))
+        .corner_radius(rounded(14.))
         .background(bg.with_a(alpha))
         .border(border_all_color(1., border))
         .content(Content::Flex)
@@ -898,7 +905,7 @@ impl Component for KebabButton {
             .center()
             .width(Size::px(26.))
             .height(Size::px(26.))
-            .corner_radius(rounded(6.))
+            .corner_radius(rounded(10.))
             .background(if *hovered.read() {
                 colors::ghost_overlay_hover()
             } else {

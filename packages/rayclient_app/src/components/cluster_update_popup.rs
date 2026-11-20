@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use freya::{prelude::*, router::RouterContext};
 use rayclient_content::packages::{CachedPackageMeta, ProviderId};
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{Button, Icon, IconType, OverlayPopup, ScrollArea, TabBar, TabItem};
 use crate::hooks::{
     package_meta_batch, use_dispatch, use_notifications_snapshot, use_package_meta_batch,
@@ -11,7 +12,6 @@ use crate::i18n::{t, tf};
 use crate::notifications::{ClusterUpdateItem, ClusterUpdateSummary};
 use crate::routes::Route;
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
 
 const DIALOG_W: f32 = 420.;
 const DIALOG_H: f32 = 400.;
@@ -166,16 +166,7 @@ fn dialog(
         .height(Size::px(DIALOG_H))
         .max_width(Size::window_percent(95.))
         .overflow(Overflow::Clip)
-        .corner_radius(rounded(16.))
-        .background(colors::card())
-        .border(border_all_color(1., colors::component_border()))
-        .shadow(Shadow::from((
-            0.,
-            18.,
-            52.,
-            0.,
-            Color::from_argb(150, 0, 0, 0),
-        )))
+        .dialog_surface()
         .child(content(summaries, meta, active, dispatch))
 }
 

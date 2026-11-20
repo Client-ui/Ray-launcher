@@ -1,0 +1,122 @@
+[
+  {
+    "path": "mods/fabric-api-0.141.3+1.21.11.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/P7dR8mSH/versions/i5tSkVBH/fabric-api-0.141.3%2B1.21.11.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "Fabric API",
+      "description": "Required library for Ray Client",
+      "authors": [
+        "modmuss50"
+      ]
+    }
+  },
+  {
+    "path": "mods/CustomSkinLoader_Fabric-14.27.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/idMHQ4n2/versions/Fsrt5ueW/CustomSkinLoader_Fabric-14.27.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "CustomSkinLoader",
+      "description": "Shows your offline-account skin in game",
+      "authors": [
+        "xfl03"
+      ]
+    }
+  },
+  {
+    "path": "mods/sodium-fabric-0.8.12+mc1.21.11.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/AANobbMI/versions/NFkjnzWE/sodium-fabric-0.8.12%2Bmc1.21.11.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "Sodium",
+      "description": "Faster, smoother rendering",
+      "authors": [
+        "CaffeineMC"
+      ]
+    }
+  },
+  {
+    "path": "mods/lithium-fabric-0.21.1+mc1.21.11.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/gvQqBUqZ/versions/4DdLmtyz/lithium-fabric-0.21.1%2Bmc1.21.11.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "Lithium",
+      "description": "Faster game logic and ticking",
+      "authors": [
+        "CaffeineMC"
+      ]
+    }
+  },
+  {
+    "path": "mods/ferritecore-8.2.0-fabric.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/uXXizFIs/versions/Ii0gP3D8/ferritecore-8.2.0-fabric.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "FerriteCore",
+      "description": "Lower memory use",
+      "authors": [
+        "malte0811"
+      ]
+    }
+  },
+  {
+    "path": "mods/ImmediatelyFast-Fabric-1.14.1+1.21.11.jar",
+    "hashes": {
+      "sha1": "0000000000000000000000000000000000000000"
+    },
+    "downloads": [
+      "https://cdn.modrinth.com/data/5ZwdcRci/versions/XCnavm6o/ImmediatelyFast-Fabric-1.14.1%2B1.21.11.jar"
+    ],
+    "fileSize": 0,
+    "enabled": true,
+    "hidden": false,
+    "type": "normal",
+    "overrides": {
+      "name": "ImmediatelyFast",
+      "description": "Faster HUD, text and GUI rendering",
+      "authors": [
+        "RaphiMC"
+      ]
+    }
+  }
+]

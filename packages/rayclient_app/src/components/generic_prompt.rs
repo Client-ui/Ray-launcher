@@ -5,12 +5,12 @@ use freya::prelude::*;
 use rayclient_events::{Answer, ChoiceInput, ChoiceStyle};
 use rayclient_java::JAVA_CHOICE_DOWNLOAD;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, OVERLAY_BASE_LEVEL, OverlayPopup};
 use crate::hooks::{use_dispatch, use_notifications_snapshot};
 use crate::microsoft_java::MICROSOFT_JAVA_CHOICE_INSTALL;
 use crate::notifications::PendingPromptView;
-use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::theme::{colors, text_size};
 use crate::updater::UPDATE_CHOICE_INSTALL;
 
 fn claimed_elsewhere(prompt: &PendingPromptView) -> bool {
@@ -110,6 +110,23 @@ impl Component for GenericPromptOverlay {
             .child(secondary)
             .child(primary);
 
+        let dialog_content = dialog_body()
+            .child(
+                label()
+                    .text(prompt.title.clone())
+                    .font_size(text_size(18.))
+                    .font_weight(FontWeight::BOLD)
+                    .color(colors::fg_primary()),
+            )
+            .child(
+                label()
+                    .text(prompt.question.clone())
+                    .font_size(text_size(12.))
+                    .max_lines(6)
+                    .width(Size::fill())
+                    .color(colors::fg_secondary()),
+            );
+        let dialog_actions = dialog_footer(buttons);
         OverlayPopup::new()
             .overlay_level(OVERLAY_BASE_LEVEL + 3)
             .on_close(move |_| close.dismiss_prompt())
@@ -123,27 +140,10 @@ impl Component for GenericPromptOverlay {
                             .vertical()
                             .width(Size::px(440.))
                             .max_width(Size::window_percent(90.))
-                            .spacing(14.)
-                            .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
-                            .child(
-                                label()
-                                    .text(prompt.title.clone())
-                                    .font_size(text_size(16.))
-                                    .font_weight(FontWeight::SEMI_BOLD)
-                                    .color(colors::fg_primary()),
-                            )
-                            .child(
-                                label()
-                                    .text(prompt.question.clone())
-                                    .font_size(text_size(12.))
-                                    .max_lines(6)
-                                    .width(Size::fill())
-                                    .color(colors::fg_secondary()),
-                            )
-                            .child(buttons),
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
+                            .child(dialog_content)
+                            .child(dialog_actions),
                     ),
             )
             .into_element()

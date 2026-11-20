@@ -1,14 +1,14 @@
 {
   "name": "Ray Dark",
+  "radius_scale": 1.2,
   "colors": {
-    "light": false,
-    "page": "#0C0B0E",
-    "page_elevated": "#141217",
-    "card": "#1C1920",
-    "component": "#27232C",
-    "border": "#FFFFFF26",
-    "text": "#F7F5F8",
-    "text_secondary": "#B3AEBB",
+    "page": "#08080B",
+    "page_elevated": "#101015",
+    "card": "#17171E",
+    "component": "#21212B",
+    "border": "#FFFFFF17",
+    "text": "#F4F4F8",
+    "text_secondary": "#A9A9B8",
     "accent": "#FF8A2B"
   }
 }

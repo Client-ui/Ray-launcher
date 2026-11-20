@@ -13,6 +13,33 @@ const BUTTON_NAME_CHARS: usize = 22;
 
 pub(super) fn sidebar(
     project: Option<ProjectDetail>,
+    confirm: State<Option<String>>,
+) -> impl IntoElement {
+    let Some(project) = project else {
+        return rect()
+            .width(Size::px(SIDEBAR_W))
+            .min_width(Size::px(SIDEBAR_W))
+            .into_element();
+    };
+
+    rect()
+        .vertical()
+        .width(Size::px(SIDEBAR_W))
+        .min_width(Size::px(SIDEBAR_W))
+        .spacing(12.)
+        .maybe(
+            !project.members.is_empty() || !project.author.is_empty(),
+            |el| el.child(authors_card(&project, confirm)),
+        )
+        .child(details_card(&project))
+        .maybe(!project.links.is_empty(), |el| {
+            el.child(links_card(&project.links, confirm))
+        })
+        .into_element()
+}
+
+pub(super) fn hero(
+    project: Option<ProjectDetail>,
     latest_version: Option<VersionSummary>,
     installer: Installer,
     confirm: State<Option<String>>,
@@ -21,10 +48,7 @@ pub(super) fn sidebar(
     waiting: bool,
 ) -> impl IntoElement {
     let Some(project) = project else {
-        return rect()
-            .width(Size::px(SIDEBAR_W))
-            .min_width(Size::px(SIDEBAR_W))
-            .into_element();
+        return rect().into_element();
     };
 
     let project_id = project.id.clone();
@@ -40,79 +64,11 @@ pub(super) fn sidebar(
         .and_then(Installed::disabled_bundled)
         .and_then(|version| version.enable_action(installer.cluster_id));
 
-    rect()
+    let actions = rect()
         .vertical()
         .width(Size::px(SIDEBAR_W))
         .min_width(Size::px(SIDEBAR_W))
-        .spacing(12.)
-        .child(
-            rect()
-                .vertical()
-                .width(Size::fill())
-                .corner_radius(rounded(12.))
-                .overflow(Overflow::Clip)
-                .background(colors::page_elevated())
-                .border(border_all_color(1., colors::component_border()))
-                .child(
-                    rect()
-                        .width(Size::fill())
-                        .overflow(Overflow::Clip)
-                        .child(PackageBanner::new(project.icon_url.clone(), 110.)),
-                )
-                .child(
-                    rect()
-                        .vertical()
-                        .width(Size::fill())
-                        .padding(Gaps::new_all(12.))
-                        .spacing(8.)
-                        .child(
-                            label()
-                                .text(project.name.clone())
-                                .font_size(text_size(18.))
-                                .font_weight(FontWeight::BOLD)
-                                .max_lines(2)
-                                .color(colors::fg_primary()),
-                        )
-                        .child(ProviderTag {
-                            text: tf(
-                                "oneclient.browser.package.sidebar.provider",
-                                &[&project.content_type, &project.provider],
-                            ),
-                            provider: project.provider,
-                            url: project.web_url(),
-                            confirm,
-                        })
-                        .maybe(!project.summary.is_empty(), |el| {
-                            el.child(
-                                label()
-                                    .text(project.summary.clone())
-                                    .font_size(text_size(12.))
-                                    .max_lines(4)
-                                    .color(colors::fg_secondary()),
-                            )
-                        })
-                        .child(
-                            rect()
-                                .horizontal()
-                                .cross_align(Alignment::Center)
-                                .spacing(4.)
-                                .child(
-                                    Icon::new(IconType::Download01)
-                                        .size(12.)
-                                        .color(colors::fg_secondary()),
-                                )
-                                .child(
-                                    label()
-                                        .text(tf(
-                                            "oneclient.browser.package.sidebar.downloads",
-                                            &[&abbreviate_number(project.downloads)],
-                                        ))
-                                        .font_size(text_size(11.))
-                                        .color(colors::fg_secondary()),
-                                ),
-                        ),
-                ),
-        )
+        .spacing(8.)
         .child(match enable {
             Some(action) => EnableButton {
                 action,
@@ -166,15 +122,95 @@ pub(super) fn sidebar(
                 .child(Icon::new(IconType::Plus).size(14.))
                 .text(t("oneclient.browser.package.sidebar.add_to_instance"))
                 .into_element()
-        }))
-        .maybe(
-            !project.members.is_empty() || !project.author.is_empty(),
-            |el| el.child(authors_card(&project, confirm)),
+        }));
+
+    let stat_pill = |icon: IconType, text: String| {
+        rect()
+            .horizontal()
+            .cross_align(Alignment::Center)
+            .spacing(6.)
+            .padding(Gaps::new_symmetric(4., 10.))
+            .corner_radius(rounded(999.))
+            .background(colors::brand_glow(34))
+            .border(border_all_color(1., colors::brand_glow(90)))
+            .child(Icon::new(icon).size(12.).color(colors::fg_primary()))
+            .child(
+                label()
+                    .text(text)
+                    .font_size(text_size(11.))
+                    .font_weight(FontWeight::MEDIUM)
+                    .color(colors::fg_primary()),
+            )
+    };
+
+    crate::ui::raised_card()
+        .vertical()
+        .width(Size::fill())
+        .overflow(Overflow::Clip)
+        .child(
+            rect()
+                .width(Size::fill())
+                .overflow(Overflow::Clip)
+                .child(PackageBanner::new(project.icon_url.clone(), 96.).backdrop_only()),
         )
-        .child(details_card(&project))
-        .maybe(!project.links.is_empty(), |el| {
-            el.child(links_card(&project.links, confirm))
-        })
+        .child(
+            rect()
+                .horizontal()
+                .width(Size::fill())
+                .cross_align(Alignment::Center)
+                .spacing(20.)
+                .padding(Gaps::new_all(20.))
+                .content(Content::Flex)
+                .child(
+                    rect()
+                        .center()
+                        .padding(Gaps::new_all(6.))
+                        .corner_radius(rounded(24.))
+                        .background(colors::card())
+                        .border(border_all_color(1., colors::component_border()))
+                        .child(Thumbnail::new(project.icon_url.clone(), 88.).radius(18.)),
+                )
+                .child(
+                    rect()
+                        .vertical()
+                        .width(Size::flex(1.0))
+                        .spacing(8.)
+                        .child(
+                            label()
+                                .text(project.name.clone())
+                                .font_size(text_size(28.))
+                                .font_weight(FontWeight::BOLD)
+                                .max_lines(2)
+                                .color(colors::fg_primary()),
+                        )
+                        .child(ProviderTag {
+                            text: tf(
+                                "oneclient.browser.package.sidebar.provider",
+                                &[&project.content_type, &project.provider],
+                            ),
+                            provider: project.provider,
+                            url: project.web_url(),
+                            confirm,
+                        })
+                        .maybe(!project.summary.is_empty(), |el| {
+                            el.child(
+                                label()
+                                    .text(project.summary.clone())
+                                    .font_size(text_size(13.))
+                                    .max_lines(3)
+                                    .color(colors::fg_secondary()),
+                            )
+                        })
+                        .child(rect().horizontal().spacing(6.).child(stat_pill(
+                            IconType::Download01,
+                            tf(
+                                "oneclient.browser.package.sidebar.downloads",
+                                &[&abbreviate_number(project.downloads)],
+                            ),
+                        ))),
+                )
+                .child(actions),
+        )
         .into_element()
 }
 
@@ -238,8 +274,8 @@ fn card_spaced(title: &str, rows: Vec<Element>, spacing: f32) -> impl IntoElemen
         .width(Size::fill())
         .spacing(spacing)
         .padding(Gaps::new_all(16.))
-        .corner_radius(rounded(12.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
         .child(
             label()

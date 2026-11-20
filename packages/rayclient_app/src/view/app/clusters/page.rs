@@ -21,7 +21,8 @@ use crate::i18n::{t, tf};
 use crate::routes::Route;
 use crate::theme::{colors, rounded, text_size};
 use crate::ui::{
-    border_all_color, fixed_grid, grid_columns_for_width, last_played_label, window_logical_size,
+    border_all_color, eyebrow, fixed_grid, grid_columns_for_width, last_played_label, raised_card,
+    window_logical_size,
 };
 use crate::utils::{
     ClusterGroups, GridSelection, ReleaseLine, default_line, default_loader, default_version_key,
@@ -30,13 +31,13 @@ use crate::utils::{
 use crate::view::app::clusters::CreateInstanceModal;
 use crate::view::app::{launch_button_state, launch_syncing, use_shared_dir_taken};
 
-const PAGE_PADDING: Gaps = Gaps::new(12., 28., 28., 28.);
+const PAGE_PADDING: Gaps = Gaps::new(20., 36., 32., 36.);
 const COLUMN_GAP_PX: f32 = 24.;
-const CARD_GAP_PX: f32 = 10.;
+const CARD_GAP_PX: f32 = 16.;
 const ROW_GAP_PX: f32 = 8.;
-const CARD_HEIGHT_PX: f32 = 150.;
+const CARD_HEIGHT_PX: f32 = 188.;
 const ROW_HEIGHT_PX: f32 = 56.;
-const MAX_CARD_WIDTH_PX: f32 = 300.;
+const MAX_CARD_WIDTH_PX: f32 = 320.;
 const MAX_ROW_WIDTH_PX: f32 = 480.;
 const SIDEBAR_WIDTH_PX: f32 = 360.;
 const COMPACT_SIDEBAR_WIDTH_PX: f32 = 300.;
@@ -414,7 +415,7 @@ impl Component for Clusters {
                             .width(Size::flex(1.0))
                             .height(Size::fill())
                             .content(Content::Flex)
-                            .spacing(18.)
+                            .spacing(24.)
                             .child(page_header(show_create))
                             .child(toolbar(tabs, query, inline_search.then(|| filters.clone())))
                             .maybe_child((!inline_search).then(|| {
@@ -432,7 +433,7 @@ impl Component for Clusters {
                                     .width(Size::fill())
                                     .height(Size::flex(1.0))
                                     .scrollbar_gutter(true)
-                                    .spacing(22.)
+                                    .spacing(32.)
                                     .append_children((!shown_lines.is_empty()).then(|| {
                                         section(
                                             "Ray Client",
@@ -548,7 +549,7 @@ fn section(title: &str, caption: &str, grid: Element) -> Element {
     rect()
         .vertical()
         .width(Size::fill())
-        .spacing(10.)
+        .spacing(14.)
         .child(section_header(title, caption))
         .child(grid)
         .into_element()
@@ -562,9 +563,9 @@ pub(crate) fn section_header(title: &str, caption: &str) -> Element {
         .child(
             label()
                 .text(title.to_string())
-                .font_size(text_size(14.))
-                .font_weight(FontWeight::MEDIUM)
-                .color(colors::fg_primary()),
+                .font_size(text_size(17.))
+                .font_weight(FontWeight::BOLD)
+                .color(colors::fg_strong()),
         )
         .child(
             label()
@@ -808,15 +809,12 @@ impl Component for Sidebar {
         let art_height = art_height_for(*sidebar_height.read());
         let top_padding = if art_height.is_some() { 4. } else { 22. };
 
-        rect()
+        raised_card()
             .width(Size::px(self.width))
             .min_width(Size::px(self.width))
             .height(Size::fill())
             .vertical()
             .content(Content::Flex)
-            .corner_radius(rounded(20.))
-            .background(colors::page_elevated())
-            .border(border_all_color(1., colors::component_border()))
             .overflow(Overflow::Clip)
             .on_sized(move |event: Event<SizedEventData>| {
                 let height = event.data().area.height();
@@ -849,8 +847,8 @@ impl Component for Sidebar {
                                     .child(
                                         label()
                                             .text(self.title.clone())
-                                            .font_size(text_size(24.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
+                                            .font_size(text_size(28.))
+                                            .font_weight(FontWeight::BOLD)
                                             .color(colors::fg_strong()),
                                     )
                                     .child(
@@ -988,6 +986,7 @@ fn play_button(
     let (label, enabled) = state;
     Button::new()
         .primary()
+        .large()
         .width(Size::flex(1.))
         .enabled(enabled)
         .on_press(move |_| {
@@ -1004,29 +1003,33 @@ fn page_header(mut show_create: State<bool>) -> impl IntoElement {
         .width(Size::fill())
         .cross_align(Alignment::End)
         .content(Content::Flex)
-        .spacing(16.)
+        .spacing(20.)
         .child(
             rect()
                 .vertical()
                 .width(Size::flex(1.))
-                .spacing(6.)
+                .spacing(8.)
+                .child(eyebrow("Ray Client".to_string()))
                 .child(
                     label()
                         .text(t("oneclient.clusters.page.title"))
-                        .font_size(text_size(32.))
-                        .font_weight(FontWeight::SEMI_BOLD)
+                        .font_size(text_size(36.))
+                        .line_height(1.1)
+                        .font_weight(FontWeight::BOLD)
                         .color(colors::fg_strong()),
                 )
                 .child(
                     label()
                         .text(t("oneclient.clusters.page.description"))
-                        .font_size(text_size(13.))
+                        .font_size(text_size(14.))
+                        .max_lines(2)
                         .color(colors::fg_secondary()),
                 ),
         )
         .child(
             Button::new()
                 .primary()
+                .large()
                 .on_press(move |_| show_create.set(true))
                 .child(Icon::new(IconType::Plus).size(16.))
                 .text(t("oneclient.clusters.page.new_instance")),

@@ -6,8 +6,10 @@ use freya::{
 };
 
 use crate::hooks::use_overlay_claim;
+use crate::theme::{colors, rounded};
+use crate::ui::{border_all_color, divider, top_sheen};
 
-const SCRIM_ALPHA: f32 = 90.;
+const SCRIM_ALPHA: f32 = 120.;
 const SCRIM_MIN_ALPHA: u8 = 1;
 
 /// Overlay level of a top level popup. Its scrim sits two levels below it.
@@ -160,4 +162,57 @@ impl Component for OverlayPopup {
                     .children(self.children.clone()),
             )
     }
+}
+
+/// The shared "Ray Glass" dialog panel: lit from above, hairline border, sheen on the top edge
+/// and a large soft shadow. Callers add size, padding and children
+pub(crate) trait DialogSurface {
+    fn dialog_surface(self) -> Self;
+}
+
+impl DialogSurface for Rect {
+    fn dialog_surface(self) -> Self {
+        let base = colors::card();
+        self.corner_radius(rounded(22.))
+            .background(
+                LinearGradient::new()
+                    .angle(0.)
+                    .stop((colors::lighten(base, 0.05), 0.))
+                    .stop((base, 100.)),
+            )
+            .border(border_all_color(1., colors::component_border()))
+            .border(top_sheen())
+            .shadow(Shadow::from((
+                0.,
+                20.,
+                60.,
+                0.,
+                Color::from_argb(150, 0, 0, 0),
+            )))
+    }
+}
+
+/// Padding and spacing of the header and body block above a dialog footer
+pub(crate) fn dialog_body() -> Rect {
+    rect()
+        .vertical()
+        .width(Size::fill())
+        .spacing(14.)
+        .padding(Gaps::new_all(24.))
+}
+
+/// A footer for dialog actions, split from the content by a hairline and tinted slightly darker
+pub(crate) fn dialog_footer(actions: impl IntoElement) -> Element {
+    rect()
+        .vertical()
+        .width(Size::fill())
+        .child(divider())
+        .child(
+            rect()
+                .width(Size::fill())
+                .padding(Gaps::new_symmetric(16., 24.))
+                .background(Color::from_argb(34, 0, 0, 0))
+                .child(actions),
+        )
+        .into_element()
 }

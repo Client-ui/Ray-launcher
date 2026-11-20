@@ -438,3 +438,23 @@ pub fn selection_bg() -> Color {
 pub fn toast_action() -> Color {
     Color::from_rgb(155, 161, 166)
 }
+
+/// Moves a colour toward white, for highlights and the lit top of raised surfaces
+pub fn lighten(base: Color, amount: f32) -> Color {
+    let (r, g, b) = mix((base.r(), base.g(), base.b()), (255, 255, 255), amount);
+    Color::from_argb(base.a(), r, g, b)
+}
+
+/// The brand colour as a translucent wash, for glows and selected states
+pub fn brand_glow(alpha: u8) -> Color {
+    brand().with_a(alpha)
+}
+
+/// A one-pixel highlight along the top edge of a raised surface
+pub fn sheen() -> Color {
+    if is_light() {
+        Color::from_argb(150, 255, 255, 255)
+    } else {
+        Color::from_argb(40, 255, 255, 255)
+    }
+}

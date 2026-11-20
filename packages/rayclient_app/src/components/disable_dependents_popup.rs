@@ -8,13 +8,13 @@
 
 use freya::prelude::*;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, Icon, IconType, OverlayPopup, ScrollArea};
 use crate::disable::{self, PendingDisable};
 use crate::hooks::{Actions, invalidate_cluster_queries, use_disable_confirm, use_dispatch};
 use crate::i18n::t;
 use crate::launcher;
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
 
 const DIALOG_W: f32 = 480.;
 const LIST_MAX_H: f32 = 260.;
@@ -72,6 +72,37 @@ impl Component for DisableDependentsOverlay {
                 .text(disable::confirm_label(&current)),
         );
 
+        let dialog_content = dialog_body()
+            .child(
+                rect()
+                    .horizontal()
+                    .cross_align(Alignment::Center)
+                    .spacing(10.)
+                    .child(
+                        Icon::new(IconType::AlertTriangle)
+                            .size(20.)
+                            .color(colors::code_warn()),
+                    )
+                    .child(
+                        label()
+                            .text(disable::title(&current))
+                            .font_size(text_size(18.))
+                            .font_weight(FontWeight::BOLD)
+                            .max_lines(2)
+                            .width(Size::fill())
+                            .color(colors::fg_primary()),
+                    ),
+            )
+            .child(
+                label()
+                    .text(disable::summary(&current))
+                    .font_size(text_size(12.))
+                    .max_lines(6)
+                    .width(Size::fill())
+                    .color(colors::fg_secondary()),
+            )
+            .child(lists(&current));
+        let dialog_actions = dialog_footer(buttons);
         OverlayPopup::new()
             .on_close(move |_| pending.set(None))
             .child(
@@ -84,41 +115,10 @@ impl Component for DisableDependentsOverlay {
                             .vertical()
                             .width(Size::px(DIALOG_W))
                             .max_width(Size::window_percent(92.))
-                            .spacing(14.)
-                            .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .cross_align(Alignment::Center)
-                                    .spacing(10.)
-                                    .child(
-                                        Icon::new(IconType::AlertTriangle)
-                                            .size(20.)
-                                            .color(colors::code_warn()),
-                                    )
-                                    .child(
-                                        label()
-                                            .text(disable::title(&current))
-                                            .font_size(text_size(16.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
-                                            .max_lines(2)
-                                            .width(Size::fill())
-                                            .color(colors::fg_primary()),
-                                    ),
-                            )
-                            .child(
-                                label()
-                                    .text(disable::summary(&current))
-                                    .font_size(text_size(12.))
-                                    .max_lines(6)
-                                    .width(Size::fill())
-                                    .color(colors::fg_secondary()),
-                            )
-                            .child(lists(&current))
-                            .child(buttons),
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
+                            .child(dialog_content)
+                            .child(dialog_actions),
                     ),
             )
             .into_element()

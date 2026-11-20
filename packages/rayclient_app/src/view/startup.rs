@@ -11,6 +11,7 @@ use crate::hooks::{
 };
 use crate::i18n::{t, tf};
 use crate::theme::{colors, rounded, text_size};
+use crate::ui::raised_card;
 
 /// Startup is a sequence of boolean gates, not measurable work, so the bar steps
 /// once per gate the launcher clears instead of tracking bytes
@@ -171,7 +172,7 @@ impl Component for Startup {
 
         let progress = rect().width(Size::px(288.)).child(progress_track(
             filled,
-            4.,
+            5.,
             dot_color,
             colors::fg_primary().with_a(30),
         ));
@@ -197,26 +198,49 @@ impl Component for Startup {
         let mut content = rect()
             .center()
             .vertical()
-            .spacing(14.)
+            .spacing(18.)
             .child(
-                SvgViewer::new(("logo.svg", logo.read().cloned()))
-                    .show_loader(false)
+                rect()
                     .width(Size::px(288.))
                     .height(Size::px(60.))
-                    .color(colors::fg_primary()),
+                    .corner_radius(rounded(30.))
+                    .shadow(
+                        Shadow::new()
+                            .x(0.)
+                            .y(0.)
+                            .blur(110.)
+                            .spread(8.)
+                            .color(colors::brand_glow(if is_error { 20 } else { 52 })),
+                    )
+                    .child(
+                        SvgViewer::new(("logo.svg", logo.read().cloned()))
+                            .show_loader(false)
+                            .width(Size::px(288.))
+                            .height(Size::px(60.))
+                            .color(colors::fg_primary()),
+                    ),
             )
             .child(
                 label()
                     .text(t("oneclient.startup.tagline"))
-                    .font_size(text_size(15.))
-                    .color(colors::fg_primary().with_a(140)),
+                    .font_size(text_size(16.))
+                    .font_weight(FontWeight::MEDIUM)
+                    .color(colors::fg_primary().with_a(150)),
             )
-            .child(rect().height(Size::px(14.)))
+            .child(rect().height(Size::px(10.)));
+
+        let mut status_card = raised_card()
+            .vertical()
+            .center()
+            .width(Size::px(360.))
+            .max_width(Size::window_percent(90.))
+            .padding(Gaps::new_symmetric(22., 28.))
+            .spacing(14.)
             .child(loading_row)
             .child(progress);
 
         if let Some(detail) = detail {
-            content = content.child(
+            status_card = status_card.child(
                 label()
                     .text(detail)
                     .font_size(text_size(12.))
@@ -224,6 +248,7 @@ impl Component for Startup {
                     .color(colors::fg_secondary().with_a(180)),
             );
         }
+        content = content.child(status_card);
 
         if is_error {
             content = content

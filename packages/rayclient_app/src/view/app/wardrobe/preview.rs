@@ -21,16 +21,16 @@ use crate::ui::border_all_color;
 
 fn panel_box() -> Rect {
     rect()
-        .corner_radius(rounded(12.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
         .overflow(Overflow::Clip)
 }
 
 fn wardrobe_panel() -> Rect {
     rect()
-        .corner_radius(rounded(16.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(18.))
+        .background(colors::card())
         .border(border_all_color(1., colors::component_border()))
 }
 

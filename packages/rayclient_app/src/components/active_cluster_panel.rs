@@ -12,7 +12,8 @@ use crate::hooks::{
 };
 use crate::i18n::t;
 use crate::routes::Route;
-use crate::theme::{colors, text_size};
+use crate::theme::{colors, rounded, text_size};
+use crate::ui::border_all_color;
 use crate::utils::sort_clusters_for_home;
 use crate::view::app::{launch_button_state, launch_syncing, shared_dir_taken};
 
@@ -107,24 +108,18 @@ impl Component for ActiveClusterPanel {
                     .width(Size::fill())
                     .max_lines(1)
                     .text_overflow(TextOverflow::Ellipsis)
-                    .font_size(text_size(56.))
-                    .line_height(1.1)
+                    .font_size(text_size(72.))
+                    .line_height(1.04)
                     .font_weight(FontWeight::BOLD)
                     .color(colors::on_art()),
             )
-            .child(
-                label()
-                    .text(subtitle)
-                    .font_size(text_size(16.))
-                    .font_weight(FontWeight::SEMI_BOLD)
-                    .color(colors::on_art_secondary()),
-            )
+            .child(info_chips(&subtitle))
             .child(
                 rect()
                     .horizontal()
-                    .spacing(8.)
+                    .spacing(12.)
                     .cross_align(Alignment::Center)
-                    .margin(Gaps::new(8., 0., 0., 0.))
+                    .margin(Gaps::new(20., 0., 0., 0.))
                     .child(launch_button(
                         cluster_id,
                         dispatch,
@@ -141,19 +136,63 @@ fn launch_button(
     state: (&'static str, bool),
 ) -> impl IntoElement {
     let (label, enabled) = state;
-    Button::new()
+    let mut button = Button::new()
         .primary()
-        .medium()
-        .font_size(text_size(16.))
-        .font_weight(FontWeight::from(450))
+        .large()
+        .font_size(text_size(20.))
+        .font_weight(FontWeight::BOLD)
         .enabled(enabled)
-        .padding(Gaps::new_symmetric(8., 24.))
+        .padding(Gaps::new_symmetric(16., 44.))
         .on_press(move |_| {
             if enabled {
                 dispatch.launch_cluster(cluster_id);
             }
+        });
+    if enabled {
+        button = button.child(Icon::new(IconType::Play).size(22.));
+    }
+    // The halo sits on a wrapper so the button keeps its own states
+    rect()
+        .corner_radius(rounded(16.))
+        .maybe(enabled, |el| {
+            el.shadow(
+                Shadow::new()
+                    .x(0.)
+                    .y(10.)
+                    .blur(36.)
+                    .spread(0.)
+                    .color(colors::brand_glow(110)),
+            )
         })
-        .text(label)
+        .child(button.text(label))
+}
+
+/// The "Ray Client · 1.21.4 · ..." line as a row of small frosted pills
+fn info_chips(subtitle: &str) -> Rect {
+    let mut row = rect()
+        .horizontal()
+        .spacing(10.)
+        .cross_align(Alignment::Center)
+        .margin(Gaps::new(14., 0., 0., 0.));
+    for (index, part) in subtitle.split(" \u{b7} ").enumerate() {
+        row = row.child(chip(part.to_string()).key(index));
+    }
+    row
+}
+
+fn chip(text: String) -> Rect {
+    rect()
+        .padding(Gaps::new_symmetric(7., 15.))
+        .corner_radius(rounded(20.))
+        .background(colors::shade().with_a(120))
+        .border(border_all_color(1., colors::on_art().with_a(55)))
+        .child(
+            label()
+                .text(text)
+                .font_size(text_size(14.))
+                .font_weight(FontWeight::SEMI_BOLD)
+                .color(colors::on_art()),
+        )
 }
 
 fn cluster_settings_button(cluster_id: i64) -> impl IntoElement {

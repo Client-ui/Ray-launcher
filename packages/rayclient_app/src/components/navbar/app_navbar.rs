@@ -131,6 +131,20 @@ fn navbar_center(is_small: bool) -> impl IntoElement {
     let over_art = matches!(route, Route::Home {});
     let browse_target = browse_target();
 
+    let capsule = if over_art {
+        // Dark glass so the white labels stay readable on any artwork or theme
+        rect()
+            .corner_radius(rounded(18.))
+            .background(Color::from_argb(120, 0, 0, 0))
+            .border(crate::ui::border_all_color(
+                1.,
+                Color::from_argb(46, 255, 255, 255),
+            ))
+            .border(crate::ui::top_sheen())
+    } else {
+        crate::ui::glass_panel().corner_radius(rounded(18.))
+    };
+
     rect()
         .horizontal()
         .width(Size::flex(1.0))
@@ -140,37 +154,43 @@ fn navbar_center(is_small: bool) -> impl IntoElement {
             Alignment::Center
         })
         .cross_align(Alignment::Center)
-        .spacing(if is_small { 12. } else { 4. })
-        .child(NavLink {
-            active: route == Route::Home {},
-            target: NavTarget::Route(Route::Home {}),
-            nav_label: t("oneclient.components.navbar.home"),
-            over_art,
-        })
-        .child(NavLink {
-            active: route == Route::Clusters {},
-            target: NavTarget::Route(Route::Clusters {}),
-            nav_label: t("oneclient.components.navbar.versions"),
-            over_art,
-        })
-        .child(NavLink {
-            active: matches!(
-                route,
-                Route::Browser {
-                    pick_cluster: true,
-                    ..
-                }
-            ),
-            target: NavTarget::Route(browse_target),
-            nav_label: t("oneclient.components.navbar.browse"),
-            over_art,
-        })
-        .child(NavLink {
-            active: route == Route::Wardrobe {},
-            target: NavTarget::Route(Route::Wardrobe {}),
-            nav_label: t("oneclient.components.navbar.wardrobe"),
-            over_art,
-        })
+        .child(
+            capsule
+                .horizontal()
+                .cross_align(Alignment::Center)
+                .spacing(4.)
+                .padding(Gaps::new_all(5.))
+                .child(NavLink {
+                    active: route == Route::Home {},
+                    target: NavTarget::Route(Route::Home {}),
+                    nav_label: t("oneclient.components.navbar.home"),
+                    over_art,
+                })
+                .child(NavLink {
+                    active: route == Route::Clusters {},
+                    target: NavTarget::Route(Route::Clusters {}),
+                    nav_label: t("oneclient.components.navbar.versions"),
+                    over_art,
+                })
+                .child(NavLink {
+                    active: matches!(
+                        route,
+                        Route::Browser {
+                            pick_cluster: true,
+                            ..
+                        }
+                    ),
+                    target: NavTarget::Route(browse_target),
+                    nav_label: t("oneclient.components.navbar.browse"),
+                    over_art,
+                })
+                .child(NavLink {
+                    active: route == Route::Wardrobe {},
+                    target: NavTarget::Route(Route::Wardrobe {}),
+                    nav_label: t("oneclient.components.navbar.wardrobe"),
+                    over_art,
+                }),
+        )
 }
 
 /// Falls back active cluster then most recently played then Versions when none exist
@@ -220,7 +240,7 @@ impl Component for NavLink {
         };
 
         let background = if active {
-            theme::colors::ghost_overlay()
+            theme::colors::brand_glow(34)
         } else if hovering() || focused().is_focused() {
             theme::colors::ghost_overlay_hover()
         } else {
@@ -231,18 +251,32 @@ impl Component for NavLink {
             .horizontal()
             .main_align(Alignment::Center)
             .cross_align(Alignment::Center)
-            .height(Size::px(36.))
+            .height(Size::px(38.))
             .width(Size::px(nav_label.len() as f32 * 10. + 34.))
-            .corner_radius(rounded(10.))
+            .corner_radius(rounded(12.))
             .background(background)
             .maybe(active, |el| {
                 el.border(
                     Border::new()
-                        .fill(theme::colors::component_border())
+                        .fill(theme::colors::brand_glow(90))
                         .width(1.)
                         .alignment(BorderAlignment::Inner),
                 )
             })
+            .maybe_child(active.then(|| {
+                // Small brand bar under the active tab, centred on the label
+                rect()
+                    .position(
+                        Position::new_absolute()
+                            .bottom(3.)
+                            .left(nav_label.len() as f32 * 5. + 9.),
+                    )
+                    .width(Size::px(16.))
+                    .height(Size::px(3.))
+                    .corner_radius(CornerRadius::new_all(2.))
+                    .background(theme::colors::brand())
+                    .into_element()
+            }))
             .a11y_id(a11y_id)
             .a11y_focusable(true)
             .a11y_role(AccessibilityRole::Button)

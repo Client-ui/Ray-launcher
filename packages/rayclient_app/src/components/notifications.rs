@@ -74,7 +74,7 @@ impl Component for NotificationPanel {
         let content = ScrollArea::new()
             .width(Size::fill())
             .height(Size::flex(1.0))
-            .spacing(8.)
+            .spacing(10.)
             .scrollbar_gutter(true)
             .children(rows);
 
@@ -83,31 +83,27 @@ impl Component for NotificationPanel {
             .content(Content::Flex)
             .width(Size::px(368.))
             .height(Size::px(480.))
-            .padding(Gaps::new_all(12.))
-            .spacing(8.)
+            .padding(Gaps::new_all(16.))
+            .spacing(12.)
             .opacity(progress)
             .margin(Gaps::new((1.0 - progress) * -8.0, 0., 0., 0.))
             .background(colors::page_elevated().with_a(220))
             .backdrop_blur(12.)
-            .corner_radius(rounded(12.))
-            .border(
-                Border::new()
-                    .fill(colors::component_border())
-                    .width(1.)
-                    .alignment(BorderAlignment::Inner),
-            )
+            .corner_radius(rounded(22.))
+            .border(crate::ui::border_all_color(1., colors::component_border()))
+            .border(crate::ui::top_sheen())
             .shadow(Shadow::from((
                 0.,
-                8.,
-                32.,
+                14.,
+                40.,
                 0.,
-                Color::from_argb(120, 0, 0, 0),
+                Color::from_argb(130, 0, 0, 0),
             )))
             .child(
                 label()
                     .text(t("oneclient.components.notifications.title"))
-                    .font_size(text_size(18.))
-                    .font_weight(FontWeight::MEDIUM)
+                    .font_size(text_size(20.))
+                    .font_weight(FontWeight::BOLD)
                     .a11y_role(AccessibilityRole::TitleBar),
             )
             .child(divider())
@@ -159,8 +155,21 @@ impl Component for NotifEntryRow {
             .width(Size::fill())
             .spacing(13.)
             .cross_align(Alignment::Start)
-            .padding(Gaps::new_all(8.))
-            .corner_radius(rounded(8.))
+            .padding(Gaps::new_all(12.))
+            .corner_radius(rounded(14.))
+            .background(if entry.read {
+                colors::component_bg()
+            } else {
+                colors::brand_glow(34)
+            })
+            .border(crate::ui::border_all_color(
+                1.,
+                if entry.read {
+                    colors::component_border()
+                } else {
+                    colors::brand_glow(90)
+                },
+            ))
             .maybe(*hovered.read() && !has_actions, |el| {
                 el.background(colors::ghost_overlay_hover())
             })
@@ -174,18 +183,21 @@ impl Component for NotifEntryRow {
             })
             .child(
                 rect()
-                    .width(Size::px(32.))
-                    .height(Size::px(32.))
-                    .corner_radius(rounded(6.))
+                    .width(Size::px(40.))
+                    .height(Size::px(40.))
+                    .corner_radius(rounded(12.))
+                    .background(level_color(&entry.level).with_a(30))
                     .center()
                     .child(
                         Icon::new(icon_for(&entry))
-                            .size(24.)
+                            .size(22.)
                             .color(level_color(&entry.level)),
                     ),
             )
             .child(row_body(&entry, body_dispatch, confirm_link));
 
+        // Rows are cards now so the hairline between them is redundant
+        let _ = self.show_divider;
         rect()
             .vertical()
             .width(Size::fill())
@@ -194,7 +206,6 @@ impl Component for NotifEntryRow {
             .maybe(!entry.tasks.is_empty(), |el| {
                 el.child(tasks_section(&entry, expanded))
             })
-            .maybe(self.show_divider, |el| el.child(divider()))
     }
 }
 
@@ -208,7 +219,7 @@ fn tasks_section(entry: &InboxEntry, mut expanded: State<bool>) -> impl IntoElem
         .vertical()
         .width(Size::fill())
         .spacing(6.)
-        .margin(Gaps::new(2., 0., 0., 44.))
+        .margin(Gaps::new(2., 0., 0., 56.))
         .child(
             rect()
                 .horizontal()
@@ -359,7 +370,7 @@ fn row_body(
                     label()
                         .text(entry.title.clone())
                         .font_size(text_size(14.))
-                        .font_weight(FontWeight::MEDIUM)
+                        .font_weight(FontWeight::BOLD)
                         .color(level_color(&entry.level))
                         .width(Size::flex(1.0)),
                 )

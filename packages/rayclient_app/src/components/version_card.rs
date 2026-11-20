@@ -8,7 +8,7 @@ use crate::theme::{colors, rounded, text_size};
 use crate::ui::border_all_color;
 use crate::utils::{GridSelection, ReleaseLine, line_art_key, line_title};
 
-const CARD_HEIGHT_PX: f32 = 150.;
+const CARD_HEIGHT_PX: f32 = 188.;
 
 pub struct VersionCard {
     pub key: GridSelection,
@@ -93,15 +93,15 @@ impl Component for VersionCard {
         let art_opacity = if selected {
             1.0
         } else if hovered || focused {
-            0.85
+            0.92
         } else {
-            0.6
+            0.62
         };
 
         let border = if selected || focused {
             border_all_color(2., colors::brand())
         } else if hovered {
-            border_all_color(1., colors::component_border_hover())
+            border_all_color(2., colors::lighten(colors::component_border_hover(), 0.08))
         } else {
             border_all_color(1., colors::component_border())
         };
@@ -110,9 +110,21 @@ impl Component for VersionCard {
             .key(self.key)
             .width(Size::fill())
             .height(Size::px(CARD_HEIGHT_PX))
-            .corner_radius(rounded(16.))
+            .corner_radius(rounded(20.))
             .overflow(Overflow::Clip)
             .background(colors::page_elevated())
+            .offset_y(if hovered && !selected { -2. } else { 0. })
+            .maybe(selected, |el| {
+                // A brand glow lifts the chosen card off the grid
+                el.shadow(
+                    Shadow::new()
+                        .x(0.)
+                        .y(6.)
+                        .blur(24.)
+                        .spread(0.)
+                        .color(colors::brand_glow(70)),
+                )
+            })
             .a11y_id(a11y_id)
             .a11y_focusable(true)
             .a11y_role(AccessibilityRole::Button)
@@ -141,10 +153,10 @@ impl Component for VersionCard {
                 rect()
                     .width(Size::fill())
                     .height(Size::fill())
-                    .padding(12.)
-                    .spacing(5.)
+                    .padding(Gaps::new(14., 16., 14., 16.))
+                    .spacing(4.)
                     .main_align(Alignment::End)
-                    .corner_radius(rounded(16.))
+                    .corner_radius(rounded(20.))
                     .border(border.alignment(BorderAlignment::Inner))
                     .layer(Layer::Relative(3))
                     .background(
@@ -157,26 +169,31 @@ impl Component for VersionCard {
                     .child(
                         label()
                             .text(self.title.clone())
-                            .font_size(text_size(22.))
-                            .font_weight(FontWeight::SEMI_BOLD)
+                            .font_size(text_size(30.))
+                            .line_height(1.05)
+                            .font_weight(FontWeight::BOLD)
+                            .max_lines(1)
+                            .text_overflow(TextOverflow::Ellipsis)
                             .color(Color::WHITE),
                     )
                     .child(
                         label()
                             .text(self.caption.clone())
-                            .font_size(text_size(11.))
+                            .font_size(text_size(12.))
+                            .font_weight(FontWeight::MEDIUM)
                             .max_lines(1)
                             .text_overflow(TextOverflow::Ellipsis)
-                            .color(colors::on_media().with_a(150)),
+                            .color(colors::on_media().with_a(175)),
                     ),
             )
             .maybe_child((self.count > 1).then(|| {
                 rect()
-                    .position(Position::new_absolute().top(8.).right(8.))
+                    .position(Position::new_absolute().top(12.).right(12.))
                     .layer(Layer::Relative(4))
-                    .padding(Gaps::new_symmetric(4., 8.))
-                    .corner_radius(rounded(6.))
+                    .padding(Gaps::new_symmetric(4., 10.))
+                    .corner_radius(rounded(10.))
                     .background(Color::from_af32rgb(0.66, 11, 16, 19))
+                    .border(border_all_color(1., Color::from_argb(60, 255, 255, 255)))
                     .child(
                         label()
                             .text(tf(

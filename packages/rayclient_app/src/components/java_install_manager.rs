@@ -1,6 +1,7 @@
 use freya::prelude::*;
 use rayclient_java::{AvailableJava, JavaVendor};
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{Button, Dropdown, Icon, IconType, OverlayPopup, ScrollArea};
 use crate::hooks::{java_runtimes, provider_versions, use_java_runtimes, use_provider_versions};
 use crate::i18n::{t, tf};
@@ -140,9 +141,7 @@ impl Component for JavaInstallManager {
                             .max_width(Size::window_percent(90.))
                             .spacing(16.)
                             .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(16.))
-                            .background(colors::page_elevated())
-                            .border(border_all_color(1., colors::component_border()))
+                            .dialog_surface()
                             .child(
                                 label()
                                     .text(t("oneclient.components.java_install_manager.title"))

@@ -3,12 +3,12 @@ use std::time::Duration;
 use freya::prelude::*;
 use rayclient_events::Answer;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, Icon, IconType, OverlayPopup};
 use crate::hooks::{use_dispatch, use_notifications_snapshot};
 use crate::i18n::t;
 use crate::microsoft_java::{MICROSOFT_JAVA_CHOICE_INSTALL, MICROSOFT_JAVA_CHOICE_NEVER};
-use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
+use crate::theme::{colors, text_size};
 
 const HOLD_SECONDS: u8 = 3;
 
@@ -79,6 +79,80 @@ impl Component for MicrosoftJavaPromptOverlay {
         let never = dispatch.clone();
         let accept = dispatch.clone();
 
+        let dialog_content = dialog_body()
+            .child(
+                rect()
+                    .horizontal()
+                    .cross_align(Alignment::Center)
+                    .spacing(10.)
+                    .child(
+                        Icon::new(IconType::DownloadCloud02)
+                            .size(20.)
+                            .color(colors::brand()),
+                    )
+                    .child(
+                        label()
+                            .text(prompt.title.clone())
+                            .font_size(text_size(18.))
+                            .font_weight(FontWeight::BOLD)
+                            .color(colors::fg_primary()),
+                    ),
+            )
+            .child(
+                label()
+                    .text(prompt.question.clone())
+                    .font_size(text_size(12.))
+                    .max_lines(6)
+                    .width(Size::fill())
+                    .color(colors::fg_secondary()),
+            );
+        let dialog_actions = dialog_footer(
+            rect()
+                .horizontal()
+                .width(Size::fill())
+                .cross_align(Alignment::Center)
+                .main_align(Alignment::SpaceBetween)
+                .child(
+                    label()
+                        .text(if locked {
+                            held.to_string()
+                        } else {
+                            String::new()
+                        })
+                        .font_size(text_size(12.))
+                        .color(colors::fg_secondary()),
+                )
+                .child(
+                    rect()
+                        .horizontal()
+                        .spacing(8.)
+                        .child(
+                            Button::new()
+                                .secondary()
+                                .disabled(locked)
+                                .on_press(move |_| cancel.dismiss_prompt())
+                                .text(dismiss_label),
+                        )
+                        .child(
+                            Button::new()
+                                .secondary()
+                                .disabled(locked)
+                                .on_press(move |_| {
+                                    never.answer_prompt(Answer::new(MICROSOFT_JAVA_CHOICE_NEVER))
+                                })
+                                .text(never_label),
+                        )
+                        .child(
+                            Button::new()
+                                .primary()
+                                .on_press(move |_| {
+                                    accept.answer_prompt(Answer::new(MICROSOFT_JAVA_CHOICE_INSTALL))
+                                })
+                                .child(Icon::new(IconType::DownloadCloud02).size(14.))
+                                .text(install_label),
+                        ),
+                ),
+        );
         OverlayPopup::new()
             // Closing from the backdrop is a dismissal too so it waits as well
             .on_close(move |_| {
@@ -96,91 +170,10 @@ impl Component for MicrosoftJavaPromptOverlay {
                             .vertical()
                             .width(Size::px(440.))
                             .max_width(Size::window_percent(90.))
-                            .spacing(14.)
-                            .padding(Gaps::new_all(20.))
-                            .corner_radius(rounded(14.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .cross_align(Alignment::Center)
-                                    .spacing(10.)
-                                    .child(
-                                        Icon::new(IconType::DownloadCloud02)
-                                            .size(20.)
-                                            .color(colors::brand()),
-                                    )
-                                    .child(
-                                        label()
-                                            .text(prompt.title.clone())
-                                            .font_size(text_size(16.))
-                                            .font_weight(FontWeight::SEMI_BOLD)
-                                            .color(colors::fg_primary()),
-                                    ),
-                            )
-                            .child(
-                                label()
-                                    .text(prompt.question.clone())
-                                    .font_size(text_size(12.))
-                                    .max_lines(6)
-                                    .width(Size::fill())
-                                    .color(colors::fg_secondary()),
-                            )
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .width(Size::fill())
-                                    .cross_align(Alignment::Center)
-                                    .main_align(Alignment::SpaceBetween)
-                                    .child(
-                                        label()
-                                            .text(if locked {
-                                                held.to_string()
-                                            } else {
-                                                String::new()
-                                            })
-                                            .font_size(text_size(12.))
-                                            .color(colors::fg_secondary()),
-                                    )
-                                    .child(
-                                        rect()
-                                            .horizontal()
-                                            .spacing(8.)
-                                            .child(
-                                                Button::new()
-                                                    .secondary()
-                                                    .disabled(locked)
-                                                    .on_press(move |_| cancel.dismiss_prompt())
-                                                    .text(dismiss_label),
-                                            )
-                                            .child(
-                                                Button::new()
-                                                    .secondary()
-                                                    .disabled(locked)
-                                                    .on_press(move |_| {
-                                                        never.answer_prompt(Answer::new(
-                                                            MICROSOFT_JAVA_CHOICE_NEVER,
-                                                        ))
-                                                    })
-                                                    .text(never_label),
-                                            )
-                                            .child(
-                                                Button::new()
-                                                    .primary()
-                                                    .on_press(move |_| {
-                                                        accept.answer_prompt(Answer::new(
-                                                            MICROSOFT_JAVA_CHOICE_INSTALL,
-                                                        ))
-                                                    })
-                                                    .child(
-                                                        Icon::new(IconType::DownloadCloud02)
-                                                            .size(14.),
-                                                    )
-                                                    .text(install_label),
-                                            ),
-                                    ),
-                            ),
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
+                            .child(dialog_content)
+                            .child(dialog_actions),
                     ),
             )
             .into_element()

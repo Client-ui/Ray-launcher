@@ -19,7 +19,7 @@ use crate::theme::{colors, rounded, text_size};
 use crate::ui::{border_all, border_all_color};
 use crate::utils::sort_clusters_for_home;
 
-const ROW_HEIGHT_PX: f32 = 208.0;
+const ROW_HEIGHT_PX: f32 = 220.0;
 const CARD_GAP_PX: f32 = 24.0;
 const MORE_TILE_WIDTH_PX: f32 = 96.0;
 const MIN_CARD_WIDTH_PX: f32 = 300.0;
@@ -204,13 +204,16 @@ impl Component for ClusterCard {
                     .width(Size::fill())
                     .height(Size::fill())
                     .position(Position::new_absolute())
-                    .corner_radius(rounded(12.))
+                    .corner_radius(rounded(20.))
                     .overflow(Overflow::Clip)
                     .border(
                         if active || focused {
                             border_all_color(2., colors::brand())
                         } else if *hovering.read() {
-                            border_all_color(1., colors::component_border_hover())
+                            border_all_color(
+                                2.,
+                                colors::lighten(colors::component_border_hover(), 0.08),
+                            )
                         } else {
                             border_all(1.)
                         }
@@ -227,14 +230,21 @@ impl Component for ClusterCard {
                     .on_pointer_out(move |_| {
                         *hovering.write() = false;
                     })
-                    .shadow(
+                    .shadow(if active {
+                        Shadow::new()
+                            .blur(28.)
+                            .spread(0.)
+                            .x(0.)
+                            .y(8.)
+                            .color(colors::brand_glow(80))
+                    } else {
                         Shadow::new()
                             .blur(24.)
                             .spread(12.)
                             .x(0.)
                             .y(0.)
-                            .color(Color::from_af32rgb(0.3, 0, 0, 0)),
-                    )
+                            .color(Color::from_af32rgb(0.3, 0, 0, 0))
+                    })
                     .on_press(on_press)
                     .on_secondary_down(move |e: Event<PressEventData>| {
                         if let PressEventData::Mouse(m) = e.data() {

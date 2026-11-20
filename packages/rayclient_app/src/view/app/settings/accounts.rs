@@ -187,8 +187,9 @@ fn hero(
         .cross_align(Alignment::Center)
         .spacing(16.)
         .padding(Gaps::new_all(16.))
-        .corner_radius(rounded(12.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
+        .border(border_all_color(1., colors::component_border()))
         .child(model_frame(account.as_ref().map(|account| account.id)))
         .child(
             rect()
@@ -524,8 +525,8 @@ impl Component for AccountRow {
             .content(Content::Flex)
             .spacing(12.)
             .padding(Gaps::new_all(12.))
-            .corner_radius(rounded(12.))
-            .background(colors::page_elevated())
+            .corner_radius(rounded(16.))
+            .background(colors::card())
             .border(border_all_color(1., border_color))
             .opacity(if is_refreshing {
                 REFRESHING_OPACITY
@@ -782,8 +783,9 @@ fn empty_state() -> Element {
         .center()
         .padding(Gaps::new_all(32.))
         .spacing(8.)
-        .corner_radius(rounded(12.))
-        .background(colors::page_elevated())
+        .corner_radius(rounded(16.))
+        .background(colors::card())
+        .border(border_all_color(1., colors::component_border()))
         .child(
             Icon::new(IconType::Users01)
                 .size(32.)

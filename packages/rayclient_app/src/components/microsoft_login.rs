@@ -6,6 +6,7 @@ use freya::text_edit::Clipboard;
 use rayclient_auth::{AuthErrorGuidance, MicrosoftLoginSession};
 use rayclient_core::LauncherError;
 
+use crate::components::overlay_popup::DialogSurface;
 use crate::components::{Button, Icon, IconType, OverlayPopup, ScrollArea};
 use crate::hooks::{
     CancelMicrosoftLoginKeys, login_code_already_handled, reset_login_code_dedup,
@@ -203,9 +204,7 @@ pub(crate) fn login_dialog(
                         .cross_align(Alignment::Center)
                         .spacing(18.)
                         .padding(Gaps::new_all(28.))
-                        .corner_radius(rounded(16.))
-                        .background(colors::page_elevated())
-                        .border(border_all_color(1., colors::component_border()))
+                        .dialog_surface()
                         .child(
                             label()
                                 .text(t("oneclient.components.microsoft_login.title"))

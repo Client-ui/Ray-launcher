@@ -52,7 +52,7 @@ fn header() -> Element {
         .child(
             label()
                 .text(t("oneclient.stats.title"))
-                .font_size(text_size(32.))
+                .font_size(text_size(36.))
                 .font_weight(FontWeight::BOLD)
                 .color(colors::fg_primary()),
         )

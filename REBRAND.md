@@ -70,7 +70,7 @@ cargo run -p rayclient_app
 - Dark and orange theme (`assets/themes/dark.json`, `light.json`); Minecraft themes removed, old settings fall back to Ray Dark.
 - Default UI font is Inter (readable, no pixel font).
 - Offline accounts no longer require a Microsoft account first (also offered in first-run setup).
-- Only Minecraft 1.21.11 (Fabric) is offered. The catalog is `rayclient_core/assets/versions.json`; the Ray Client bundle (Ray Client 1.0.5 jar + Fabric API) is `rayclient_content/assets/ray-client-1.21.11.polymrpack`. Both are built in, so startup makes no catalog requests.
+- Minecraft 1.20 to 1.21.11 on Fabric is offered (no 1.20.5). The catalog is `rayclient_core/assets/versions.json`; each version has its own Ray Client 1.1.1 bundle in `rayclient_content/assets/ray-client-<mc>.polymrpack`. All are built in, so startup makes no catalog requests. 1.21.11 also pins Fabric API and the performance mods; the other versions carry only the Ray jar and get Fabric API from Modrinth on install.
 - Eight bundled orange wallpapers, picked per instance; wallpapers fade in.
 - App icons regenerated from the new R logo.
 - Fabric API in the bundle is pinned by Modrinth version id (0.141.3+1.21.11); its sha1 field is a placeholder because install resolves it by id.
@@ -81,3 +81,16 @@ cargo run -p rayclient_app
 - 22 bundled wallpapers; six extra themes (AMOLED, Midnight, Ocean, Forest, Rose, Sunset).
 - New installs default to tuned G1 JVM flags (editable in Java settings).
 - Nightly CI: the Apple Silicon job can no longer fail the whole run.
+
+## Adding or updating a Ray Client version
+
+1. Put the jars in a folder, named `ray-client-mc<MC>-<VERSION>.jar`.
+2. `python3 tools/build_version_bundles.py <folder>` regenerates `rayclient_content/assets/ray-client-<MC>.polymrpack`.
+3. Add the version to `rayclient_core/assets/versions.json` and to the `embedded_bundles!` list in `rayclient_content/src/bundles/manager.rs`.
+4. Companion mods that must be pinned for a version go in `tools/bundle_extras/<MC>.json` (see `1.21.11.json`).
+
+## Visual refresh
+
+Everything is driven by the palette tokens in `rayclient_app/assets/themes/*.json` plus `radius_scale` (now 1.2) and the helpers in `theme/colors.rs` (`lighten`, `brand_glow`, `sheen`). Component changes: `button.rs` (raised primary), `navbar/app_navbar.rs` (active pill), `version_card.rs` (selected glow), `active_cluster_panel.rs` (pills, Play button).
+
+> These changes were written without a Rust toolchain that could fetch crates, so they are unbuilt. Run `cargo check --workspace` first.

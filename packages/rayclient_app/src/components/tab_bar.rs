@@ -1,6 +1,7 @@
 use freya::prelude::*;
 
 use crate::theme::{colors, rounded, text_size};
+use crate::ui;
 
 pub struct TabItem {
     label: String,
@@ -138,7 +139,7 @@ fn count_pill(count: &str, font_size: f32) -> impl IntoElement {
     rect()
         .center()
         .padding(Gaps::new_symmetric(1., 6.))
-        .corner_radius(rounded(10.))
+        .corner_radius(rounded(12.))
         .background(colors::component_bg())
         .child(
             label()
@@ -205,13 +206,27 @@ impl Component for TabButton {
 
         let active = self.active;
         let font_size = self.font_size;
-        let underline_on = active || focus().is_focused();
 
+        let focused = focus().is_focused();
         let mut el = rect()
             .vertical()
             .content(Content::Fit)
+            .main_align(Alignment::Center)
             .cross_align(Alignment::Center)
+            .padding(Gaps::new_symmetric(6., 14.))
+            .corner_radius(rounded(12.))
             .map(self.min_width, |el, w| el.min_width(Size::px(w)))
+            .background(if active {
+                colors::brand_glow(34)
+            } else {
+                Color::TRANSPARENT
+            })
+            .maybe(active, |el| {
+                el.border(ui::border_all_color(1., colors::brand_glow(90)))
+            })
+            .maybe(focused && !active, |el| {
+                el.border(ui::border_all_color(1., colors::brand()))
+            })
             .a11y_id(a11y_id)
             .a11y_focusable(true)
             .a11y_role(AccessibilityRole::Button)
@@ -227,24 +242,7 @@ impl Component for TabButton {
                 .cross_align(Alignment::Center)
                 .spacing(6.)
                 .content(Content::Fit)
-                .child(
-                    rect()
-                        .vertical()
-                        .content(Content::Fit)
-                        .child(tab_label(&self.label, font_size, active, self.accent))
-                        .child(
-                            rect()
-                                .height(Size::px(2.))
-                                .width(Size::fill_minimum())
-                                .margin(Gaps::new_symmetric(0., 4.0))
-                                .corner_radius(rounded(2.))
-                                .background(if underline_on {
-                                    self.accent.unwrap_or_else(colors::fg_primary)
-                                } else {
-                                    Color::TRANSPARENT
-                                }),
-                        ),
-                )
+                .child(tab_label(&self.label, font_size, active, self.accent))
                 .maybe_child(
                     self.count
                         .as_ref()

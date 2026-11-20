@@ -2,11 +2,11 @@ use std::collections::HashSet;
 
 use freya::prelude::*;
 
+use crate::components::overlay_popup::{DialogSurface, dialog_body, dialog_footer};
 use crate::components::{Button, Icon, IconType, OverlayPopup, ScrollArea, toggle_controlled};
 use crate::hooks::{use_dispatch, use_notifications_snapshot};
 use crate::i18n::{t, tf};
 use crate::theme::{colors, rounded, text_size};
-use crate::ui::border_all_color;
 
 const DIALOG_W: f32 = 460.;
 const LIST_MAX_H: f32 = 306.;
@@ -69,6 +69,63 @@ impl Component for BundleChoicesPopup {
         let later = dispatch.clone();
         let close = dispatch.clone();
 
+        let dialog_content = dialog_body()
+            .child(
+                label()
+                    .text(t("oneclient.components.bundle_choices_popup.title"))
+                    .font_size(text_size(18.))
+                    .font_weight(FontWeight::BOLD)
+                    .color(colors::fg_primary()),
+            )
+            .child(
+                label()
+                    .text(tf(
+                        "oneclient.components.bundle_choices_popup.description",
+                        &[&choices.cluster_name],
+                    ))
+                    .font_size(text_size(12.5))
+                    .max_lines(4)
+                    .color(colors::fg_secondary()),
+            )
+            .child(
+                ScrollArea::new()
+                    .width(Size::fill())
+                    .height(Size::Inner)
+                    .max_height(Size::px(LIST_MAX_H))
+                    .child(list),
+            );
+        let dialog_actions = dialog_footer(
+            rect()
+                .horizontal()
+                .width(Size::fill())
+                .main_align(Alignment::End)
+                .spacing(8.)
+                .child(
+                    Button::new()
+                        .ghost()
+                        .on_press(move |_| {
+                            chosen.set(HashSet::new());
+                            later.close_bundle_choices(None);
+                        })
+                        .text(t("oneclient.components.bundle_choices_popup.later")),
+                )
+                .child(
+                    Button::new()
+                        .primary()
+                        .on_press(move |_| {
+                            let flipped = chosen.read().clone();
+                            let picked = names
+                                .iter()
+                                .filter(|name| held.contains(*name) != flipped.contains(*name))
+                                .cloned()
+                                .collect();
+                            chosen.set(HashSet::new());
+                            dispatch.close_bundle_choices(Some(picked));
+                        })
+                        .child(Icon::new(IconType::Check).size(15.))
+                        .text(t("oneclient.components.bundle_choices_popup.confirm")),
+                ),
+        );
         OverlayPopup::new()
             .on_close(move |_| {
                 chosen.set(HashSet::new());
@@ -86,74 +143,10 @@ impl Component for BundleChoicesPopup {
                             .height(Size::Inner)
                             .max_width(Size::window_percent(95.))
                             .max_height(Size::window_percent(85.))
-                            .padding(Gaps::new_all(22.))
-                            .spacing(14.)
-                            .corner_radius(rounded(16.))
-                            .background(colors::card())
-                            .border(border_all_color(1., colors::component_border()))
-                            .child(
-                                label()
-                                    .text(t("oneclient.components.bundle_choices_popup.title"))
-                                    .font_size(text_size(17.))
-                                    .font_weight(FontWeight::SEMI_BOLD)
-                                    .color(colors::fg_primary()),
-                            )
-                            .child(
-                                label()
-                                    .text(tf(
-                                        "oneclient.components.bundle_choices_popup.description",
-                                        &[&choices.cluster_name],
-                                    ))
-                                    .font_size(text_size(12.5))
-                                    .max_lines(4)
-                                    .color(colors::fg_secondary()),
-                            )
-                            .child(
-                                ScrollArea::new()
-                                    .width(Size::fill())
-                                    .height(Size::Inner)
-                                    .max_height(Size::px(LIST_MAX_H))
-                                    .child(list),
-                            )
-                            .child(
-                                rect()
-                                    .horizontal()
-                                    .width(Size::fill())
-                                    .main_align(Alignment::End)
-                                    .spacing(8.)
-                                    .child(
-                                        Button::new()
-                                            .ghost()
-                                            .on_press(move |_| {
-                                                chosen.set(HashSet::new());
-                                                later.close_bundle_choices(None);
-                                            })
-                                            .text(t(
-                                                "oneclient.components.bundle_choices_popup.later",
-                                            )),
-                                    )
-                                    .child(
-                                        Button::new()
-                                            .primary()
-                                            .on_press(move |_| {
-                                                let flipped = chosen.read().clone();
-                                                let picked = names
-                                                    .iter()
-                                                    .filter(|name| {
-                                                        held.contains(*name)
-                                                            != flipped.contains(*name)
-                                                    })
-                                                    .cloned()
-                                                    .collect();
-                                                chosen.set(HashSet::new());
-                                                dispatch.close_bundle_choices(Some(picked));
-                                            })
-                                            .child(Icon::new(IconType::Check).size(15.))
-                                            .text(t(
-                                                "oneclient.components.bundle_choices_popup.confirm",
-                                            )),
-                                    ),
-                            ),
+                            .overflow(Overflow::Clip)
+                            .dialog_surface()
+                            .child(dialog_content)
+                            .child(dialog_actions),
                     ),
             )
             .into_element()

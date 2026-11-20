@@ -4,6 +4,7 @@ use freya::prelude::*;
 use rayclient_core::ScreenshotInfo;
 use rayclient_core::settings::ViewLayout;
 
+use crate::components::DialogSurface;
 use crate::components::{
     Button, ContextMenu, Icon, IconType, LocalImage, OverlayPopup, ScreenshotViewer, ScrollArea,
     Segment, SegmentedControl, open_folder_button, screenshot_context_menu,
@@ -387,9 +388,7 @@ fn confirm_panel(
                         .max_width(Size::window_percent(90.))
                         .spacing(14.)
                         .padding(Gaps::new_all(20.))
-                        .corner_radius(rounded(14.))
-                        .background(colors::card())
-                        .border(border_all_color(1., colors::component_border()))
+                        .dialog_surface()
                         .child(
                             label()
                                 .text(if count == 1 {
@@ -500,7 +499,7 @@ impl Component for ScreenshotTile {
             .vertical()
             .width(Size::flex(1.0))
             .max_width(Size::px(MAX_COL_W))
-            .corner_radius(rounded(10.))
+            .corner_radius(rounded(14.))
             .background(colors::card())
             .overflow(Overflow::Clip)
             .border(border_all_color(1., border_color).alignment(BorderAlignment::Inner))

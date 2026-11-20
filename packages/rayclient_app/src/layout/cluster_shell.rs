@@ -9,8 +9,8 @@ use crate::hooks::{
 };
 use crate::i18n::t;
 use crate::routes::Route;
-use crate::theme::{colors, text_size};
-use crate::ui::entrance_motion_layer;
+use crate::theme::{colors, rounded, text_size};
+use crate::ui::{border_all_color, entrance_motion_layer, top_sheen};
 use crate::view::app::ExportInstanceModal;
 use crate::view::app::{launch_button_state, launch_syncing, use_shared_dir_taken};
 
@@ -326,9 +326,20 @@ fn cluster_header(
         .horizontal()
         .content(Content::Flex)
         .width(Size::fill())
-        .min_height(Size::px(HEADER_HEIGHT))
+        .min_height(Size::px(HEADER_HEIGHT + 24.))
         .cross_align(Alignment::Center)
-        .spacing(12.)
+        .spacing(16.)
+        .padding(Gaps::new_symmetric(16., 22.))
+        .corner_radius(rounded(22.))
+        .background(
+            LinearGradient::new()
+                .angle(90.)
+                .stop((colors::brand_glow(46), 0.))
+                .stop((colors::card(), 70.))
+                .stop((colors::lighten(colors::card(), 0.03), 100.)),
+        )
+        .border(border_all_color(1., colors::component_border()))
+        .border(top_sheen())
         .child(
             rect()
                 .vertical()
@@ -338,8 +349,10 @@ fn cluster_header(
                 .child(
                     label()
                         .text(title)
-                        .font_size(text_size(28.))
+                        .font_size(text_size(30.))
                         .font_weight(FontWeight::BOLD)
+                        .max_lines(1)
+                        .text_overflow(TextOverflow::Ellipsis)
                         .color(colors::fg_primary()),
                 )
                 .child(

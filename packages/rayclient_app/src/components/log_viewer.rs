@@ -208,7 +208,7 @@ impl Component for LogViewer {
             .height(Size::fill())
             .overflow(Overflow::Clip)
             .background(colors::page_elevated())
-            .corner_radius(rounded(12.))
+            .corner_radius(rounded(16.))
             .maybe_child(
                 (!self.title.is_empty() || streaming)
                     .then(|| toolbar(self.title.clone(), streaming, auto_scroll)),
