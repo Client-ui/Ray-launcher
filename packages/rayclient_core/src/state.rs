@@ -179,14 +179,8 @@ pub fn run_startup_tasks(state: &Arc<LauncherState>) {
             tracing::error!("cluster migrations failed: {err:#}");
         }
 
-        if let Err(err) = crate::clusters::ensure_from_versions(&background).await {
-            tracing::error!("versions cluster provisioning failed: {err:#}");
-        } else {
-            background
-                .services
-                .events
-                .signal(rayclient_events::Signal::ClustersChanged);
-        }
+        // Ray Client versions are no longer provisioned as instances at startup; the
+        // player adds the ones they want from the create-instance wizard
 
         // Must run last judging an artifact unused before recovery bundle
         // tracking and provisioning have restored their rows would evict

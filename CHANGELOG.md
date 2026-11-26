@@ -2,7 +2,7 @@
 
 ### Features
 
-- Ray Client 1.1.1 for Minecraft 1.20, 1.20.1 to 1.20.4, 1.20.6 and 1.21 to 1.21.11 (Fabric). Each version ships its own bundle, built by `tools/build_version_bundles.py`
+- Ray Client 1.1.1 for Minecraft 1.20, 1.20.1 to 1.20.6 and 1.21 to 1.21.11 (Fabric). Each version ships its own bundle, built by `tools/build_version_bundles.py`
 - Fabric API is added automatically for the versions whose bundle only carries the Ray jar
 - Redesigned look: layered surfaces with hairline borders, softer corners (new "Default" corner preset), refreshed palettes for all 15 built-in themes
 - Primary buttons are lit from above with a soft brand glow, the active nav tab has a brand pill and bar, the selected version card glows

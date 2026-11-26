@@ -1850,9 +1850,6 @@ impl Actions {
                 if let Err(err) = rayclient_core::clusters::apply_remote_migrations(&state).await {
                     tracing::error!("cluster migrations failed: {err:#}");
                 }
-                if let Err(err) = rayclient_core::clusters::ensure_from_bundles(&state).await {
-                    tracing::error!("bundle cluster provisioning failed: {err:#}");
-                }
             })
             .await;
 

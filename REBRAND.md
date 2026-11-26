@@ -70,7 +70,7 @@ cargo run -p rayclient_app
 - Dark and orange theme (`assets/themes/dark.json`, `light.json`); Minecraft themes removed, old settings fall back to Ray Dark.
 - Default UI font is Inter (readable, no pixel font).
 - Offline accounts no longer require a Microsoft account first (also offered in first-run setup).
-- Minecraft 1.20 to 1.21.11 on Fabric is offered (no 1.20.5). The catalog is `rayclient_core/assets/versions.json`; each version has its own Ray Client 1.1.1 bundle in `rayclient_content/assets/ray-client-<mc>.polymrpack`. All are built in, so startup makes no catalog requests. 1.21.11 also pins Fabric API and the performance mods; the other versions carry only the Ray jar and get Fabric API from Modrinth on install.
+- Minecraft 1.20 to 1.21.11 on Fabric is offered. The catalog is `rayclient_core/assets/versions.json`; each version has its own Ray Client 1.1.1 bundle in `rayclient_content/assets/ray-client-<mc>.polymrpack`. All are built in, so startup makes no catalog requests. 1.21.11 also pins Fabric API and the performance mods; the other versions carry only the Ray jar and get Fabric API from Modrinth on install.
 - Eight bundled orange wallpapers, picked per instance; wallpapers fade in.
 - App icons regenerated from the new R logo.
 - Fabric API in the bundle is pinned by Modrinth version id (0.141.3+1.21.11); its sha1 field is a placeholder because install resolves it by id.
